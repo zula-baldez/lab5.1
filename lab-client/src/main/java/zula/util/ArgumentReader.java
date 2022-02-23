@@ -85,7 +85,7 @@ public class ArgumentReader {
     }
 
     public Color readColor() {
-        consoleManager.getOutputManager().write("Введите цвет из предложенных вариантов: ");
+        consoleManager.getOutputManager().write("Введите цвет из предложенных вариантов. может быть null. Для ввода null введите пустую строку");
         Color[] colors = Color.values();
         for (Color color : colors) {
             consoleManager.getOutputManager().write(color.toString());

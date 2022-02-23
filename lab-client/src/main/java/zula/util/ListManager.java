@@ -121,9 +121,13 @@ public class ListManager {
             consoleManager.getOutputManager().write("Нечего удалять");
         }
     }
-    public void removeById(int id) {
-        dragons.removeIf(n -> n.getId() == id);
-        usedId.remove(id);
+    public void removeById(ConsoleManager consoleManager, int id) {
+        if(consoleManager.getListManager().idIsUsed(id)) {
+            dragons.removeIf(n -> n.getId() == id);
+            usedId.remove(id);
+        } else {
+            consoleManager.getOutputManager().write("Элемента с id=" + id + " не существует. Проверьте правильность введенных данных.");
+        }
     }
     public void removeLower(ConsoleManager consoleManager, int id) {
         if (consoleManager.getListManager().idIsUsed(id)) {
