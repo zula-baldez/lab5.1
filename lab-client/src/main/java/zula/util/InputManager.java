@@ -3,10 +3,12 @@ package zula.util;
 
 import zula.exceptions.EndOfFileException;
 
+import javax.swing.plaf.IconUIResource;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 public class InputManager {
@@ -37,7 +39,7 @@ public class InputManager {
         return path;
     }
     public void setFileReading(boolean readingFromFile, String pathToFile) throws FileNotFoundException {
-        inputStreamReader = new InputStreamReader(new FileInputStream(pathToFile));
+        inputStreamReader = new InputStreamReader(new FileInputStream(pathToFile), StandardCharsets.UTF_8);
         this.fileReading = readingFromFile;
         this.path = pathToFile;
     }
@@ -50,10 +52,14 @@ public class InputManager {
     public String readLine() throws IOException, EndOfFileException {
         StringBuilder readedLine = new StringBuilder();
         while (inputStreamReader.ready()) {
-
             char readedSymbol = (char) inputStreamReader.read();
-            if (readedSymbol == '\n') {
-                return readedLine.substring(0, readedLine.length() - 1);
+            if (readedSymbol == '\n' | readedSymbol  == '\r') {
+                if(readedSymbol == '\r') {
+                    inputStreamReader.read();
+                    return readedLine.toString();
+                } else {
+                    return readedLine.toString();
+                }
             } else {
                 readedLine.append(readedSymbol);
             }

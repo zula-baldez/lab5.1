@@ -1,10 +1,7 @@
 package zula.parser;
-
-
 import zula.commands.Command;
 import zula.exceptions.WrongCommandException;
 import zula.util.ConsoleManager;
-
 import java.util.HashMap;
 
 /**
