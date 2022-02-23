@@ -2,8 +2,6 @@ package zula.util;
 
 
 import zula.exceptions.EndOfFileException;
-
-import javax.swing.plaf.IconUIResource;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -54,7 +52,7 @@ public class InputManager {
         while (inputStreamReader.ready()) {
             char readedSymbol = (char) inputStreamReader.read();
             if (readedSymbol == '\n' | readedSymbol  == '\r') {
-                if(readedSymbol == '\r') {
+                if (readedSymbol == '\r') {
                     inputStreamReader.read();
                     return readedLine.toString();
                 } else {
