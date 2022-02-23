@@ -1,0 +1,127 @@
+package zula.util;
+import zula.dragon.Color;
+import zula.dragon.Coordinates;
+import zula.dragon.DragonCave;
+import zula.dragon.DragonType;
+import zula.dragon.DragonValidator;
+import zula.exceptions.WrongArgumentException;
+import zula.parser.ArgumentParser;
+import zula.parser.StringConverter;
+
+import java.util.Date;
+import java.util.function.Predicate;
+
+
+public class ArgumentReader {
+    private final ConsoleManager consoleManager;
+    private final DragonValidator dragonValidator;
+
+    public ArgumentReader(ConsoleManager consoleManager) {
+
+        this.consoleManager = consoleManager;
+        this.dragonValidator = new DragonValidator(consoleManager);
+    }
+
+    private <T> T readArg(Predicate<T> predicate, StringConverter<T> stringConverter) {
+        while (true) {
+            T t;
+            String readedLine = consoleManager.getInputManager().read(consoleManager);
+            if ("".equals(readedLine)) {
+                t = null;
+            } else {
+                try {
+                    t = stringConverter.convert(readedLine);
+                } catch (IllegalArgumentException e) {
+                    consoleManager.getOutputManager().write("Неверные входные данные");
+                    continue;
+                }
+            }
+            if (predicate.test(t)) {
+                return t;
+                } else {
+                    consoleManager.getOutputManager().write("Неверные входные данные");
+                }
+        }
+    }
+
+    public <T> T parseArgFromString(String readedLine, Predicate<T> predicate, StringConverter<T> stringConverter) throws WrongArgumentException {
+
+            T t;
+            if ("".equals(readedLine)) {
+                t = null;
+            } else {
+                try {
+                    t = stringConverter.convert(readedLine);
+                } catch (IllegalArgumentException e) {
+                    throw new WrongArgumentException();
+                }
+            }
+            if (predicate.test(t)) {
+                return t;
+            } else {
+                throw new WrongArgumentException();
+            }
+
+    }
+
+
+
+
+    public String readName() {
+        consoleManager.getOutputManager().write("Введите имя:");
+        return readArg(dragonValidator::nameValidator, (String s) -> s);
+    }
+
+    public Coordinates readCoordinates() {
+        consoleManager.getOutputManager().write("Введите x:");
+        Double x = readArg(dragonValidator::xValidator, Double::parseDouble);
+        Integer y = readArg(dragonValidator::yValidator, Integer::parseInt);
+        return new Coordinates(x, y);
+    }
+
+    public DragonCave readCave() {
+        consoleManager.getOutputManager().write("Введите depth:");
+        Float depth = readArg(dragonValidator::depthValidator, Float::parseFloat);
+        consoleManager.getOutputManager().write("Введите numberOfTreasure:");
+        Double numberOfTreasure = readArg(dragonValidator::numberOfTreasuresValidator, Double::parseDouble);
+        return new DragonCave(depth, numberOfTreasure);
+    }
+    public DragonType readType() {
+
+        consoleManager.getOutputManager().write("Введите тип дракона из предложенных вариантов: ");
+        DragonType[] types = DragonType.values();
+        for (DragonType dragon : types) {
+            consoleManager.getOutputManager().write(dragon.toString());
+        }
+        return readArg(dragonValidator::typeValidator, DragonType::valueOf);
+
+
+    }
+
+    public Long readAge() {
+
+        consoleManager.getOutputManager().write("Введите возраст:");
+        return readArg(dragonValidator::ageValidator, Long::parseLong);
+
+    }
+
+    public Float readWingspan() {
+        consoleManager.getOutputManager().write("Введите wingspan:");
+        return readArg(dragonValidator::wingspanValidator, Float::parseFloat);
+    }
+
+    public Color readColor() {
+        consoleManager.getOutputManager().write("Введите цвет из предложенных вариантов: ");
+        Color[] colors = Color.values();
+        for (Color color : colors) {
+           consoleManager.getOutputManager().write(color.toString());
+        }
+        return readArg(dragonValidator::colorValidator, Color::valueOf);
+    }
+    public Date readDate() {
+        return readArg(dragonValidator::dateValidator, ArgumentParser::parseDate);
+    }
+    public int readId() {
+        return readArg(dragonValidator::idValidator, Integer::parseInt);
+    }
+}
