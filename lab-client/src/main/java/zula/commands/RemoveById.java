@@ -19,7 +19,7 @@ public class RemoveById extends Command {
             consoleManager.getOutputManager().write("Неверные аргументы");
             return;
         }
-        consoleManager.getListManager().removeById(id);
+        consoleManager.getListManager().removeById(consoleManager, id);
     }
     @Override
     public void checkAmountOfArgs(String arguments) throws WrongArgumentException {
