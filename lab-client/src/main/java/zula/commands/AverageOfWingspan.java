@@ -8,9 +8,9 @@ public class AverageOfWingspan extends Command {
     @Override
     public void doInstructions(ConsoleManager consoleManager, String argument) {
         double sum = 0;
-        for (Dragon dragon : consoleManager.getListManager().getList()) {
+        for (Dragon dragon : consoleManager.getListManager().getCopyOfList()) {
             sum += dragon.getWingspan();
         }
-        consoleManager.getOutputManager().write(Double.toString(sum / consoleManager.getListManager().getList().size()));
+        consoleManager.getOutputManager().write(Double.toString(sum / consoleManager.getListManager().getCopyOfList().size()));
     }
 }

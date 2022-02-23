@@ -1,4 +1,4 @@
-package zula.parser;
+package zula.util;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -12,8 +12,7 @@ import zula.dragon.DragonType;
 import zula.dragon.DragonValidator;
 import zula.exceptions.WrongArgumentException;
 import org.xml.sax.SAXException;
-import zula.util.ArgumentReader;
-import zula.util.ConsoleManager;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -34,7 +33,7 @@ import java.util.function.Predicate;
 /**
  * class that contains methods that needs to save or download data
  */
-public class Mapper {
+public class XmlManager {
     private String name = null;
     private Coordinates coordinates = null;
     private Date creationDate = null;
@@ -44,12 +43,12 @@ public class Mapper {
     private DragonType type = null;
     private DragonCave cave = null;
     private int id = -1;
-    private final HashMap<String, Integer> flags = new HashMap<String, Integer>();
-    private final ArgumentReader argumentReader;
+    private final HashMap<String, Integer> flags = new HashMap<>();
+    private final ArgumentParser argumentParser;
     private final DragonValidator dragonValidator;
     private final ConsoleManager consoleManager;
-    public Mapper(ConsoleManager consoleManager) {
-        this.argumentReader = new ArgumentReader(consoleManager);
+    public XmlManager(ConsoleManager consoleManager) {
+        this.argumentParser = new ArgumentParser();
         this.dragonValidator = new DragonValidator(consoleManager);
         this.consoleManager = consoleManager;
     }
@@ -66,11 +65,9 @@ public class Mapper {
             Node dragon = dragos.item(i);
             NodeList childs = dragon.getChildNodes();
             checkTextContext(childs);
-
             if (!flags.containsKey("name") | !flags.containsKey("coordinates") | !flags.containsKey("creationDate") | !flags.containsKey("age") | !flags.containsKey("wingspan") | !flags.containsKey("color") | !flags.containsKey("type") | !flags.containsKey("cave") | !flags.containsKey("id")) {
                 throw new WrongArgumentException();
             }
-
             if (flags.get("name") == 1 && flags.get("coordinates") == 1 && flags.get("creationDate") == 1 && flags.get("age") == 1 && flags.get("wingspan") == 1 && flags.get("color") == 1 && flags.get("type") == 1 && flags.get("cave") == 1 && flags.get("id") == 1) {
                 Dragon drago = new Dragon(name, coordinates, age, wingspan, color, type, cave);
                 drago.addAttributes(creationDate, id);
@@ -81,7 +78,39 @@ public class Mapper {
         }
     }
 
-
+    private void checkTextContext(NodeList childs) throws WrongArgumentException {
+        for (int j = 0; j < childs.getLength(); j++) {
+            Node node = childs.item(j);
+            String nodeName = node.getNodeName();
+            if ("name".equals(nodeName)) {
+                name = parseSimpleArgs(node, dragonValidator::nameValidator, (s) -> s);
+            }
+            if ("coordinates".equals(nodeName)) {
+                coordinates = parseCoordinates(node);
+            }
+            if ("creationDate".equals(nodeName)) {
+                creationDate = parseSimpleArgs(node, dragonValidator::dateValidator, StringConverterRealisation::parseDate);
+            }
+            if ("age".equals(nodeName)) {
+                age = parseSimpleArgs(node, dragonValidator::ageValidator, Long::parseLong);
+            }
+            if ("wingspan".equals(nodeName)) {
+                wingspan = parseSimpleArgs(node, dragonValidator::wingspanValidator, Float::parseFloat);
+            }
+            if ("color".equals(nodeName)) {
+                color = parseSimpleArgs(node, dragonValidator::colorValidator, Color::valueOf);
+            }
+            if ("type".equals(nodeName)) {
+                type = parseSimpleArgs(node, dragonValidator::typeValidator, DragonType::valueOf);
+            }
+            if ("cave".equals(nodeName)) {
+                cave = parseCave(node);
+            }
+            if ("id".equals(nodeName)) {
+                id = parseSimpleArgs(node, dragonValidator::idValidator, Integer::parseInt);
+            }
+        }
+    }
 
 
 
@@ -95,7 +124,7 @@ public class Mapper {
         } else {
             flags.put(node.getNodeName(), 1);
         }
-        return argumentReader.parseArgFromString(textContent, predicate, stringConverter);
+        return argumentParser.parseArgFromString(textContent, predicate, stringConverter);
 
     }
     private Coordinates parseCoordinates(Node node) throws WrongArgumentException {
@@ -132,39 +161,7 @@ public class Mapper {
         return new DragonCave(depth, numberOfTreasures);
     }
 
-    private void checkTextContext(NodeList childs) throws WrongArgumentException {
-        for (int j = 0; j < childs.getLength(); j++) {
-            Node node = childs.item(j);
-            String nodeName = node.getNodeName();
-            if ("name".equals(nodeName)) {
-                name = parseSimpleArgs(node, dragonValidator::nameValidator, (s) -> s);
-            }
-            if ("coordinates".equals(nodeName)) {
-                coordinates = parseCoordinates(node);
-            }
-            if ("creationDate".equals(nodeName)) {
-                creationDate = parseSimpleArgs(node, dragonValidator::dateValidator, ArgumentParser::parseDate);
-            }
-            if ("age".equals(nodeName)) {
-                age = parseSimpleArgs(node, dragonValidator::ageValidator, Long::parseLong);
-            }
-            if ("wingspan".equals(nodeName)) {
-                wingspan = parseSimpleArgs(node, dragonValidator::wingspanValidator, Float::parseFloat);
-            }
-            if ("color".equals(nodeName)) {
-                color = parseSimpleArgs(node, dragonValidator::colorValidator, Color::valueOf);
-            }
-            if ("type".equals(nodeName)) {
-                type = parseSimpleArgs(node, dragonValidator::typeValidator, DragonType::valueOf);
-            }
-            if ("cave".equals(nodeName)) {
-                cave = parseCave(node);
-            }
-            if ("id".equals(nodeName)) {
-                id = parseSimpleArgs(node, dragonValidator::idValidator, Integer::parseInt);
-            }
-        }
-    }
+
     public void toXML(LinkedList<Dragon> dragons, String path) throws  ParserConfigurationException {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
@@ -177,7 +174,7 @@ public class Mapper {
         }
         try {
             writeDocument(document, path);
-        } catch (Exception e) {
+        } catch (IOException | TransformerException e) {
             consoleManager.getOutputManager().write("Ошибка при записи в файл");
         }
     }
@@ -213,6 +210,7 @@ public class Mapper {
         dragonNode.appendChild(nodeId);
         return dragonNode;
     }
+    //to pass checkstyle
     public Element setColor(Dragon dragon, Element nodeColor) {
         if (dragon.getColor() != null) {
             nodeColor.setTextContent(dragon.getColor().toString());
@@ -241,8 +239,8 @@ public class Mapper {
         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
         StreamResult streamResult = new StreamResult(new FileWriter(path, false));
         transformer.transform(source, streamResult);
-        String res = streamResult.getWriter().toString();
-        streamResult.getWriter().write(res);
+        String resultString = streamResult.getWriter().toString();
+        streamResult.getWriter().write(resultString);
     }
 
 }

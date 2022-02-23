@@ -9,7 +9,7 @@ import java.util.LinkedList;
 public class PrintAscending extends Command {
     @Override
     public void doInstructions(ConsoleManager consoleManager, String argument) {
-        LinkedList<Dragon> toSort = (LinkedList<Dragon>) consoleManager.getListManager().getList().clone();
+        LinkedList<Dragon> toSort = consoleManager.getListManager().getCopyOfList();
         Collections.sort(toSort);
         for (Dragon dragon : toSort) {
             consoleManager.getOutputManager().write(dragon.toString());

@@ -6,9 +6,8 @@ import zula.util.ConsoleManager;
 
 public class Info extends Command {
 
-
     @Override
     public void doInstructions(ConsoleManager consoleManager, String argument) {
-        consoleManager.getOutputManager().write("размер " + consoleManager.getListManager().getList().size() + " Дата создания - " + consoleManager.getListManager().getDate() + " Тип - LinkedList");
+        consoleManager.getOutputManager().write("размер " + consoleManager.getListManager().getCopyOfList().size() + " Дата создания - " + consoleManager.getListManager().getDate() + " Тип - LinkedList");
     }
 }

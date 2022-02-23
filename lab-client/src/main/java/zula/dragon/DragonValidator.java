@@ -20,10 +20,7 @@ public class DragonValidator {
     public boolean nameValidator(String name) {
         return (name != null && !"".equals(name));
     }
-/*
-    public boolean coordinatesValidator(Coordinates coordinates) {
-        return !((coordinates == (null) && coordinates.getY() < maxY && coordinates.getX() > minY));
-    }*/
+
     public boolean ageValidator(Long age) {
         return age > 0;
     }
@@ -35,10 +32,6 @@ public class DragonValidator {
     public boolean typeValidator(DragonType type) {
         return !(type == null);
     }
-
-//    public boolean caveValidator(DragonCave cave) {
-//        return !(cave == null);
-//    }
 
     public boolean colorValidator(Color color) {
         return true;

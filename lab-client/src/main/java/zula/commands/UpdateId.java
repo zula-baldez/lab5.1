@@ -4,7 +4,7 @@ package zula.commands;
 
 import zula.dragon.DragonValidator;
 import zula.exceptions.WrongArgumentException;
-import zula.util.ArgumentReader;
+import zula.util.ArgumentParser;
 import zula.util.ConsoleManager;
 
 
@@ -21,8 +21,8 @@ public class UpdateId extends Command {
     public void doInstructions(ConsoleManager consoleManager, String arguments) {
         int id;
         try {
-           ArgumentReader argumentReader = new ArgumentReader(consoleManager);
-            id = argumentReader.parseArgFromString(arguments, new DragonValidator(consoleManager)::idValidator, Integer::parseInt);
+           ArgumentParser argumentParser = new ArgumentParser();
+            id = argumentParser.parseArgFromString(arguments, new DragonValidator(consoleManager)::idValidator, Integer::parseInt);
         } catch (WrongArgumentException e) {
             consoleManager.getOutputManager().write("Неверные аргументы");
             return;

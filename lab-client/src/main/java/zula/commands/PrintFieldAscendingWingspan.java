@@ -11,7 +11,7 @@ public class PrintFieldAscendingWingspan extends Command {
     @Override
     public void doInstructions(ConsoleManager consoleManager, String argument) {
         ArrayList<Float> toSort = new ArrayList<>();
-        for (Dragon dragon : consoleManager.getListManager().getList()) {
+        for (Dragon dragon : consoleManager.getListManager().getCopyOfList()) {
             toSort.add(dragon.getWingspan());
         }
         Collections.sort(toSort);

@@ -1,4 +1,4 @@
-package zula.parser;
+package zula.util;
 
 @FunctionalInterface
 public interface StringConverter<T> {

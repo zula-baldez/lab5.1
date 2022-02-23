@@ -8,14 +8,14 @@ import java.util.Objects;
  */
 public class Dragon implements Comparable<Dragon> {
     private int id; //Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
-    private final String name; //Поле не может быть null, Строка не может быть пустой
-    private final Coordinates coordinates; //Поле не может быть null
+    private String name; //Поле не может быть null, Строка не может быть пустой
+    private Coordinates coordinates; //Поле не может быть null
     private java.util.Date creationDate; //Поле не может быть null, Значение этого поля должно генерироваться автоматически
-    private final long age; //Значение поля должно быть больше 0
-    private final float wingspan; //Значение поля должно быть больше 0
-    private final Color color; //Поле может быть null
-    private final DragonType type; //Поле не может быть null
-    private final DragonCave cave; //Поле не может быть null
+    private long age; //Значение поля должно быть больше 0
+    private float wingspan; //Значение поля должно быть больше 0
+    private Color color; //Поле может быть null
+    private DragonType type; //Поле не может быть null
+    private DragonCave cave; //Поле не может быть null
 
     public Dragon(String name, Coordinates coordinates,
                   long age, float wingspan, Color color, DragonType type, DragonCave cave) {

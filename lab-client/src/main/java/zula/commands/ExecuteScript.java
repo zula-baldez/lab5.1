@@ -13,7 +13,7 @@ public class ExecuteScript extends Command {
         try {
             consoleManager.getInputManager().setFileReading(true, arguments);
         } catch (IOException e) {
-            consoleManager.getOutputManager().write("Не удалось открыть файл");
+            consoleManager.getOutputManager().write("Не удалось открыть файл или отсутствуют права доступа");
         }
     }
 

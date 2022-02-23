@@ -69,16 +69,16 @@ public class ListManager {
         dragons.add(e);
     }
 
-    public LinkedList<Dragon> getList() {
-        return dragons;
+    public LinkedList<Dragon> getCopyOfList() {
+        return (LinkedList<Dragon>) dragons.clone();
     }
 
     public void deleteDragon(Dragon e) {
         dragons.remove(e);
     }
 
-    public HashMap<String, Command> getCommands() {
-        return commands;
+    public HashMap<String, Command> getCloneOfCommands() {
+        return (HashMap<String, Command>) commands.clone();
     }
 
     public Date getDate() {

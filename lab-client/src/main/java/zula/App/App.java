@@ -1,10 +1,9 @@
 package zula.App;
-
 import org.xml.sax.SAXException;
 import zula.exceptions.WrongArgumentException;
 import zula.exceptions.WrongCommandException;
-import zula.parser.CommandReader;
-import zula.parser.Mapper;
+import zula.util.CommandParser;
+import zula.util.XmlManager;
 import zula.util.ConsoleManager;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -21,7 +20,7 @@ public class App {
         } catch (WrongArgumentException e) {
             System.out.println("В содержимом XML - файла ошибка, данные записаны неверно");
             return;
-        } catch (Exception e) {
+        } catch (ParserConfigurationException | SAXException e) {
             e.printStackTrace();
             return;
         }
@@ -32,26 +31,26 @@ public class App {
 
     public static void readAndExecute(ConsoleManager consoleManager) {
         consoleManager.getOutputManager().write("Введите команду!");
-        String readedLine;
-        readedLine = consoleManager.getInputManager().read(consoleManager);
+        String readLine;
+        readLine = consoleManager.getInputManager().read(consoleManager);
         String command;
         try {
-            command = CommandReader.commandReader(readedLine, consoleManager);
+            command = CommandParser.commandParse(readLine, consoleManager);
 
         } catch (WrongCommandException e) {
             consoleManager.getOutputManager().write("Такой команды не существует. Повторите ввод");
             return;
         }
-        readedLine = (readedLine.replace(command, ""));
-        if (readedLine.length() >= 1 && readedLine.charAt(0) == ' ') {
-            readedLine = readedLine.substring(1);
+        readLine = (readLine.replace(command, ""));
+        if (readLine.length() >= 1 && readLine.charAt(0) == ' ') {
+            readLine = readLine.substring(1);
         }
-        if ("execute_script".equals(command) && readedLine.equals(consoleManager.getInputManager().getPath())) {
+        if ("execute_script".equals(command) && readLine.equals(consoleManager.getInputManager().getPath())) {
             consoleManager.getOutputManager().write("Угроза рекурсии!");
             return;
         }
         try {
-            consoleManager.getListManager().getCommands().get(command).execute(readedLine, consoleManager);
+            consoleManager.getListManager().getCloneOfCommands().get(command).execute(readLine, consoleManager);
         } catch (WrongArgumentException e) {
             consoleManager.getOutputManager().write("Аргументы неверные");
         }
@@ -60,8 +59,6 @@ public class App {
 
     private void readFile(ConsoleManager consoleManager, String path) throws WrongArgumentException, ParserConfigurationException, IOException, SAXException {
         consoleManager.getListManager().setPath(path);
-        new Mapper(consoleManager).fromXML(path);
-
-
+        new XmlManager(consoleManager).fromXML(path);
     }
 }

@@ -1,15 +1,15 @@
-package zula.parser;
+package zula.util;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
 /**
- * class that contains some custom StringConverter methods
+ * util class that contains some realisations of StringConverter
  */
 
-public final class ArgumentParser {
-    private ArgumentParser() {
+public final class StringConverterRealisation {
+    private StringConverterRealisation() {
         throw new UnsupportedOperationException("This is an utility class and can not be instantiated");
     }
     public static Date parseDate(String arguments) {

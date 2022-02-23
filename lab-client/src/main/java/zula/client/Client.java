@@ -15,7 +15,7 @@ public final class Client {
         ConsoleManager consoleManager = new ConsoleManager(new InputManager(), new OutputManager(), new ListManager());
         App app = new App();
         if (args.length != 1) {
-            consoleManager.getOutputManager().write("Ошибка при запуске программы");
+            consoleManager.getOutputManager().write("Неверный аргумент командной строки");
             return;
         }
         app.startApp(consoleManager, args[0]);

@@ -3,7 +3,7 @@ package zula.commands;
 
 import zula.dragon.DragonValidator;
 import zula.exceptions.WrongArgumentException;
-import zula.util.ArgumentReader;
+import zula.util.ArgumentParser;
 import zula.util.ConsoleManager;
 
 public class RemoveById extends Command {
@@ -12,9 +12,9 @@ public class RemoveById extends Command {
     public void doInstructions(ConsoleManager consoleManager, String arguments) {
         int id;
         try {
-            ArgumentReader argumentReader = new ArgumentReader(consoleManager);
+            ArgumentParser argumentParser = new ArgumentParser();
             DragonValidator dragonValidator = new DragonValidator(consoleManager);
-            id = argumentReader.parseArgFromString(arguments, dragonValidator::idValidator, Integer::parseInt);
+            id = argumentParser.parseArgFromString(arguments, dragonValidator::idValidator, Integer::parseInt);
         } catch (WrongArgumentException e) {
             consoleManager.getOutputManager().write("Неверные аргументы");
             return;
