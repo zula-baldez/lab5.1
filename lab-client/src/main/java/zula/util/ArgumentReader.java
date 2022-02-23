@@ -1,6 +1,10 @@
 package zula.util;
 
-import zula.dragon.*;
+import zula.dragon.Color;
+import zula.dragon.Coordinates;
+import zula.dragon.DragonCave;
+import zula.dragon.DragonType;
+import zula.dragon.DragonValidator;
 
 import java.util.Date;
 import java.util.function.Predicate;
@@ -17,7 +21,6 @@ public class ArgumentReader {
         while (true) {
             T t;
             String readedLine = consoleManager.getInputManager().read(consoleManager);
-            System.out.println(readedLine);
             if ("".equals(readedLine)) {
                 t = null;
             } else {
