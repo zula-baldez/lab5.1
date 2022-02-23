@@ -13,8 +13,8 @@ public class RemoveById extends Command {
         int id;
         try {
             ArgumentParser argumentParser = new ArgumentParser();
-            DragonValidator dragonValidator = new DragonValidator(consoleManager);
-            id = argumentParser.parseArgFromString(arguments, dragonValidator::idValidator, Integer::parseInt);
+            //ввод без проверки на уникальность id
+            id = argumentParser.parseArgFromString(arguments, (i) -> true, Integer::parseInt);
         } catch (WrongArgumentException e) {
             consoleManager.getOutputManager().write("Неверные аргументы");
             return;

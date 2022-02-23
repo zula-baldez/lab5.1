@@ -20,7 +20,7 @@ public class RemoveLower extends Command {
         int id;
         try {
             ArgumentParser argumentParser = new ArgumentParser();
-            id = argumentParser.parseArgFromString(arguments, new DragonValidator(consoleManager)::idValidator, Integer::parseInt);
+            id = argumentParser.parseArgFromString(arguments, (i) -> true, Integer::parseInt);
         } catch (WrongArgumentException e) {
             consoleManager.getOutputManager().write("Неверные аргументы");
             return;

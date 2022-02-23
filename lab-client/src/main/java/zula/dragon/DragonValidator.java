@@ -22,11 +22,11 @@ public class DragonValidator {
     }
 
     public boolean ageValidator(Long age) {
-        return age > 0;
+        return (age != null && age > 0);
     }
 
     public boolean wingspanValidator(Float wingspan) {
-        return wingspan > 0;
+        return wingspan != null && wingspan > 0;
     }
 
     public boolean typeValidator(DragonType type) {

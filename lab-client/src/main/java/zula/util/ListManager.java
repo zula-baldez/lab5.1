@@ -122,7 +122,7 @@ public class ListManager {
         }
     }
     public void removeById(ConsoleManager consoleManager, int id) {
-        if(consoleManager.getListManager().idIsUsed(id)) {
+        if(idIsUsed(id)) {
             dragons.removeIf(n -> n.getId() == id);
             usedId.remove(id);
         } else {
@@ -133,6 +133,8 @@ public class ListManager {
         if (consoleManager.getListManager().idIsUsed(id)) {
             dragons.removeIf(n -> n.getId() < id);
             usedId.remove(id);
+        } else {
+            consoleManager.getOutputManager().write("Элемента с id=" + id + " не существует. Проверьте правильность введенных данных.");
         }
     }
     public void reverseList() {
@@ -152,7 +154,7 @@ public class ListManager {
                 DragonCave cave = argumentReader.readCave();
                 Date date2 = drag.getCreationDate();
                 deleteDragon(drag);
-                System.out.println("Добавлен элемент с введенными параметрами");
+                System.out.println("Переопределен элемент с введенным id");
                 Dragon dragon = new Dragon(name, coordinates, age, wingspan, color, type, cave);
                 dragon.addAttributes(date2, id);
                 addDragon(dragon);
