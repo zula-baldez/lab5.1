@@ -89,10 +89,6 @@ public class ListManager {
         return usedId.contains(i);
     }
 
-    public void setUsedId(int i) {
-        usedId.add(i);
-    }
-
     public String getPath() {
         return path;
     }
@@ -106,7 +102,14 @@ public class ListManager {
         usedId.add(maxId);
         return maxId;
     }
-
+    public boolean isIdValid(int id) {
+        if (!(usedId.contains(id)) && id > 0) {
+            maxId = Math.max(id + 1, maxId);
+            usedId.add(id);
+            return true;
+        }
+        return false;
+    }
     public void clearDragons() {
         dragons.clear();
     }
@@ -120,13 +123,15 @@ public class ListManager {
     }
     public void removeById(int id) {
         dragons.removeIf(n -> n.getId() == id);
+        usedId.remove(id);
     }
     public void removeLower(ConsoleManager consoleManager, int id) {
         if (consoleManager.getListManager().idIsUsed(id)) {
             dragons.removeIf(n -> n.getId() < id);
+            usedId.remove(id);
         }
     }
-    public void reverseList(ConsoleManager consoleManager) {
+    public void reverseList() {
         Collections.reverse(dragons);
     }
 

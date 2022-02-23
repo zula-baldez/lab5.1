@@ -46,6 +46,7 @@ public class InputManager {
     public boolean isFileReading() {
         return fileReading;
     }
+
     public String readLine() throws IOException, EndOfFileException {
         StringBuilder readedLine = new StringBuilder();
         while (inputStreamReader.ready()) {

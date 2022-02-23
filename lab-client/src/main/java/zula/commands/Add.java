@@ -29,7 +29,8 @@ public class Add extends Command {
         DragonCave cave = argumentReader.readCave();
         Dragon dragon = new Dragon(name, coordinates, age, wingspan, color, type, cave);
         consoleManager.getListManager().addDragon(dragon);
-        dragon.addAttributes(creationDate, consoleManager.getListManager().generateID());
+        int id  = consoleManager.getListManager().generateID();
+        dragon.addAttributes(creationDate, id);
     }
 
 

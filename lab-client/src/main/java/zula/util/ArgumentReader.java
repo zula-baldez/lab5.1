@@ -26,6 +26,7 @@ public class ArgumentReader {
         while (true) {
             T t;
             String readedLine = consoleManager.getInputManager().read(consoleManager);
+            System.out.println(readedLine);
             if ("".equals(readedLine)) {
                 t = null;
             } else {
@@ -45,7 +46,6 @@ public class ArgumentReader {
     }
 
     public <T> T parseArgFromString(String readedLine, Predicate<T> predicate, StringConverter<T> stringConverter) throws WrongArgumentException {
-
             T t;
             if ("".equals(readedLine)) {
                 t = null;
@@ -73,16 +73,17 @@ public class ArgumentReader {
     }
 
     public Coordinates readCoordinates() {
-        consoleManager.getOutputManager().write("Введите x:");
+        consoleManager.getOutputManager().write("Введите x. Double, >= -23");
         Double x = readArg(dragonValidator::xValidator, Double::parseDouble);
+        consoleManager.getOutputManager().write("Введите y. Integer, <= 160");
         Integer y = readArg(dragonValidator::yValidator, Integer::parseInt);
         return new Coordinates(x, y);
     }
 
     public DragonCave readCave() {
-        consoleManager.getOutputManager().write("Введите depth:");
+        consoleManager.getOutputManager().write("Введите depth. Float, может быть null. Для ввода null введите пустую строку");
         Float depth = readArg(dragonValidator::depthValidator, Float::parseFloat);
-        consoleManager.getOutputManager().write("Введите numberOfTreasure:");
+        consoleManager.getOutputManager().write("Введите numberOfTreasure. Double, может быть null. Для ввода null введите пустую строку");
         Double numberOfTreasure = readArg(dragonValidator::numberOfTreasuresValidator, Double::parseDouble);
         return new DragonCave(depth, numberOfTreasure);
     }
@@ -100,13 +101,13 @@ public class ArgumentReader {
 
     public Long readAge() {
 
-        consoleManager.getOutputManager().write("Введите возраст:");
+        consoleManager.getOutputManager().write("Введите возраст, Long:");
         return readArg(dragonValidator::ageValidator, Long::parseLong);
 
     }
 
     public Float readWingspan() {
-        consoleManager.getOutputManager().write("Введите wingspan:");
+        consoleManager.getOutputManager().write("Введите wingspan, Float");
         return readArg(dragonValidator::wingspanValidator, Float::parseFloat);
     }
 

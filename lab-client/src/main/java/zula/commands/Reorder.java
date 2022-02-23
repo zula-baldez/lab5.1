@@ -5,6 +5,6 @@ import zula.util.ConsoleManager;
 public class Reorder extends Command {
     @Override
     public void doInstructions(ConsoleManager consoleManager, String arguments) {
-        consoleManager.getListManager().reverseList(consoleManager);
+        consoleManager.getListManager().reverseList();
     }
 }

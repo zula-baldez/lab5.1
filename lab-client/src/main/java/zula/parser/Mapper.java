@@ -162,7 +162,6 @@ public class Mapper {
             }
             if ("id".equals(nodeName)) {
                 id = parseSimpleArgs(node, dragonValidator::idValidator, Integer::parseInt);
-                consoleManager.getListManager().getUsedId().add(id);
             }
         }
     }
@@ -179,7 +178,7 @@ public class Mapper {
         try {
             writeDocument(document, path);
         } catch (Exception e) {
-            System.out.println("");
+            consoleManager.getOutputManager().write("Ошибка при записи в файл");
         }
     }
     private Element createSubNodes(Dragon dragon, Document document) {

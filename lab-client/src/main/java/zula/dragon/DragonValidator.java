@@ -12,8 +12,10 @@ public class DragonValidator {
     private final int maxY = 160;
     private final double minX = -23;
     private final HashSet<Integer> usedId;
-    public DragonValidator(ConsoleManager consoleManager) {
-        usedId = consoleManager.getListManager().getUsedId();
+    private final ConsoleManager consoleManager;
+    public DragonValidator(ConsoleManager consoleManagerArg) {
+        usedId = consoleManagerArg.getListManager().getUsedId();
+        consoleManager = consoleManagerArg;
     }
     public boolean nameValidator(String name) {
         return (name != null && !"".equals(name));
@@ -43,7 +45,7 @@ public class DragonValidator {
     }
 
     public boolean idValidator(Integer id) {
-        return !(usedId.contains(id)) && id > 0;
+        return consoleManager.getListManager().isIdValid(id);
     }
     public boolean xValidator(Double x) {
         return (x != null && x > minX);
