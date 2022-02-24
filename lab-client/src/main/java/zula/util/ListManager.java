@@ -122,7 +122,7 @@ public class ListManager {
         }
     }
     public void removeById(ConsoleManager consoleManager, int id) {
-        if(idIsUsed(id)) {
+        if (idIsUsed(id)) {
             dragons.removeIf(n -> n.getId() == id);
             usedId.remove(id);
         } else {

@@ -1,6 +1,5 @@
 package zula.commands;
 
-import zula.dragon.DragonValidator;
 import zula.exceptions.WrongArgumentException;
 import zula.util.ArgumentParser;
 import zula.util.ConsoleManager;
