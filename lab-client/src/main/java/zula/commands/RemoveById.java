@@ -5,6 +5,8 @@ import zula.exceptions.WrongArgumentException;
 import zula.util.ArgumentParser;
 import zula.util.ConsoleManager;
 
+import java.util.Objects;
+
 public class RemoveById extends Command {
 
     @Override
@@ -13,7 +15,7 @@ public class RemoveById extends Command {
         try {
             ArgumentParser argumentParser = new ArgumentParser();
             //ввод без проверки на уникальность id
-            id = argumentParser.parseArgFromString(arguments, (i) -> true, Integer::parseInt);
+            id = argumentParser.parseArgFromString(arguments, Objects::nonNull, Integer::parseInt);
         } catch (WrongArgumentException e) {
             consoleManager.getOutputManager().write("Неверные аргументы");
             return;

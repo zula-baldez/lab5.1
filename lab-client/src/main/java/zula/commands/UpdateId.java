@@ -6,6 +6,8 @@ import zula.exceptions.WrongArgumentException;
 import zula.util.ArgumentParser;
 import zula.util.ConsoleManager;
 
+import java.util.Objects;
+
 
 public class UpdateId extends Command {
 
@@ -21,7 +23,7 @@ public class UpdateId extends Command {
         int id;
         try {
            ArgumentParser argumentParser = new ArgumentParser();
-            id = argumentParser.parseArgFromString(arguments, (i) -> true, Integer::parseInt);
+            id = argumentParser.parseArgFromString(arguments, Objects::nonNull, Integer::parseInt);
         } catch (WrongArgumentException e) {
             consoleManager.getOutputManager().write("Неверные аргументы");
             return;
