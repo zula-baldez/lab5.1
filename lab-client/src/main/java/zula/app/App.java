@@ -1,4 +1,4 @@
-package zula.App;
+package zula.app;
 import org.xml.sax.SAXException;
 import zula.exceptions.WrongArgumentException;
 import zula.exceptions.WrongCommandException;

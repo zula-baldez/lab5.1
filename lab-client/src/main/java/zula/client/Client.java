@@ -1,6 +1,6 @@
 package zula.client;
 
-import zula.App.App;
+import zula.app.App;
 import zula.util.ConsoleManager;
 import zula.util.InputManager;
 import zula.util.ListManager;
