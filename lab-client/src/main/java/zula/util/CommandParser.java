@@ -12,7 +12,9 @@ public final class CommandParser {
     }
     public static String commandParse(String arguments, ConsoleManager consoleManager) throws WrongCommandException {
         String[] args = arguments.split(" ");
-        if (args.length==0) throw new WrongCommandException();
+        if (args.length == 0) {
+            throw new WrongCommandException();
+        }
         String command = args[0];
 
         HashMap<String, Command> commands = consoleManager.getListManager().getCloneOfCommands();
