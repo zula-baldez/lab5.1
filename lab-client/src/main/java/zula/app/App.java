@@ -15,10 +15,10 @@ public class App {
         try {
             readFile(consoleManager, path);
         } catch (IOException e) {
-            System.out.println("Файл не найден или отсутствуют права доступа");
+            consoleManager.getOutputManager().write("Файл не найден или отсутствуют права доступа");
             return;
         } catch (WrongArgumentException e) {
-            System.out.println("В содержимом XML - файла ошибка, данные записаны неверно");
+            consoleManager.getOutputManager().write("В содержимом XML - файла ошибка, данные записаны неверно");
             return;
         } catch (ParserConfigurationException | SAXException e) {
             e.printStackTrace();
@@ -45,7 +45,7 @@ public class App {
         if (readLine.length() >= 1 && readLine.charAt(0) == ' ') {
             readLine = readLine.substring(1);
         }
-        if ("execute_script".equals(command) && readLine.equals(consoleManager.getInputManager().getPath())) {
+        if ("execute_script".equals(command) && consoleManager.getInputManager().containsFileInStack(readLine)) {
             consoleManager.getOutputManager().write("Угроза рекурсии!");
             return;
         }

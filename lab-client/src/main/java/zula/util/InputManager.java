@@ -8,12 +8,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
+import java.util.Stack;
 
 public class InputManager {
+    private Stack<InputStreamReader> readers = new Stack<>();
+    private Stack<String> files = new Stack<>();
     private final Scanner scanner = new Scanner(System.in);
-    private InputStreamReader inputStreamReader;
+    private InputStreamReader currentInputStreamReader;
     private boolean fileReading = false;
-    private String path = "";
     public String read(ConsoleManager consoleManager) {
         if (isFileReading()) {
             try {
@@ -33,13 +35,22 @@ public class InputManager {
             return scanner.nextLine();
         }
     }
-    public String getPath() {
-        return path;
+    public boolean containsFileInStack(String path) {
+        if (files.contains(path)) {
+            return true;
+        }
+        return false;
+
     }
     public void setFileReading(boolean readingFromFile, String pathToFile) throws FileNotFoundException {
-        inputStreamReader = new InputStreamReader(new FileInputStream(pathToFile), StandardCharsets.UTF_8);
+        InputStreamReader buffer = currentInputStreamReader;
+        currentInputStreamReader = new InputStreamReader(new FileInputStream(pathToFile), StandardCharsets.UTF_8);
         this.fileReading = readingFromFile;
-        this.path = pathToFile;
+        files.add(pathToFile);
+        if(buffer!=null) {
+            readers.add(buffer);
+        }
+
     }
 
 
@@ -49,23 +60,26 @@ public class InputManager {
 
     public String readLine() throws IOException, EndOfFileException {
         StringBuilder readedLine = new StringBuilder();
-        while (inputStreamReader.ready()) {
-            char readedSymbol = (char) inputStreamReader.read();
+        while (currentInputStreamReader.ready()) {
+            char readedSymbol = (char) currentInputStreamReader.read();
             if (readedSymbol == '\n' | readedSymbol  == '\r') {
                 if (readedSymbol == '\r') {
-                    inputStreamReader.read();
-                    return readedLine.toString();
-                } else {
-                    return readedLine.toString();
+                    currentInputStreamReader.read();
                 }
+                return readedLine.toString();
             } else {
                 readedLine.append(readedSymbol);
             }
         }
-
-            fileReading = false;
-            throw new EndOfFileException();
-
+            if (readers.size() == 0) {
+                fileReading = false;
+                throw new EndOfFileException();
+            } else {
+                InputStreamReader isr = readers.pop();
+                currentInputStreamReader = isr;
+                files.pop();
+                return readLine();
+            }
 
 
     }
