@@ -24,8 +24,10 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -60,9 +62,11 @@ public class XmlManager {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db;
         Document document;
+
         try {
-             db = dbf.newDocumentBuilder();
-             document = db.parse(path);
+            db = dbf.newDocumentBuilder();
+            db.setErrorHandler(null);
+            document = db.parse(path);
         } catch (ParserConfigurationException | SAXException e) {
             throw new WrongArgumentException();
         }
