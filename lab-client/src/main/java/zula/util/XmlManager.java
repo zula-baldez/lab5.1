@@ -52,10 +52,16 @@ public class XmlManager {
         this.dragonValidator = new DragonValidator(consoleManager);
         this.consoleManager = consoleManager;
     }
-    public void fromXML(String path) throws WrongArgumentException, ParserConfigurationException, IOException, SAXException {
+    public void fromXML(String path) throws WrongArgumentException, IOException {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        Document document = db.parse(path);
+        DocumentBuilder db;
+        Document document;
+        try {
+             db = dbf.newDocumentBuilder();
+             document = db.parse(path);
+        } catch (ParserConfigurationException | SAXException e) {
+            return;
+        }
         if (!path.matches("^.*xml$")) {
             throw new IOException();
         }

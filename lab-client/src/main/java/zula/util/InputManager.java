@@ -47,7 +47,7 @@ public class InputManager {
         currentInputStreamReader = new InputStreamReader(new FileInputStream(pathToFile), StandardCharsets.UTF_8);
         this.fileReading = readingFromFile;
         files.add(pathToFile);
-        if(buffer!=null) {
+        if (buffer != null) {
             readers.add(buffer);
         }
 

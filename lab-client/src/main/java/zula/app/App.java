@@ -1,12 +1,11 @@
 package zula.app;
-import org.xml.sax.SAXException;
+
 import zula.exceptions.WrongArgumentException;
 import zula.exceptions.WrongCommandException;
 import zula.util.CommandParser;
-import zula.util.XmlManager;
 import zula.util.ConsoleManager;
+import zula.util.XmlManager;
 
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 
 
@@ -20,10 +19,8 @@ public class App {
         } catch (WrongArgumentException e) {
             consoleManager.getOutputManager().write("В содержимом XML - файла ошибка, данные записаны неверно");
             return;
-        } catch (ParserConfigurationException | SAXException e) {
-            e.printStackTrace();
-            return;
         }
+
         while (consoleManager.isProcessStillWorks()) {
             readAndExecute(consoleManager);
         }
@@ -57,7 +54,7 @@ public class App {
     }
 
 
-    private void readFile(ConsoleManager consoleManager, String path) throws WrongArgumentException, ParserConfigurationException, IOException, SAXException {
+    private void readFile(ConsoleManager consoleManager, String path) throws WrongArgumentException, IOException {
         consoleManager.getListManager().setPath(path);
         new XmlManager(consoleManager).fromXML(path);
     }
