@@ -1,9 +1,11 @@
 package zula.util;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 import zula.dragon.Color;
 import zula.dragon.Coordinates;
 import zula.dragon.Dragon;
@@ -11,7 +13,6 @@ import zula.dragon.DragonCave;
 import zula.dragon.DragonType;
 import zula.dragon.DragonValidator;
 import zula.exceptions.WrongArgumentException;
-import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -53,6 +54,9 @@ public class XmlManager {
         this.consoleManager = consoleManager;
     }
     public void fromXML(String path) throws WrongArgumentException, IOException {
+        if (!path.matches("^.*xml$")) {
+            throw new IOException();
+        }
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db;
         Document document;
@@ -60,10 +64,7 @@ public class XmlManager {
              db = dbf.newDocumentBuilder();
              document = db.parse(path);
         } catch (ParserConfigurationException | SAXException e) {
-            return;
-        }
-        if (!path.matches("^.*xml$")) {
-            throw new IOException();
+            throw new WrongArgumentException();
         }
         NodeList dragos = document.getDocumentElement().getElementsByTagName("dragon");
         for (int i = 0; i < dragos.getLength(); i++) {
@@ -216,7 +217,6 @@ public class XmlManager {
         dragonNode.appendChild(nodeId);
         return dragonNode;
     }
-    //to pass checkstyle
     public Element setColor(Dragon dragon, Element nodeColor) {
         if (dragon.getColor() != null) {
             nodeColor.setTextContent(dragon.getColor().toString());
