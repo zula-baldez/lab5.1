@@ -1,12 +1,11 @@
 package zula.client;
 
 import zula.app.App;
-import zula.common.commands.Add;
 import zula.common.commands.Command;
 import zula.common.commands.GetListOfCommands;
-import zula.common.commands.Show;
 import zula.common.data.ServerMessage;
 import zula.common.exceptions.PrintException;
+import zula.common.exceptions.WrongArgumentException;
 import zula.common.util.IoManager;
 import zula.common.util.InputManager;
 import zula.common.util.OutputManager;
@@ -25,7 +24,6 @@ public final class Client {
         try {
             IoManager ioManager = new IoManager(new InputManager(new InputStreamReader(System.in)), new OutputManager(new OutputStreamWriter(System.out)));
             ConnectionManager connectionManager = new ConnectionManager("127.0.0.1", 4004, ioManager);
-
             try {
                 connectionManager.connectToServer();
 
@@ -35,23 +33,22 @@ public final class Client {
             }
             try {
                 connectionManager.sendToServer(new GetListOfCommands(), "");
-
-                ioManager.getOutputManager().write("Список существующих команд загружен успешно.");
-
             } catch (IOException e) {
                 ioManager.getOutputManager().write("Не удалось получить список существующий команд");
                 return;
             }
-
             HashMap<String, Command> commands;
             try {
-                 commands = connectionManager.getMessage().getCommands();
-
-
+                ServerMessage serverMessage = connectionManager.getMessage();
+                commands = (HashMap<String, Command>) serverMessage.getArguments();
             } catch (IOException | ClassNotFoundException e) {
                 ioManager.getOutputManager().write("Не удалось получить список доступных команд");
                 return;
+            } catch (WrongArgumentException e) {
+                ioManager.getOutputManager().write(e.getMessage());
+                return;
             }
+            ioManager.getOutputManager().write("Список существующих команд загружен успешно.");
             App app = new App(ioManager, connectionManager, commands);
             if (args.length != 1) {
                 ioManager.getOutputManager().write("Неверный аргумент командной строки");
@@ -59,14 +56,13 @@ public final class Client {
             }
             try {
                 app.startApp(args[0]);
-
             } catch (IOException e) {
                 ioManager.getOutputManager().write("Соединение потеряно");
             } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+                ioManager.getOutputManager().write("Ответ сервера не соответствует протоколу обмена сообщениями");
             }
         } catch (PrintException e) {
-            return;
+
         }
 
     }

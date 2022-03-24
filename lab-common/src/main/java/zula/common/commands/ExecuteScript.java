@@ -1,7 +1,12 @@
 package zula.common.commands;
 
 
+
+import zula.common.data.ServerMessage;
 import zula.common.exceptions.PrintException;
+import zula.common.exceptions.WrongArgumentException;
+import zula.common.exceptions.WrongCommandException;
+import zula.common.util.CommandParser;
 import zula.common.util.IoManager;
 import zula.common.util.ListManager;
 
@@ -13,12 +18,10 @@ public class ExecuteScript extends Command {
 
     @Override
     public void doInstructions(IoManager ioManager, ListManager listManager, Serializable argument) throws IOException, PrintException {
-        try {
-            ioManager.getInputManager().setFileReading(true, argument.toString());
-        } catch (IOException e) {
-            ioManager.getOutputManager().write("Не удалось открыть файл или отсутствуют права доступа");
-        }
+
+        ioManager.getOutputManager().write("");
+
+
+
     }
-
-
 }

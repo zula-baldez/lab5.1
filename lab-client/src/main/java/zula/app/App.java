@@ -12,6 +12,7 @@ import zula.common.util.*;
 import java.io.*;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 
@@ -27,63 +28,85 @@ public class App {
     }
 
     public void startApp(String path) throws PrintException, IOException, ClassNotFoundException {
-
-
+        connectionManager.sendToServer(new ReadDataFromFile(), path);
+        try {
+            connectionManager.getMessage();
+        } catch (WrongArgumentException e) {
+            ioManager.getOutputManager().write(e.getMessage());
+        }
         while (ioManager.isProcessStillWorks()) {
             readAndExecute();
         }
     }
 
-    public void readAndExecute() throws PrintException, IOException, ClassNotFoundException {
-        ioManager.getOutputManager().write("Введите команду!");
-        String readLine;
-        readLine = ioManager.getInputManager().read(ioManager);
-        String command;
+    public void readAndExecute() throws PrintException, ClassNotFoundException {
         try {
-            command = CommandParser.commandParse(readLine, ioManager);
-            if(!commands.containsKey(command)) {
-                throw new WrongCommandException();
+            ioManager.getOutputManager().write("Введите команду!");
+            String readLine;
+            readLine = ioManager.getInputManager().read(ioManager);
+            String command;
+            try {
+                command = CommandParser.commandParse(readLine, ioManager);
+                if (!commands.containsKey(command)) {
+                    throw new WrongCommandException();
+                }
+
+            } catch (WrongCommandException e) {
+                ioManager.getOutputManager().write("Такой команды не существует. Повторите ввод");
+                return;
+            }
+            readLine = (readLine.replace(command, ""));
+            if (readLine.length() >= 1 && readLine.charAt(0) == ' ') {
+                readLine = readLine.substring(1);
             }
 
-        } catch (WrongCommandException e) {
-            ioManager.getOutputManager().write("Такой команды не существует. Повторите ввод");
-            return;
-        }
-        readLine = (readLine.replace(command, ""));
-        if (readLine.length() >= 1 && readLine.charAt(0) == ' ') {
-            readLine = readLine.substring(1);
-        }
-        /*if ("execute_script".equals(command) && ioManager.getInputManager().containsFileInStack(readLine)) {
-            ioManager.getOutputManager().write("Угроза рекурсии!");
-            return;
-        }*/
-        Serializable args;
+            Serializable args;
 
-        try {
-             args = readArgs(command, readLine);
-        } catch(WrongArgumentException e) {
-            ioManager.getOutputManager().write("Неверные входные данные");
-            return;
-        }
 
-            if(command.equals("exit")) {
+            try {
+                args = readArgs(command, readLine);
+            } catch (WrongArgumentException e) {
+                ioManager.getOutputManager().write(e.getMessage());
+                return;
+            } catch (IOException e) {
+                ioManager.getOutputManager().write("Файл не найден");
+                return;
+            }
+
+            if (command.equals("exit")) {
                 ioManager.exitProcess();
             }
-            connectionManager.sendToServer(commands.get(command), args);
+            if (!command.equals("execute_script")) {
+                try {
+                    connectionManager.sendToServer(commands.get(command), args);
+                } catch (IOException e) {
+                    ioManager.getOutputManager().write("Ошибка при отправке на сервер");
+                    ioManager.exitProcess();
+                    return;
+                }
 
-            ServerMessage serverMessage = connectionManager.getMessage();
-            String answer = serverMessage.getArguments().toString();
-            ioManager.getOutputManager().write(answer);
+                ServerMessage serverMessage;
+                try {
+                    serverMessage = connectionManager.getMessage();
+                } catch (IOException e) {
+                    ioManager.getOutputManager().write("Ошибка чтения");
+                    return;
+                } catch (WrongArgumentException e) {
+                    ioManager.getOutputManager().write("Неверные входные данные");
+                    return;
+                }
+                String answer = serverMessage.getArguments().toString();
+                ioManager.getOutputManager().write(answer);
+
+            }
+        }catch (NoSuchElementException e) {
+            ioManager.exitProcess();
+            return;
+            }
+        }
 
 
 
-    }
-
-/*
-    private void readFile(String path) throws WrongArgumentException, IOException {
-        consoleManager.getListManager().setPath(path);
-        new XmlManager(consoleManager).fromXML(path);
-    }*/
 
     private Serializable readArgs(String command, String commandArguments) throws WrongArgumentException, PrintException, IOException, ClassNotFoundException {
         ArgumentParser argumentParser = new ArgumentParser();
@@ -103,7 +126,7 @@ public class App {
             return argumentParser.parseArgFromString(commandArguments, Objects::nonNull, Integer::parseInt);
         }
         if (command.equals("update_id")) {
-            if (argumentParser.checkIfTheArgsEmpty(commandArguments)) throw new WrongArgumentException();
+            if (argumentParser.checkIfTheArgsEmpty(commandArguments)) throw new WrongArgumentException("Такого id не существует");
             connectionManager.sendToServer(new DragonByIdCommand(), Integer.parseInt(commandArguments));
             ServerMessage serverMessage = connectionManager.getMessage();
             if(serverMessage.getResponseStatus()==ResponseCode.OK) {
@@ -112,6 +135,15 @@ public class App {
                 return dragon;
             } else {
                 throw new WrongArgumentException();
+            }
+        }
+        if (command.equals("execute_script")) {
+            if(Objects.nonNull(commandArguments)) {
+
+                        if (ioManager.getInputManager().containsFileInStack(commandArguments)) {
+                    throw new WrongArgumentException("Угроза рекурсии!");
+                }
+                ioManager.getInputManager().setFileReading(true, commandArguments);
             }
         }
 

@@ -92,10 +92,5 @@ public class ArgumentReader {
         }
         return readArg(dragonValidator::colorValidator, Color::valueOf);
     }
-    public Date readDate() throws IOException, PrintException {
-        return readArg(dragonValidator::dateValidator, StringConverterRealisation::parseDate);
-    }
-    public int readId() throws IOException, PrintException {
-        return readArg(Objects::nonNull, Integer::parseInt);
-    }
+
 }

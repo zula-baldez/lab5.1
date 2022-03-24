@@ -24,7 +24,7 @@ public class InputManager {
     }
 
 
-    public String read(IoManager ioManager) throws IOException, PrintException {
+    public String read(IoManager ioManager) throws PrintException {
         if (isFileReading()) {
             try {
                 String command = readLine();

@@ -14,6 +14,6 @@ public class RemoveLast extends Command {
     @Override
     public void doInstructions(IoManager ioManager, ListManager listManager, Serializable argument) throws IOException, PrintException {
 
-        listManager.deleteLast(ioManager);
+        ioManager.getOutputManager().writeServerMessage(listManager.deleteLast(ioManager));
     }
 }

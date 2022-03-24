@@ -43,6 +43,9 @@ public class ListManager {
 
     }
 
+    public void setPath(String path1) {
+        this.path = path1;
+    }
 
     public HashSet<Integer> getUsedId() {
         return usedId;
@@ -88,9 +91,9 @@ public class ListManager {
     }
 
     public int generateID() {
-        maxId++;
         usedId.add(maxId);
-        return maxId;
+        maxId++;
+        return maxId-1;
     }
 
     public void clearDragons() {

@@ -36,7 +36,7 @@ public class DragonValidator implements Serializable {
 
 
     public boolean xValidator(Double x) {
-        return (x != null && x > minX);
+        return (x != null && x >= minX);
     }
     public boolean yValidator(Integer y) {
         return (y != null && y <= maxY);

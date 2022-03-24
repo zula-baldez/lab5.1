@@ -3,6 +3,7 @@ package zula.server;
 import org.w3c.dom.ls.LSOutput;
 import zula.common.commands.Command;
 import zula.common.commands.GetListOfCommands;
+import zula.common.commands.ReadDataFromFile;
 import zula.common.data.ResponseCode;
 import zula.common.data.ServerMessage;
 import zula.common.exceptions.PrintException;
@@ -32,24 +33,28 @@ public final class Server {
         ListManager listManager = new ListManager();
         try {
             ServerSocket server = new ServerSocket(4004);
-
             Socket clientSocket = server.accept();
             try  {
                 out = new ObjectOutputStream(clientSocket.getOutputStream());
                 in = new ObjectInputStream(clientSocket.getInputStream());
 
                 IoManager ioManager = new IoManager(new InputManager(new InputStreamReader(in)), new ServerOutputManager(out));
-                xmlManager = new XmlManager(listManager, ioManager);
-                xmlManager.fromXML(listManager.getPath());
+
+
                 while (ioManager.isProcessStillWorks()) {
                     ServerMessage serverMessage = (ServerMessage) in.readObject();
-                    if (serverMessage.getCommand() instanceof GetListOfCommands) {
-                        out.writeObject(new ServerMessage(listManager.getCloneOfCommands(), ResponseCode.OK));
-                        out.flush();
-                    } else {
+                    if (serverMessage.getCommand() instanceof ReadDataFromFile) {
+                        xmlManager = new XmlManager(listManager, ioManager);
 
+
+                        listManager.setPath(serverMessage.getArguments().toString());
+                        xmlManager.fromXML(serverMessage.getArguments().toString());
+                        out.writeObject(new ServerMessage("", ResponseCode.OK));
+                    }
+                    else {
                         serverMessage.getCommand().execute(ioManager, listManager, serverMessage.getArguments());
                     }
+
 
                 }
             }  catch (ClassNotFoundException e) {
@@ -58,6 +63,7 @@ public final class Server {
                 e.printStackTrace();
             } catch (WrongArgumentException e) {
                 out.writeObject(new ServerMessage("В данных XML - ошибка",  ResponseCode.ERROR));
+                e.printStackTrace();
                 return;
             }
         } catch (IOException e) {

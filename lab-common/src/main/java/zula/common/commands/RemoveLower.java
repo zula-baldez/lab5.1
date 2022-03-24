@@ -16,7 +16,7 @@ public class RemoveLower extends Command {
     public void doInstructions(IoManager ioManager, ListManager listManager, Serializable argument) throws IOException, PrintException {
         int id = Integer.parseInt(argument.toString());
 
-        listManager.removeLower(ioManager, id);
+        ioManager.getOutputManager().writeServerMessage(listManager.removeLower(ioManager, id));
 
 
     }
