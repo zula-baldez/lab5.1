@@ -15,13 +15,13 @@ public class ArgumentParser {
                 try {
                     t = stringConverter.convert(readLine);
                 } catch (IllegalArgumentException e) {
-                    throw new WrongArgumentException();
+                    throw new WrongArgumentException("Неверные аргументы");
                 }
             }
             if (predicate.test(t)) {
                 return t;
             } else {
-                throw new WrongArgumentException();
+                throw new WrongArgumentException("Неверные аргументы");
             }
 
     }

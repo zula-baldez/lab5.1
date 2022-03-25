@@ -11,11 +11,13 @@ import zula.common.util.InputManager;
 import zula.common.util.OutputManager;
 
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.HashMap;
 
 public final class Client {
-
+    private static final int SERVERPORT = 4004;
     private Client() {
         throw new UnsupportedOperationException("This is an utility class and can not be instantiated");
     }
@@ -23,29 +25,20 @@ public final class Client {
     public static void main(String[] args) {
         try {
             IoManager ioManager = new IoManager(new InputManager(new InputStreamReader(System.in)), new OutputManager(new OutputStreamWriter(System.out)));
-            ConnectionManager connectionManager = new ConnectionManager("127.0.0.1", 4004, ioManager);
+            ConnectionManager connectionManager = new ConnectionManager("127.0.0.1", SERVERPORT, ioManager);
             try {
                 connectionManager.connectToServer();
-
-            } catch(IOException e) {
-                ioManager.getOutputManager().write("Не удалось подключиться к серверу");
-                return;
-            }
-            try {
-                connectionManager.sendToServer(new GetListOfCommands(), "");
             } catch (IOException e) {
-                ioManager.getOutputManager().write("Не удалось получить список существующий команд");
+                ioManager.getOutputManager().write("Не удалось подключиться к серверу");
                 return;
             }
             HashMap<String, Command> commands;
             try {
+                connectionManager.sendToServer(new GetListOfCommands(), "");
                 ServerMessage serverMessage = connectionManager.getMessage();
                 commands = (HashMap<String, Command>) serverMessage.getArguments();
-            } catch (IOException | ClassNotFoundException e) {
+            } catch (IOException | ClassNotFoundException | WrongArgumentException e) {
                 ioManager.getOutputManager().write("Не удалось получить список доступных команд");
-                return;
-            } catch (WrongArgumentException e) {
-                ioManager.getOutputManager().write(e.getMessage());
                 return;
             }
             ioManager.getOutputManager().write("Список существующих команд загружен успешно.");
@@ -62,7 +55,7 @@ public final class Client {
                 ioManager.getOutputManager().write("Ответ сервера не соответствует протоколу обмена сообщениями");
             }
         } catch (PrintException e) {
-
+            System.out.println("Запись невозможна");
         }
 
     }

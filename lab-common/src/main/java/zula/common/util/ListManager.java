@@ -1,14 +1,30 @@
 package zula.common.util;
 
-import zula.common.data.*;
-import zula.common.exceptions.PrintException;
-import zula.common.util.ArgumentReader;
-import zula.common.util.IoManager;
-import zula.common.commands.*;
+import zula.common.commands.Add;
+import zula.common.commands.AverageOfWingspan;
+import zula.common.commands.Clear;
+import zula.common.commands.Command;
+import zula.common.commands.ExecuteScript;
+import zula.common.commands.Exit;
+import zula.common.commands.Help;
+import zula.common.commands.Info;
+import zula.common.commands.PrintAscending;
+import zula.common.commands.PrintFieldAscendingWingspan;
+import zula.common.commands.RemoveById;
+import zula.common.commands.RemoveLast;
+import zula.common.commands.RemoveLower;
+import zula.common.commands.Reorder;
+import zula.common.commands.Show;
+import zula.common.commands.UpdateId;
+import zula.common.data.Dragon;
+import zula.common.data.ResponseCode;
+import zula.common.data.ServerMessage;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 
 
 /**
@@ -78,13 +94,13 @@ public class ListManager {
         return path;
     }
     public boolean validateId(int id) {
-        if(usedId.contains(id)) {
+        if (usedId.contains(id)) {
             return false;
         } else {
-            if(id < 0) {
+            if (id < 0) {
                 return false;
             }
-            maxId=id+1;
+            maxId = id + 1;
             usedId.add(id);
             return true;
         }
@@ -93,14 +109,14 @@ public class ListManager {
     public int generateID() {
         usedId.add(maxId);
         maxId++;
-        return maxId-1;
+        return maxId - 1;
     }
 
     public void clearDragons() {
         dragons.clear();
     }
 
-    public ServerMessage deleteLast(IoManager ioManager) throws PrintException {
+    public ServerMessage deleteLast(IoManager ioManager) {
         if (dragons.size() != 0) {
             dragons.removeLast();
             return  new ServerMessage("Удаление проведено успешно", ResponseCode.OK);
@@ -109,7 +125,7 @@ public class ListManager {
           return new ServerMessage("Нечего удалять", ResponseCode.ERROR);
         }
     }
-    public ServerMessage removeById(IoManager ioManager, int id) throws PrintException {
+    public ServerMessage removeById(IoManager ioManager, int id) {
         if (idIsUsed(id)) {
             dragons.removeIf(n -> n.getId() == id);
             usedId.remove(id);
@@ -119,15 +135,15 @@ public class ListManager {
           return new ServerMessage("Элемента с id=" + id + " не существует. Проверьте правильность введенных данных.", ResponseCode.ERROR);
         }
     }
-    public ServerMessage getById(IoManager ioManager, int id) throws PrintException {
-        for(Dragon e: dragons) {
-            if(e.getId()==id)
-            return  new ServerMessage("", ResponseCode.OK);
+    public ServerMessage getById(IoManager ioManager, int id) {
+        for (Dragon e: dragons) {
+            if (e.getId() == id) {
+                return new ServerMessage("", ResponseCode.OK);
+            }
         }
-            return new ServerMessage("", ResponseCode.ERROR);
-
+            return new ServerMessage("Элемента с заданным id не существует", ResponseCode.ERROR);
     }
-    public ServerMessage removeLower(IoManager ioManager, int id) throws PrintException {
+    public ServerMessage removeLower(IoManager ioManager, int id) {
         if (idIsUsed(id)) {
             dragons.removeIf(n -> n.getId() < id);
             usedId.remove(id);
@@ -140,28 +156,6 @@ public class ListManager {
         Collections.reverse(dragons);
     }
 
-    public void updateId(IoManager ioManager, int id) {
-       /* for (Dragon drag : dragons) {
-            if (drag.getId() == id) {
-                ArgumentReader argumentReader = new ArgumentReader(ioManager);
-                String name = argumentReader.readName();
-                Coordinates coordinates = argumentReader.readCoordinates();
-                long age = argumentReader.readAge();
-                float wingspan = argumentReader.readWingspan();
-                Color color = argumentReader.readColor();
-                DragonType type = argumentReader.readType();
-                DragonCave cave = argumentReader.readCave();
-                Date date2 = drag.getCreationDate();
-                deleteDragon(drag);
-                System.out.println("Переопределен элемент с введенным id");
-                Dragon dragon = new Dragon(name, coordinates, age, wingspan, color, type, cave);
-                dragon.addAttributes(date2, id);
-                addDragon(dragon);
-                return;
-            }
-        }
-        ioManager.getOutputManager().write("Элемента с id=" + id + " не существует. Проверьте правильность введенных данных.");
-    */
-    }
+
 
 }

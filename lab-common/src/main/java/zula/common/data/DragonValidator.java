@@ -5,7 +5,6 @@ package zula.common.data;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.HashSet;
 
 /*
  * Class that contains methods that check if the data correct

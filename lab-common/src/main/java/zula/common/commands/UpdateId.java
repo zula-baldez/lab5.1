@@ -8,7 +8,6 @@ import zula.common.util.ListManager;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Date;
 
 
 public class UpdateId extends Command {

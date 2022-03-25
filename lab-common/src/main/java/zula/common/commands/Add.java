@@ -18,7 +18,6 @@ import java.util.Date;
 public class Add extends Command implements Serializable {
     @Override
     public void doInstructions(IoManager ioManager, ListManager listManager, Serializable argument) throws IOException, PrintException {
-
         Dragon dragon = (Dragon) argument;
         dragon.addAttributes(new Date(), listManager.generateID());
         listManager.addDragon(dragon);

@@ -1,9 +1,6 @@
 package zula.common.util;
 
-import zula.common.commands.Command;
 import zula.common.exceptions.WrongCommandException;
-
-import java.util.HashMap;
 
 /**
  * class that read the command from the String

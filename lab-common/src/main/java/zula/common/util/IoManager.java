@@ -1,7 +1,6 @@
 package zula.common.util;
 
 
-import zula.common.data.DragonValidator;
 
 /**
  * Class that works with console
