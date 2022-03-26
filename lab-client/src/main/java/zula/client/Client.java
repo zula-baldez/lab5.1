@@ -19,10 +19,10 @@ import java.util.logging.Logger;
 
 public final class Client {
     private static final int SERVERPORT = 4004;
+    private static final Logger CLIENTLOGGER = Logger.getLogger("ClintLogger");
     private Client() {
         throw new UnsupportedOperationException("This is an utility class and can not be instantiated");
     }
-    public static Logger logger = Logger.getLogger("logger");
 
     public static void main(String[] args) {
         try {
@@ -30,10 +30,10 @@ public final class Client {
             ConnectionManager connectionManager = new ConnectionManager("127.0.0.1", SERVERPORT, ioManager);
             try {
                 connectionManager.connectToServer();
-                logger.info("Подключение установлено");
+                CLIENTLOGGER.info("Подключение установлено");
             } catch (IOException e) {
                 ioManager.getOutputManager().write("Не удалось подключиться к серверу");
-                logger.severe("Ошибка при соединении");
+                CLIENTLOGGER.severe("Ошибка при соединении");
                 return;
             }
             HashMap<String, Command> commands;
@@ -45,7 +45,7 @@ public final class Client {
                 ioManager.getOutputManager().write("Не удалось получить список доступных команд");
                 return;
             }
-            logger.info("Получен список доступных команд");
+            CLIENTLOGGER.info("Получен список доступных команд");
             ioManager.getOutputManager().write("Список существующих команд загружен успешно.");
             App app = new App(ioManager, connectionManager, commands);
             if (args.length != 1) {

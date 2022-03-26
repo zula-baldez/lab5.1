@@ -15,8 +15,10 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
 import java.nio.channels.SocketChannel;
+import java.util.logging.Logger;
 
 public class ConnectionManager {
+    private static final Logger CONNECTIONLOGGER = Logger.getLogger("Connection logger");
     private ObjectInputStream in;
     private ObjectOutputStream out;
     private int countOfAccessAttemps = 0;
@@ -42,6 +44,7 @@ public class ConnectionManager {
             countOfAccessAttemps++;
             ioManager.getOutputManager().write("Попытка подключения...");
             if (countOfAccessAttemps > maxAttemps) {
+                CONNECTIONLOGGER.severe("Не удалось установить соединение");
                 throw new IOException();
             } else {
                 connect();
@@ -56,6 +59,7 @@ public class ConnectionManager {
 
     public void connectToServer() throws PrintException, IOException {
         connect();
+        CONNECTIONLOGGER.info("Установлено соединение");
         ioManager.getOutputManager().write("Подключение установлено!");
     }
 
@@ -64,6 +68,7 @@ public class ConnectionManager {
         try {
             countOfAccessAttemps = 0;
             out.writeObject(new ServerMessage(command, args, ResponseCode.OK));
+            CONNECTIONLOGGER.info("Успешная отправка на сервер");
         } catch (IOException e) {
             connectToServer();
             out.writeObject(new ServerMessage(command, args, ResponseCode.OK));

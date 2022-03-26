@@ -19,11 +19,11 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-
-
+import java.util.logging.Logger;
 
 
 public final class Server {
+    private static final Logger SERVERLOGGER = Logger.getLogger("Server logger");
     private static XmlManager xmlManager = null;
     private static ObjectInputStream in;
     private static ObjectOutputStream out = null;
@@ -42,6 +42,7 @@ public final class Server {
                 out = new ObjectOutputStream(clientSocket.getOutputStream());
                 in = new ObjectInputStream(clientSocket.getInputStream());
                 IoManager ioManager = new IoManager(new InputManager(new InputStreamReader(in)), new ServerOutputManager(out));
+                SERVERLOGGER.info("успешное соединение");
                 while (ioManager.isProcessStillWorks()) {
                     ServerMessage serverMessage = (ServerMessage) in.readObject();
                     if (serverMessage.getCommand() instanceof ReadDataFromFile) {
@@ -51,6 +52,7 @@ public final class Server {
                         out.writeObject(new ServerMessage("", ResponseCode.OK));
                     } else {
                         serverMessage.getCommand().execute(ioManager, listManager, serverMessage.getArguments());
+                        SERVERLOGGER.info("Успешное выполнение команды");
                     }
                 }
             }  catch (ClassNotFoundException | PrintException e) {
@@ -61,9 +63,8 @@ public final class Server {
                 return;
             }
         } catch (IOException e) {
-            if(xmlManager != null) {
+            if (xmlManager != null) {
                 xmlManager.toXML(listManager.getCopyOfList(), listManager.getPath());
-
             }
             return;
         }

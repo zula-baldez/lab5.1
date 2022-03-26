@@ -25,9 +25,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.logging.Logger;
 
 
 public class App {
+    private static final Logger APPLOGGER = Logger.getLogger("App logger");
     private final IoManager ioManager;
     private final ConnectionManager connectionManager;
     private final HashMap<String, Command> commands;
@@ -47,6 +49,7 @@ public class App {
             ioManager.getOutputManager().write(e.getMessage());
             return;
         }
+        APPLOGGER.info("Загружен файл для работы");
         while (ioManager.isProcessStillWorks()) {
             readAndExecute();
         }
@@ -94,12 +97,11 @@ public class App {
     }
         private String parseCommand(String readLine)  throws WrongCommandException {
             String command;
-
                 command = CommandParser.commandParse(readLine, ioManager);
                 if (!commands.containsKey(command)) {
                     throw new WrongCommandException();
                 }
-
+            APPLOGGER.info("Из входных данных получена команда");
             return command;
         }
     private String parseArgs(String command, String readLine) {
@@ -129,9 +131,11 @@ public class App {
             ioManager.getInputManager().setFileReading(true, commandArguments);
         }
         if ("add".equals(command) || "execute_script".equals(command) || "remove_by_id".equals(command) || "remove_lower".equals(command) || "update_id".equals(command)) {
+            APPLOGGER.info("Получены аргументы");
             return arguments;
         } else {
             if ("".equals(commandArguments)) {
+                APPLOGGER.info("Получены аргументы");
                 return "";
             }
             throw new WrongArgumentException("Неверные аргументы");
