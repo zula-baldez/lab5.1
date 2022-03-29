@@ -1,4 +1,4 @@
-package zula.common.util;
+package zula.server.util;
 
 import zula.common.commands.Add;
 import zula.common.commands.AverageOfWingspan;
@@ -19,6 +19,8 @@ import zula.common.commands.UpdateId;
 import zula.common.data.Dragon;
 import zula.common.data.ResponseCode;
 import zula.common.data.ServerMessage;
+import zula.common.util.CollectionManager;
+import zula.common.util.IoManager;
 
 import java.util.Collections;
 import java.util.Date;
@@ -32,7 +34,7 @@ import java.util.LinkedList;
  * information like list of commands or
  * list of objects we work with
  */
-public class ListManager {
+public class ListManager implements CollectionManager {
     private int maxId = 1;
     private String path = "C:\\Users\\moyak\\IdeaProjects\\prog5test\\XMLL.xml";
     private final LinkedList<Dragon> dragons = new LinkedList<>();

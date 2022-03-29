@@ -1,8 +1,8 @@
-package zula.common.util;
+package zula.server.util;
 
 import zula.common.data.ResponseCode;
 import zula.common.data.ServerMessage;
-import zula.common.exceptions.PrintException;
+import zula.common.util.OutputManager;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -17,7 +17,7 @@ public class ServerOutputManager extends OutputManager {
         outputStreamWriter = outputStream1;
     }
     @Override
-    public void write(Serializable arg) throws PrintException {
+    public void write(Serializable arg) {
         ServerMessage serverMessage;
         if (!(arg == null)) {
             serverMessage = new ServerMessage(arg, ResponseCode.OK);

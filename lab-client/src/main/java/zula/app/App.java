@@ -4,7 +4,6 @@ package zula.app;
 import zula.client.ConnectionManager;
 import zula.common.commands.Command;
 import zula.common.commands.DragonByIdCommand;
-import zula.common.commands.ReadDataFromFile;
 import zula.common.data.Color;
 import zula.common.data.Coordinates;
 import zula.common.data.Dragon;
@@ -16,9 +15,10 @@ import zula.common.exceptions.PrintException;
 import zula.common.exceptions.WrongArgumentException;
 import zula.common.exceptions.WrongCommandException;
 import zula.common.util.ArgumentParser;
-import zula.common.util.ArgumentReader;
-import zula.common.util.CommandParser;
 import zula.common.util.IoManager;
+import zula.util.ArgumentReader;
+import zula.util.CommandParser;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Date;
@@ -41,15 +41,8 @@ public class App {
         commands = commands1;
     }
 
-    public void startApp(String path) throws PrintException, IOException, ClassNotFoundException {
-        connectionManager.sendToServer(new ReadDataFromFile(), path);
-        try {
-            connectionManager.getMessage();
-        } catch (WrongArgumentException e) {
-            ioManager.getOutputManager().write(e.getMessage());
-            return;
-        }
-        APPLOGGER.info("Загружен файл для работы");
+    public void startApp() throws PrintException, IOException, ClassNotFoundException {
+
         while (ioManager.isProcessStillWorks()) {
             readAndExecute();
         }

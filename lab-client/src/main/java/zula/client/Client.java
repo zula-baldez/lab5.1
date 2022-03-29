@@ -18,8 +18,10 @@ import java.util.HashMap;
 import java.util.logging.Logger;
 
 public final class Client {
-    private static final int SERVERPORT = 4004;
+    private static int port;
+    private static String ip = "127.0.0.1";
     private static final Logger CLIENTLOGGER = Logger.getLogger("ClintLogger");
+
     private Client() {
         throw new UnsupportedOperationException("This is an utility class and can not be instantiated");
     }
@@ -27,15 +29,18 @@ public final class Client {
     public static void main(String[] args) {
         try {
             IoManager ioManager = new IoManager(new InputManager(new InputStreamReader(System.in)), new OutputManager(new OutputStreamWriter(System.out)));
-            ConnectionManager connectionManager = new ConnectionManager("127.0.0.1", SERVERPORT, ioManager);
-            try {
-                connectionManager.connectToServer();
-                CLIENTLOGGER.info("Подключение установлено");
-            } catch (IOException e) {
-                ioManager.getOutputManager().write("Не удалось подключиться к серверу");
-                CLIENTLOGGER.severe("Ошибка при соединении");
+            if (args.length != 2) {
                 return;
             }
+            ip = args[0];
+            try {
+                port = Integer.parseInt(args[1]);
+            } catch (NumberFormatException e) {
+                ioManager.getOutputManager().write("Неверные аргументы командной строки");
+                return;
+            }
+            ConnectionManager connectionManager = new ConnectionManager(ip, port, ioManager);
+            connect(connectionManager, ioManager);
             HashMap<String, Command> commands;
             try {
                 connectionManager.sendToServer(new GetListOfCommands(), "");
@@ -48,12 +53,8 @@ public final class Client {
             CLIENTLOGGER.info("Получен список доступных команд");
             ioManager.getOutputManager().write("Список существующих команд загружен успешно.");
             App app = new App(ioManager, connectionManager, commands);
-            if (args.length != 1) {
-                ioManager.getOutputManager().write("Неверный аргумент командной строки");
-                return;
-            }
             try {
-                app.startApp(args[0]);
+                app.startApp();
             } catch (IOException e) {
                 ioManager.getOutputManager().write("Соединение потеряно");
             } catch (ClassNotFoundException e) {
@@ -63,4 +64,17 @@ public final class Client {
             System.out.println("Запись невозможна");
         }
     }
+
+
+    private static void connect(ConnectionManager connectionManager, IoManager ioManager) throws PrintException {
+        try {
+            connectionManager.connectToServer();
+            CLIENTLOGGER.info("Подключение установлено");
+        } catch (IOException e) {
+            ioManager.getOutputManager().write("Не удалось подключиться к серверу");
+            CLIENTLOGGER.severe("Ошибка при соединении");
+        }
+
+    }
+
 }

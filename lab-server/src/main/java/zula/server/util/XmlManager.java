@@ -14,8 +14,8 @@ import zula.common.data.DragonType;
 import zula.common.data.DragonValidator;
 import zula.common.exceptions.WrongArgumentException;
 import zula.common.util.ArgumentParser;
+import zula.common.util.CollectionManager;
 import zula.common.util.IoManager;
-import zula.common.util.ListManager;
 import zula.common.util.StringConverter;
 import zula.common.util.StringConverterRealisation;
 
@@ -53,17 +53,17 @@ public class XmlManager {
     private final HashMap<String, Integer> flags = new HashMap<>();
     private final ArgumentParser argumentParser;
     private final DragonValidator dragonValidator;
-    private final ListManager listManager;
+    private final CollectionManager collectionManager;
     private final IoManager ioManager;
-    public XmlManager(ListManager listManager1, IoManager ioManager1) {
+    public XmlManager(CollectionManager collectionManager1, IoManager ioManager1) {
         this.argumentParser = new ArgumentParser();
         this.dragonValidator = new DragonValidator();
-        this.listManager = listManager1;
+        this.collectionManager = collectionManager1;
         this.ioManager = ioManager1;
     }
     public void fromXML(String path) throws WrongArgumentException, IOException {
         if (!path.matches("^.*xml$")) {
-            throw new IOException();
+            throw new WrongArgumentException();
         }
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db;
@@ -87,7 +87,7 @@ public class XmlManager {
             if (flags.get("name") == 1 && flags.get("coordinates") == 1 && flags.get("creationDate") == 1 && flags.get("age") == 1 && flags.get("wingspan") == 1 && flags.get("color") == 1 && flags.get("type") == 1 && flags.get("cave") == 1 && flags.get("id") == 1) {
                 Dragon drago = new Dragon(name, coordinates, age, wingspan, color, type, cave);
                 drago.addAttributes(creationDate, id);
-               listManager.addDragon(drago);
+               collectionManager.addDragon(drago);
             } else {
                 throw new WrongArgumentException();
             }
@@ -124,7 +124,7 @@ public class XmlManager {
             }
             if ("id".equals(nodeName)) {
                 id = parseSimpleArgs(node, Objects::nonNull, Integer::parseInt);
-                if (!listManager.validateId(id)) {
+                if (!collectionManager.validateId(id)) {
                     throw new WrongArgumentException();
                 }
             }

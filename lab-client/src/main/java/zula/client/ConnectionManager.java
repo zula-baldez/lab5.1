@@ -53,10 +53,6 @@ public class ConnectionManager {
         }
     }
 
-
-
-
-
     public void connectToServer() throws PrintException, IOException {
         connect();
         CONNECTIONLOGGER.info("Установлено соединение");
