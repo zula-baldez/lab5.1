@@ -12,6 +12,5 @@ public class Exit extends Command {
     @Override
     public void doInstructions(IoManager ioManager, CollectionManager collectionManager, Serializable argument) throws IOException, PrintException {
         ioManager.getOutputManager().write("До свидания!");
-        ioManager.exitProcess();
     }
 }

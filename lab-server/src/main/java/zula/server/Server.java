@@ -1,10 +1,8 @@
 package zula.server;
 
 
-import zula.common.data.ServerMessage;
 import zula.common.exceptions.PrintException;
 import zula.common.exceptions.WrongArgumentException;
-
 import zula.common.util.InputManager;
 import zula.common.util.IoManager;
 import zula.server.commands.Save;
@@ -12,7 +10,6 @@ import zula.server.util.ListManager;
 import zula.server.util.ServerOutputManager;
 import zula.server.util.XmlManager;
 
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;

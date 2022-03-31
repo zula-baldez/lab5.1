@@ -17,7 +17,7 @@ import zula.common.exceptions.WrongCommandException;
 import zula.common.util.ArgumentParser;
 import zula.common.util.IoManager;
 import zula.util.ArgumentReader;
-import zula.common.util.CommandParser;
+import zula.util.CommandParser;
 
 import java.io.IOException;
 import java.io.Serializable;

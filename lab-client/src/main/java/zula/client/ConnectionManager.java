@@ -17,14 +17,8 @@ import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.util.Arrays;
 import java.util.logging.Logger;
-
-
-
-
-
-
-
 
 
 
@@ -42,6 +36,10 @@ public class ConnectionManager {
     private final PipedOutputStream pipedOutputStream = new PipedOutputStream(); //то есть первый поток байт отличается от последующих
     private PipedInputStream pipedInputStream; //для этого приходится сохранять созданные объекты, чтобы потоки байт обрабатывались корректно
     private ObjectInputStream objectInputStream; //А само использования этих объектов обусловлено тем, что в java нет специальных методов для сериализации напрямую
+    private boolean flag2 = false;
+    private boolean flag = false;
+    private final int buffSize = 5555;
+    private final int waitingTime = 1000;
     public ConnectionManager(String ip, int port, IoManager ioManager1) {
         serverIp = ip;
         serverPort = port;
@@ -57,8 +55,8 @@ public class ConnectionManager {
         } catch (IOException e) {
             countOfAccessAttemps++;
             ioManager.getOutputManager().write("Попытка подключения...");
-            try{
-                Thread.sleep(1000);
+            try {
+                Thread.sleep(waitingTime);
             } catch (InterruptedException ee) {
                 return;
             }
@@ -75,7 +73,7 @@ public class ConnectionManager {
     public void connectToServer() throws PrintException, IOException {
         connect();
         os = new ObjectOutputStream(out);
-        pipedInputStream = new PipedInputStream(pipedOutputStream, 5000);
+        pipedInputStream = new PipedInputStream(pipedOutputStream, buffSize);
     }
 
 
@@ -96,12 +94,12 @@ public class ConnectionManager {
         }
 
     public ServerMessage getMessage() throws IOException, ClassNotFoundException, WrongArgumentException {
-        try {
-            Thread.sleep(100);
-        } catch (Throwable e) {
+       try {
+            Thread.sleep(waitingTime); //ждем данных
+        } catch (InterruptedException e) {
             throw new IOException();
         }
-        ByteBuffer byteBuffer  = ByteBuffer.allocate(5555);
+        ByteBuffer byteBuffer  = ByteBuffer.allocate(buffSize);
         client.read(byteBuffer);
         byteBuffer.flip();
         byte[] bytes = new byte[byteBuffer.limit()];
@@ -110,7 +108,7 @@ public class ConnectionManager {
 
     }
 
-    private boolean flag2 = false;
+
     public ServerMessage deserialize(byte[] data) throws IOException, ClassNotFoundException {
         pipedOutputStream.write(data, 0, data.length);
         if (!flag2) {
@@ -119,9 +117,11 @@ public class ConnectionManager {
         }
         return (ServerMessage) objectInputStream.readObject();
     }
-    private boolean flag = false;
+
     public byte[] serialize(ServerMessage serverMessage) throws IOException {
-        if (flag) out.reset();
+        if (flag) {
+            out.reset();
+        }
         os.writeObject(serverMessage);
         flag = true;
         return out.toByteArray();
