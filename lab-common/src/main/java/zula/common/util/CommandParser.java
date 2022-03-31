@@ -1,7 +1,6 @@
-package zula.util;
+package zula.common.util;
 
 import zula.common.exceptions.WrongCommandException;
-import zula.common.util.IoManager;
 
 /**
  * class that read the command from the String
@@ -16,7 +15,7 @@ public final class CommandParser {
             throw new WrongCommandException();
         }
         String command = args[0];
-        return  command;
+        return command;
 
     }
 }

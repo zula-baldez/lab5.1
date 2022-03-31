@@ -32,4 +32,8 @@ public class ServerMessage implements Serializable {
     public ResponseCode getResponseStatus() {
         return responseCode;
     }
+
+
+
+
 }

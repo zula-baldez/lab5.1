@@ -7,6 +7,7 @@ import zula.common.exceptions.WrongArgumentException;
 
 import zula.common.util.InputManager;
 import zula.common.util.IoManager;
+import zula.server.commands.Save;
 import zula.server.util.ListManager;
 import zula.server.util.ServerOutputManager;
 import zula.server.util.XmlManager;
@@ -28,13 +29,14 @@ public final class Server {
     private static ObjectOutputStream out = null;
     private static final int PORT = 4004;
     private static ListManager listManager = new ListManager();
+    private static IoManager ioManager = null;
 
     private Server() {
         throw new UnsupportedOperationException("This is an utility class and can not be instantiated");
     }
 
 
-    public static void main(String[] args) throws ParserConfigurationException {
+    public static void main(String[] args) {
 
         try {
             ServerSocket server = new ServerSocket(PORT);
@@ -42,7 +44,7 @@ public final class Server {
 
                 out = new ObjectOutputStream(clientSocket.getOutputStream());
                 in = new ObjectInputStream(clientSocket.getInputStream());
-                IoManager ioManager = new IoManager(new InputManager(new InputStreamReader(in)), new ServerOutputManager(out));
+                ioManager = new IoManager(new InputManager(new InputStreamReader(in)), new ServerOutputManager(out));
                 if (args.length != 1 || args[0] == null) {
                     return;
                 }
@@ -50,19 +52,16 @@ public final class Server {
                 listManager.setPath(args[0]);
                 xmlManager.fromXML(args[0]);
                 SERVERLOGGER.info("успешное соединение");
-                while (ioManager.isProcessStillWorks()) {
-                    ServerMessage serverMessage = (ServerMessage) in.readObject();
-                    serverMessage.getCommand().execute(ioManager, listManager, serverMessage.getArguments());
-                    SERVERLOGGER.info("Успешное выполнение команды");
-                    }
-            }  catch (ClassNotFoundException | PrintException | IOException e) {
-                if (xmlManager != null) {
-                    xmlManager.toXML(listManager.getCopyOfList(), listManager.getPath());
-                }
-                return;
+
+                ServerApp serverApp = new ServerApp();
+                serverApp.startApp(ioManager, in, listManager);
+
             } catch (WrongArgumentException e) {
                 SERVERLOGGER.severe("В пути к файлу или в его содержимом - ошибка");
+            } catch (PrintException | ClassNotFoundException | IOException e) {
+                Save save = new Save();
+                save.execute(ioManager, listManager);
             }
-        xmlManager.toXML(listManager.getCopyOfList(), listManager.getPath());
+
     }
 }
