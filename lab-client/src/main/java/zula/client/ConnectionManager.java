@@ -16,8 +16,8 @@ import java.io.PipedOutputStream;
 import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.channels.NotYetConnectedException;
 import java.nio.channels.SocketChannel;
-import java.util.Arrays;
 import java.util.logging.Logger;
 
 
@@ -31,13 +31,13 @@ public class ConnectionManager {
     private final int serverPort;
     private final IoManager ioManager;
     private final int maxAttemps = 5;
-    private ByteArrayOutputStream out = new ByteArrayOutputStream(); //Нужны для сериализации и десериализации
-    private ObjectOutputStream os; //проблема в том, что у Object stream'ов при первом обращении существуют специальные символы
-    private final PipedOutputStream pipedOutputStream = new PipedOutputStream(); //то есть первый поток байт отличается от последующих
-    private PipedInputStream pipedInputStream; //для этого приходится сохранять созданные объекты, чтобы потоки байт обрабатывались корректно
-    private ObjectInputStream objectInputStream; //А само использования этих объектов обусловлено тем, что в java нет специальных методов для сериализации напрямую
-    private boolean flag2 = false;
-    private boolean flag = false;
+    private ByteArrayOutputStream objectSerializationBuffer = new ByteArrayOutputStream(); //Нужны для сериализации и десериализации
+    private ObjectOutputStream objectSerializer; //проблема в том, что у Object stream'ов при первом обращении существуют специальные символы
+    private final PipedOutputStream objectDeserializationBuffer = new PipedOutputStream(); //то есть первый поток байт отличается от последующих
+    private PipedInputStream writerToObjectDeserializationBuffer; //для этого приходится сохранять созданные объекты, чтобы потоки байт обрабатывались корректно
+    private ObjectInputStream objectDeserealizer; //А само использования этих объектов обусловлено тем, что в java нет специальных методов для сериализации напрямую
+    private boolean isItNotFirstDeserialization = false;
+    private boolean isItNotFirstSerialization = false;
     private final int buffSize = 5555;
     private final int waitingTime = 1000;
     public ConnectionManager(String ip, int port, IoManager ioManager1) {
@@ -72,8 +72,8 @@ public class ConnectionManager {
 
     public void connectToServer() throws PrintException, IOException {
         connect();
-        os = new ObjectOutputStream(out);
-        pipedInputStream = new PipedInputStream(pipedOutputStream, buffSize);
+        objectSerializer = new ObjectOutputStream(objectSerializationBuffer);
+        writerToObjectDeserializationBuffer = new PipedInputStream(objectDeserializationBuffer, buffSize);
     }
 
 
@@ -90,6 +90,8 @@ public class ConnectionManager {
             ByteBuffer byteBuffer = ByteBuffer.wrap(serialize(serverMessage));
 
             client.write(byteBuffer);
+        } catch (NotYetConnectedException e) {
+            throw new IOException();
         }
         }
 
@@ -110,21 +112,21 @@ public class ConnectionManager {
 
 
     public ServerMessage deserialize(byte[] data) throws IOException, ClassNotFoundException {
-        pipedOutputStream.write(data, 0, data.length);
-        if (!flag2) {
-            objectInputStream = new ObjectInputStream(pipedInputStream);
-            flag2 = true;
+        objectDeserializationBuffer.write(data, 0, data.length);
+        if (!isItNotFirstDeserialization) {
+            objectDeserealizer = new ObjectInputStream(writerToObjectDeserializationBuffer);
+            isItNotFirstDeserialization = true;
         }
-        return (ServerMessage) objectInputStream.readObject();
+        return (ServerMessage) objectDeserealizer.readObject();
     }
 
     public byte[] serialize(ServerMessage serverMessage) throws IOException {
-        if (flag) {
-            out.reset();
+        if (isItNotFirstSerialization) {
+            objectSerializationBuffer.reset();
         }
-        os.writeObject(serverMessage);
-        flag = true;
-        return out.toByteArray();
+        objectSerializer.writeObject(serverMessage);
+        isItNotFirstSerialization = true;
+        return objectSerializationBuffer.toByteArray();
     }
 
 }

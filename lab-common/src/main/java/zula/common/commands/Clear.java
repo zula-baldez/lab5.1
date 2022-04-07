@@ -4,8 +4,6 @@ package zula.common.commands;
 import zula.common.exceptions.PrintException;
 import zula.common.util.CollectionManager;
 import zula.common.util.IoManager;
-
-
 import java.io.IOException;
 import java.io.Serializable;
 

@@ -22,11 +22,8 @@ import zula.common.data.ServerMessage;
 import zula.common.util.CollectionManager;
 import zula.common.util.IoManager;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -59,6 +56,41 @@ public class ListManager implements CollectionManager {
         commands.put("print_field_ascending_wingspan", new PrintFieldAscendingWingspan());
         commands.put("add", new Add());
 
+    }
+
+    @Override
+    public List<Float> printFieldAscendingWingspan() {
+        return getCopyOfList().stream().map(Dragon::getWingspan).sorted((o1, o2) -> (int) (o1 - o2)).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Dragon> printAscending() {
+        List<Dragon> toSort = getCopyOfList();
+        toSort = toSort.stream().sorted((o1, o2) -> (int) (o1.getWingspan() - o2.getWingspan())).collect(Collectors.toList());
+        return toSort;
+    }
+
+    @Override
+    public String show() {
+        List<Dragon> toSort = getCopyOfList();
+        toSort = toSort.stream().sorted((o1, o2) -> {
+            if (o1.getName().length() != o2.getName().length()) {
+                return o1.getName().length() - o2.getName().length();
+            } else {
+                return o1.getName().compareTo(o2.getName());
+            }
+        }).collect(Collectors.toList());
+        String s = "";
+
+        for (Dragon e: toSort) {
+            s += e.toString() + '\n';
+        }
+        return s;
+    }
+
+    @Override
+    public double getAverageOfWingspan() {
+        return getCopyOfList().stream().mapToDouble(d -> (double) d.getWingspan()).average().orElse(0);
     }
 
     public void setPath(String path1) {
