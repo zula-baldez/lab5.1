@@ -1,6 +1,5 @@
 package zula.server.util;
 
-import sun.rmi.runtime.Log;
 import zula.common.data.ResponseCode;
 import zula.common.data.ServerMessage;
 import zula.common.util.OutputManager;
@@ -58,8 +57,12 @@ public class ServerOutputManager extends OutputManager {
     }
 
     @Override
-    public void writeServerMessage(ServerMessage serverMessage) throws IOException {
+    public void writeServerMessage(ServerMessage serverMessage) {
+        try {
         outputStreamWriter.write(serialize(serverMessage));
+        } catch (IOException e) {
+            serverOutputLogger.severe("Ошибка сериализации");
+        }
     }
 
 

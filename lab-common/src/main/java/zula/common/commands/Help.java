@@ -4,12 +4,11 @@ package zula.common.commands;
 import zula.common.exceptions.PrintException;
 import zula.common.util.CollectionManager;
 import zula.common.util.IoManager;
-import java.io.IOException;
 import java.io.Serializable;
 
 public class Help extends Command {
     @Override
-    public void doInstructions(IoManager ioManager, CollectionManager collectionManager, Serializable argument) throws IOException, PrintException {
+    public void doInstructions(IoManager ioManager, CollectionManager collectionManager, Serializable argument) throws PrintException {
         ioManager.getOutputManager().write("help : вывести справку по доступным командам\n"
                 + "info : вывести в стандартный поток вывода информацию о коллекции (тип, дата инициализации, количество элементов и т.д.)\n"
                 + "show : вывести в стандартный поток вывода все элементы коллекции в строковом представлении\n"

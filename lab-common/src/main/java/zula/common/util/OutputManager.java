@@ -23,7 +23,7 @@ public class OutputManager {
         }
 
     }
-    public void writeServerMessage(ServerMessage serverMessage) throws IOException {
+    public void writeServerMessage(ServerMessage serverMessage)  {
         //do nothing, just to polymorphism
     }
     public void writeWithResponse(Serializable arg, ResponseCode responseCode) throws PrintException {
