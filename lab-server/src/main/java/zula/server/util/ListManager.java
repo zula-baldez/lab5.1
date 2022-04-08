@@ -90,12 +90,12 @@ public class ListManager implements CollectionManager {
                 return o1.getName().compareTo(o2.getName());
             }
         }).collect(Collectors.toList());
-        StringBuilder s = new StringBuilder();
+        StringBuilder result = new StringBuilder();
 
         for (Dragon e: toSort) {
-            s.append(e.toString()).append('\n');
+            result.append(e.toString()).append('\n');
         }
-        return s.toString();
+        return result.toString();
     }
 
     @Override

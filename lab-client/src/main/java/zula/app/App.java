@@ -22,7 +22,6 @@ import zula.util.ArgumentReader;
 import zula.util.CommandParser;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
@@ -69,13 +68,9 @@ public class App {
                 ioManager.exitProcess();
             }
             connectionManager.sendToServer(commands.get(command), args);
-            try {
-                ServerMessage serverMessage = connectionManager.getMessage();
-                String answer = serverMessage.getArguments().toString();
-                ioManager.getOutputManager().write(answer);
-            } catch (IOException e) {
-                ioManager.getOutputManager().write("Не удалось прочитать ответ сервера");
-            }
+            ServerMessage serverMessage = connectionManager.getMessage();
+            String answer = serverMessage.getArguments().toString();
+            ioManager.getOutputManager().write(answer);
         } catch (NoSuchElementException e) {
             ioManager.exitProcess();
         } catch (WrongCommandException e) {

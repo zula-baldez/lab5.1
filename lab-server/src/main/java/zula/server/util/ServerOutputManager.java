@@ -1,5 +1,6 @@
 package zula.server.util;
 
+import sun.rmi.runtime.Log;
 import zula.common.data.ResponseCode;
 import zula.common.data.ServerMessage;
 import zula.common.util.OutputManager;
@@ -11,12 +12,14 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
+import java.util.logging.Logger;
 
 public class ServerOutputManager extends OutputManager {
     private final OutputStream outputStreamWriter; //
     private final ObjectOutputStream serializer; //сериализатор
     private final ByteArrayOutputStream serializationBuffer = new ByteArrayOutputStream(); //нужен для получения количества символов в сериализованном потоке
     private final int sizeOfIntInBytes = 4;
+    private final Logger serverOutputLogger = Logger.getLogger("ServerOutput");
     public ServerOutputManager(OutputStream outputStream1) throws IOException {
         super(new OutputStreamWriter(outputStream1));
         outputStreamWriter = outputStream1;
@@ -48,7 +51,7 @@ public class ServerOutputManager extends OutputManager {
         try {
             outputStreamWriter.write(serialize(serverMessage));
         } catch (IOException e) {
-            e.printStackTrace();
+           serverOutputLogger.severe("Ошибка сериализации");
         }
 
     }
