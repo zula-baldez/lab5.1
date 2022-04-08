@@ -28,12 +28,16 @@ public final class Client {
     }
 
     public static void main(String[] args) throws PrintException {
-        try {
             if (args.length != 2) {
+                IO_MANAGER.getOutputManager().write("Неверные аргументы командной строки");
                 return;
             }
             ip = args[0];
-            port = Integer.parseInt(args[1]);
+            try {
+                port = Integer.parseInt(args[1]);
+            } catch (NumberFormatException ex) {
+                IO_MANAGER.getOutputManager().write("Неверные аргументы командной строки");
+            }
             ConnectionManager connectionManager = new ConnectionManager(ip, port, IO_MANAGER);
             try {
                 connectionManager.connectToServer();
@@ -60,9 +64,7 @@ public final class Client {
             } catch (ClassNotFoundException e) {
                 IO_MANAGER.getOutputManager().write("Неверные данные");
             }
-        } catch (NumberFormatException ex) {
-            IO_MANAGER.getOutputManager().write("Неверные аргументы командной строки");
-        }
+
     }
 
 

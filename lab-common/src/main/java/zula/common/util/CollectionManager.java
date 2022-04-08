@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public interface CollectionManager {
+    void updateId(Dragon dragon);
 
     List<Float> printFieldAscendingWingspan();
 
@@ -24,11 +25,11 @@ public interface CollectionManager {
 
     HashSet<Integer> getUsedId();
 
-    void addDragon(Dragon e);
+    void addDragon(Dragon dragon);
 
     LinkedList<Dragon> getCopyOfList();
 
-    void deleteDragon(Dragon e);
+    void deleteDragon(Dragon dragon);
 
     HashMap<String, Command> getCloneOfCommands();
 
@@ -44,13 +45,13 @@ public interface CollectionManager {
 
     void clearDragons();
 
-    ServerMessage deleteLast(IoManager ioManager);
+    ServerMessage deleteLast();
 
-    ServerMessage removeById(IoManager ioManager, int id);
+    ServerMessage removeById(int id);
 
-    ServerMessage getById(IoManager ioManager, int id);
+    ServerMessage getById(int id);
 
-    ServerMessage removeLower(IoManager ioManager, int id);
+    ServerMessage removeLower(int id);
 
     void reverseList();
 

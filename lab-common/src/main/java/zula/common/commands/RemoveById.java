@@ -16,7 +16,7 @@ public class RemoveById extends Command {
     public void doInstructions(IoManager ioManager, CollectionManager collectionManager, Serializable argument) throws IOException, PrintException {
 
         int id = Integer.parseInt(argument.toString());
-        ioManager.getOutputManager().writeServerMessage(collectionManager.removeById(ioManager, id));
+        ioManager.getOutputManager().writeServerMessage(collectionManager.removeById(id));
 
 
 

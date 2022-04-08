@@ -13,9 +13,7 @@ public class UpdateId extends Command {
 
     @Override
     public void doInstructions(IoManager ioManager, CollectionManager collectionManager, Serializable argument) throws IOException, PrintException {
-        collectionManager.removeById(ioManager, (((Dragon) argument).getId()));
-        Dragon dragon = (Dragon) argument;
-        collectionManager.addDragon(dragon);
+        collectionManager.updateId((Dragon) argument);
         ioManager.getOutputManager().write("Выбранный элемент успешно обновлен");
     }
 }

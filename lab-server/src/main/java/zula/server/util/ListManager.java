@@ -20,7 +20,6 @@ import zula.common.data.Dragon;
 import zula.common.data.ResponseCode;
 import zula.common.data.ServerMessage;
 import zula.common.util.CollectionManager;
-import zula.common.util.IoManager;
 
 import java.util.Collections;
 import java.util.Date;
@@ -61,6 +60,12 @@ public class ListManager implements CollectionManager {
         commands.put("print_field_ascending_wingspan", new PrintFieldAscendingWingspan());
         commands.put("add", new Add());
 
+    }
+
+    @Override
+    public void updateId(Dragon dragon) {
+        removeById(dragon.getId());
+        addDragon(dragon);
     }
 
     @Override
@@ -155,7 +160,7 @@ public class ListManager implements CollectionManager {
         dragons.clear();
     }
 
-    public ServerMessage deleteLast(IoManager ioManager) {
+    public ServerMessage deleteLast() {
         if (dragons.size() != 0) {
             dragons.removeLast();
             return  new ServerMessage("Удаление проведено успешно", ResponseCode.OK);
@@ -164,7 +169,7 @@ public class ListManager implements CollectionManager {
           return new ServerMessage("Нечего удалять", ResponseCode.ERROR);
         }
     }
-    public ServerMessage removeById(IoManager ioManager, int id) {
+    public ServerMessage removeById(int id) {
         if (idIsUsed(id)) {
             dragons.removeIf(n -> n.getId() == id);
             usedId.remove(id);
@@ -174,7 +179,7 @@ public class ListManager implements CollectionManager {
           return new ServerMessage("Элемента с id=" + id + " не существует. Проверьте правильность введенных данных.", ResponseCode.ERROR);
         }
     }
-    public ServerMessage getById(IoManager ioManager, int id) {
+    public ServerMessage getById(int id) {
         for (Dragon e: dragons) {
             if (e.getId() == id) {
                 return new ServerMessage("", ResponseCode.OK);
@@ -182,7 +187,7 @@ public class ListManager implements CollectionManager {
         }
             return new ServerMessage("Элемента с заданным id не существует", ResponseCode.ERROR);
     }
-    public ServerMessage removeLower(IoManager ioManager, int id) {
+    public ServerMessage removeLower(int id) {
         if (idIsUsed(id)) {
             dragons.removeIf(n -> n.getId() < id);
             usedId.remove(id);

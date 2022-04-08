@@ -49,28 +49,28 @@ public class ConnectionManager {
     }
 
     private void connect() throws PrintException, IOException {
-        try {
+
             client = SocketChannel.open();
             client.configureBlocking(false);
             client.connect(new InetSocketAddress(serverIp, serverPort));
             client.finishConnect();
-        } catch (IOException e) {
-            countOfAccessAttemps++;
-            ioManager.getOutputManager().write("Попытка подключения...");
-            try {
-                Thread.sleep(waitingTime);
-            } catch (InterruptedException ee) {
-                return;
+            if (!client.isConnected()) {
+                countOfAccessAttemps++;
+                ioManager.getOutputManager().write("Попытка подключения...");
+                try {
+                    Thread.sleep(waitingTime);
+                } catch (InterruptedException ee) {
+                    return;
+                }
+                if (countOfAccessAttemps > maxAttemps) {
+                    CONNECTIONLOGGER.severe("Не удалось установить соединение");
+                    throw new IOException();
+                } else {
+                    connect();
+                }
             }
-            if (countOfAccessAttemps > maxAttemps) {
-                CONNECTIONLOGGER.severe("Не удалось установить соединение");
-                throw new IOException();
-            } else {
-                connect();
-            }
-
-        }
     }
+
 
     public void connectToServer() throws PrintException, IOException {
         connect();
@@ -81,22 +81,13 @@ public class ConnectionManager {
 
     public void sendToServer(Command command, Serializable args) throws SendException {
         try {
-            countOfAccessAttemps = 0;
             ServerMessage serverMessage = new ServerMessage(command, args, ResponseCode.OK);
-            if (!client.finishConnect()) {
-                Thread.sleep(waitingTime);
-            }
-            if (!client.finishConnect()) {
-                throw new SendException();
-            }
             ByteBuffer byteBuffer = ByteBuffer.wrap(serialize(serverMessage));
             while (byteBuffer.hasRemaining()) {
                 client.write(byteBuffer);
             }
             CONNECTIONLOGGER.info("Успешная отправка на сервер");
-        } catch (InterruptedException e) {
-            CONNECTIONLOGGER.severe("Something happened...");
-        } catch (IOException e) {
+        }  catch (IOException e) {
             throw new SendException();
         }
     }
