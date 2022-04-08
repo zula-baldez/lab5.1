@@ -15,7 +15,6 @@ import java.util.logging.Logger;
 public class ServerApp {
     private final Logger appLogger = Logger.getLogger("App logger");
     private final Scanner scanner = new Scanner(System.in);
-
     public void startApp(IoManager ioManager, ObjectInputStream in, ListManager listManager) {
         while (ioManager.isProcessStillWorks()) {
             try {
@@ -36,12 +35,8 @@ public class ServerApp {
                 ServerMessage serverMessage = (ServerMessage) in.readObject();
                 serverMessage.getCommand().execute(ioManager, listManager, serverMessage.getArguments());
                 appLogger.info("Успешное выполнение команды");
-            } catch (IOException e) {
-                appLogger.severe("");
-            } catch (PrintException e) {
-                appLogger.severe("");
-            } catch (ClassNotFoundException e) {
-                appLogger.severe("");
+            } catch (IOException | PrintException | ClassNotFoundException e) {
+                appLogger.severe("Ошибка выполнения команды");
             }
         }
     }

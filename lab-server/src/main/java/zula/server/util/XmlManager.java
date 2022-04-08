@@ -194,9 +194,7 @@ public class XmlManager {
         try {
             writeDocument(document, path);
         } catch (IOException | TransformerException e) {
-/*
-            ioManager.getOutputManager().write("Ошибка при записи в файл");
-*/
+            throw new ParserConfigurationException();
         }
     }
     private Element createSubNodes(Dragon dragon, Document document) {

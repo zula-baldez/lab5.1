@@ -22,7 +22,12 @@ import zula.common.data.ServerMessage;
 import zula.common.util.CollectionManager;
 import zula.common.util.IoManager;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 
@@ -80,12 +85,12 @@ public class ListManager implements CollectionManager {
                 return o1.getName().compareTo(o2.getName());
             }
         }).collect(Collectors.toList());
-        String s = "";
+        StringBuilder s = new StringBuilder();
 
         for (Dragon e: toSort) {
-            s += e.toString() + '\n';
+            s.append(e.toString()).append('\n');
         }
-        return s;
+        return s.toString();
     }
 
     @Override

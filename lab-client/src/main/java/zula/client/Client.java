@@ -4,11 +4,13 @@ import zula.app.App;
 import zula.common.commands.Command;
 import zula.common.commands.GetListOfCommands;
 import zula.common.data.ServerMessage;
+import zula.common.exceptions.GetServerMessageException;
 import zula.common.exceptions.PrintException;
-import zula.common.exceptions.WrongArgumentException;
+import zula.common.exceptions.SendException;
 import zula.common.util.InputManager;
 import zula.common.util.IoManager;
 import zula.common.util.OutputManager;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -46,7 +48,7 @@ public final class Client {
                 connectionManager.sendToServer(new GetListOfCommands(), "");
                 ServerMessage serverMessage = connectionManager.getMessage();
                 commands = (HashMap<String, Command>) serverMessage.getArguments();
-            } catch (IOException | ClassNotFoundException | WrongArgumentException e) {
+            } catch (SendException | GetServerMessageException e) {
                 IO_MANAGER.getOutputManager().write("Не удалось получить список доступных команд");
                 return;
             }
@@ -55,8 +57,6 @@ public final class Client {
             App app = new App(IO_MANAGER, connectionManager, commands);
             try {
                 app.startApp();
-            } catch (IOException e) {
-                IO_MANAGER.getOutputManager().write("Соединение потеряно");
             } catch (ClassNotFoundException e) {
                 IO_MANAGER.getOutputManager().write("Неверные данные");
             }

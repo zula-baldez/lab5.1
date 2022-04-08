@@ -1,8 +1,6 @@
 package zula.server;
 
 
-import zula.common.data.*;
-import zula.common.exceptions.PrintException;
 import zula.common.exceptions.WrongArgumentException;
 import zula.common.util.InputManager;
 import zula.common.util.IoManager;
@@ -11,7 +9,10 @@ import zula.server.util.ListManager;
 import zula.server.util.ServerOutputManager;
 import zula.server.util.XmlManager;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.logging.Logger;
@@ -22,7 +23,7 @@ public final class Server {
     private static XmlManager xmlManager = null;
     private static ObjectInputStream in;
     private static OutputStream out = null;
-    private static int PORT;
+    private static int port;
     private static ListManager listManager = new ListManager();
     private static IoManager ioManager = null;
 
@@ -38,15 +39,13 @@ public final class Server {
             }
             xmlManager = new XmlManager(listManager, ioManager);
             listManager.setPath(args[0]);
-            PORT = Integer.parseInt(args[1]);
+            port = Integer.parseInt(args[1]);
             xmlManager.fromXML(args[0]);
-            ServerSocket server = new ServerSocket(PORT);
+            ServerSocket server = new ServerSocket(port);
             Socket clientSocket = server.accept();
-
             out = clientSocket.getOutputStream();
             in = new ObjectInputStream(clientSocket.getInputStream());
             ioManager = new IoManager(new InputManager(new InputStreamReader(in)), new ServerOutputManager(out));
-
             SERVERLOGGER.info("успешное соединение");
             ServerApp serverApp = new ServerApp();
             serverApp.startApp(ioManager, in, listManager);

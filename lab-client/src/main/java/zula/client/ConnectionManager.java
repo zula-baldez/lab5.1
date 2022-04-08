@@ -3,8 +3,9 @@ package zula.client;
 import zula.common.commands.Command;
 import zula.common.data.ResponseCode;
 import zula.common.data.ServerMessage;
+import zula.common.exceptions.GetServerMessageException;
 import zula.common.exceptions.PrintException;
-import zula.common.exceptions.WrongArgumentException;
+import zula.common.exceptions.SendException;
 import zula.common.util.IoManager;
 
 import java.io.ByteArrayOutputStream;
@@ -17,7 +18,6 @@ import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-import java.util.Arrays;
 import java.util.logging.Logger;
 
 
@@ -35,11 +35,13 @@ public class ConnectionManager {
     private ObjectOutputStream objectSerializer; //проблема в том, что у Object stream'ов при первом обращении существуют специальные символы
     private final PipedOutputStream objectDeserializationBuffer = new PipedOutputStream(); //то есть первый поток байт отличается от последующих
     private PipedInputStream writerToObjectDeserializationBuffer; //для этого приходится сохранять созданные объекты, чтобы потоки байт обрабатывались корректно
-    private ObjectInputStream objectDeserealizer; //А само использования этих объектов обусловлено тем, что в java нет специальных методов для сериализации напрямую
+    private ObjectInputStream objectDeserializer; //А само использования этих объектов обусловлено тем, что в java нет специальных методов для сериализации напрямую
     private boolean isItNotFirstDeserialization = false;
     private boolean isItNotFirstSerialization = false;
     private final int buffSize = 5555;
     private final int waitingTime = 1000;
+    private final int maxIterationsOnTheWaitingLoop = 30; //ждем ответа не более 30 секунд
+    private final int intByteSize = 4;
     public ConnectionManager(String ip, int port, IoManager ioManager1) {
         serverIp = ip;
         serverPort = port;
@@ -73,73 +75,86 @@ public class ConnectionManager {
     public void connectToServer() throws PrintException, IOException {
         connect();
         objectSerializer = new ObjectOutputStream(objectSerializationBuffer);
-        writerToObjectDeserializationBuffer = new PipedInputStream(objectDeserializationBuffer, buffSize*buffSize);
+        writerToObjectDeserializationBuffer = new PipedInputStream(objectDeserializationBuffer, buffSize * buffSize);
     }
 
 
-    public void sendToServer(Command command, Serializable args) throws PrintException, IOException {
+    public void sendToServer(Command command, Serializable args) throws SendException {
         try {
             countOfAccessAttemps = 0;
             ServerMessage serverMessage = new ServerMessage(command, args, ResponseCode.OK);
             if (!client.finishConnect()) {
-                Thread.sleep(5);
+                Thread.sleep(waitingTime);
             }
             if (!client.finishConnect()) {
-                throw new IOException();
+                throw new SendException();
             }
             ByteBuffer byteBuffer = ByteBuffer.wrap(serialize(serverMessage));
             while (byteBuffer.hasRemaining()) {
                 client.write(byteBuffer);
             }
             CONNECTIONLOGGER.info("Успешная отправка на сервер");
-        } catch (IOException e) {
-            connectToServer();
-            ServerMessage serverMessage = new ServerMessage(command, args, ResponseCode.OK);
-            ByteBuffer byteBuffer = ByteBuffer.wrap(serialize(serverMessage));
-            while (byteBuffer.hasRemaining()) {
-                client.write(byteBuffer); //todo
-            }
         } catch (InterruptedException e) {
-            //
+            CONNECTIONLOGGER.severe("Something happened...");
+        } catch (IOException e) {
+            throw new SendException();
         }
-        }
+    }
 
-    public ServerMessage getMessage() throws IOException, ClassNotFoundException, WrongArgumentException {
-
-
-        ByteArrayOutputStream storageOfInputBytes = new ByteArrayOutputStream();
-        ByteBuffer connectionBuffer  = ByteBuffer.allocate(buffSize);
-        int amountOfReadBytes = 0;
-        int amountOfExpectedBytes = 0;
-        ByteBuffer intParserBuffer = ByteBuffer.allocate(4);
-        while (true) { //читаем первые 4 символа - количество байт во входных данных
-            if (client.read(intParserBuffer) > 0) {
-                intParserBuffer.flip();
-                amountOfExpectedBytes = intParserBuffer.getInt();
-                break;
+    public ServerMessage getMessage() throws GetServerMessageException {
+        try {
+            ByteArrayOutputStream storageOfInputBytes = new ByteArrayOutputStream();
+            ByteBuffer connectionBuffer = ByteBuffer.allocate(buffSize);
+            int amountOfReadBytes = 0;
+            int amountOfExpectedBytes = 0;
+            int counter = maxIterationsOnTheWaitingLoop;
+            ByteBuffer intParserBuffer = ByteBuffer.allocate(intByteSize);
+            while (counter > 0) { //читаем первые 4 символа - количество байт во входных данных
+                client.read(intParserBuffer);
+                if (intParserBuffer.position() == intByteSize) {
+                    intParserBuffer.flip();
+                    amountOfExpectedBytes = intParserBuffer.getInt();
+                    break;
+                }
+                counter--;
+                try {
+                    Thread.sleep(waitingTime);
+                } catch (InterruptedException e) {
+                    CONNECTIONLOGGER.severe("Something happened???");
+                }
             }
+            if (counter == 0) {
+                throw new GetServerMessageException();
+            }
+            while (amountOfExpectedBytes > amountOfReadBytes) { //читаем все остальное
+                client.read(connectionBuffer);
+                connectionBuffer.flip();
+                byte[] readBytes = new byte[connectionBuffer.limit()];
+                amountOfReadBytes += readBytes.length;
+                connectionBuffer.get(readBytes, 0, connectionBuffer.limit());
+                storageOfInputBytes.write(readBytes);
+                connectionBuffer.clear();
+            }
+            return deserialize(storageOfInputBytes.toByteArray());
+        } catch (IOException e) {
+            throw new GetServerMessageException();
         }
-        while (amountOfExpectedBytes > amountOfReadBytes) {
-            client.read(connectionBuffer);
-            connectionBuffer.flip();
-            byte[] readBytes = new byte[connectionBuffer.limit()];
-            amountOfReadBytes += readBytes.length;
-            connectionBuffer.get(readBytes, 0, connectionBuffer.limit());
-            storageOfInputBytes.write(readBytes);
-            connectionBuffer.clear();
-        }
-        return deserialize(storageOfInputBytes.toByteArray());
-
     }
 
 
-    public ServerMessage deserialize(byte[] data) throws IOException, ClassNotFoundException {
+    public ServerMessage deserialize(byte[] data) throws IOException {
         objectDeserializationBuffer.write(data, 0, data.length);
         if (!isItNotFirstDeserialization) {
-            objectDeserealizer = new ObjectInputStream(writerToObjectDeserializationBuffer);
+            objectDeserializer = new ObjectInputStream(writerToObjectDeserializationBuffer);
             isItNotFirstDeserialization = true;
         }
-        return (ServerMessage) objectDeserealizer.readObject();
+        try {
+            return (ServerMessage) objectDeserializer.readObject();
+        } catch (ClassNotFoundException e) {
+            CONNECTIONLOGGER.severe("ошибка при десериализации");
+            ioManager.exitProcess();
+            throw new IOException();
+        }
     }
 
     public byte[] serialize(ServerMessage serverMessage) throws IOException {

@@ -11,7 +11,9 @@ import zula.common.data.DragonCave;
 import zula.common.data.DragonType;
 import zula.common.data.ResponseCode;
 import zula.common.data.ServerMessage;
+import zula.common.exceptions.GetServerMessageException;
 import zula.common.exceptions.PrintException;
+import zula.common.exceptions.SendException;
 import zula.common.exceptions.WrongArgumentException;
 import zula.common.exceptions.WrongCommandException;
 import zula.common.util.ArgumentParser;
@@ -19,6 +21,7 @@ import zula.common.util.IoManager;
 import zula.util.ArgumentReader;
 import zula.util.CommandParser;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Date;
@@ -41,14 +44,16 @@ public class App {
         commands = commands1;
     }
 
-    public void startApp() throws PrintException, IOException, ClassNotFoundException {
-
+    public void startApp() throws PrintException, ClassNotFoundException {
         while (ioManager.isProcessStillWorks()) {
             readAndExecute();
         }
     }
 
-    public void readAndExecute() throws PrintException, ClassNotFoundException {
+
+
+
+    public void readAndExecute() throws PrintException {
         try {
             ioManager.getOutputManager().write("Введите команду!");
             String readLine = ioManager.getInputManager().read(ioManager);
@@ -59,33 +64,28 @@ public class App {
             } catch (WrongArgumentException e) {
                 ioManager.getOutputManager().write(e.getMessage());
                 return;
-            } catch (IOException e) {
-                ioManager.getOutputManager().write("Файл не найден");
-                return;
             }
             if ("exit".equals(command)) {
                 ioManager.exitProcess();
             }
+            connectionManager.sendToServer(commands.get(command), args);
             try {
-                connectionManager.sendToServer(commands.get(command), args);
-                } catch (IOException e) {
-                    ioManager.getOutputManager().write("Ошибка при отправке на сервер");
-                    ioManager.exitProcess();
-                    return;
-                }
-                try {
-                   ServerMessage serverMessage = connectionManager.getMessage();
-                    String answer = serverMessage.getArguments().toString();
-                    ioManager.getOutputManager().write(answer);
-                } catch (IOException e) {
-                    ioManager.getOutputManager().write("Ошибка чтения");
-                } catch (WrongArgumentException e) {
-                    ioManager.getOutputManager().write("Неверные входные данные");
-                }
+                ServerMessage serverMessage = connectionManager.getMessage();
+                String answer = serverMessage.getArguments().toString();
+                ioManager.getOutputManager().write(answer);
+            } catch (IOException e) {
+                ioManager.getOutputManager().write("Не удалось прочитать ответ сервера");
+            }
         } catch (NoSuchElementException e) {
             ioManager.exitProcess();
-            } catch (WrongCommandException e) {
+        } catch (WrongCommandException e) {
             ioManager.getOutputManager().write("Такой команды не существует");
+        } catch (SendException e) {
+            ioManager.getOutputManager().write("Ошибка при отправке на сервер");
+            ioManager.exitProcess();
+        } catch (GetServerMessageException e) {
+            ioManager.getOutputManager().write("Ошибка при получении ответа");
+            ioManager.exitProcess();
         }
     }
         private String parseCommand(String readLine)  throws WrongCommandException {
@@ -105,7 +105,7 @@ public class App {
         return readLine1;
     }
 
-    private Serializable readArgs(String command, String commandArguments1) throws WrongArgumentException, PrintException, IOException, ClassNotFoundException {
+    private Serializable readArgs(String command, String commandArguments1) throws WrongArgumentException, PrintException, GetServerMessageException, SendException {
         String commandArguments = parseArgs(command, commandArguments1);
         Serializable arguments = commandArguments;
         if ("add".equals(command)) {
@@ -121,7 +121,11 @@ public class App {
             if (ioManager.getInputManager().containsFileInStack(commandArguments)) {
                 throw new WrongArgumentException("Угроза рекурсии!");
             }
-            ioManager.getInputManager().setFileReading(true, commandArguments);
+            try {
+                ioManager.getInputManager().setFileReading(true, commandArguments);
+            } catch (FileNotFoundException e) {
+                throw new WrongArgumentException("Файл не найден или отсутствуют права доступа");
+            }
         }
         if ("add".equals(command) || "execute_script".equals(command) || "remove_by_id".equals(command) || "remove_lower".equals(command) || "update_id".equals(command)) {
             APPLOGGER.info("Получены аргументы");
@@ -142,18 +146,20 @@ public class App {
         }
         try {
             return readAddArgs();
-        } catch (IOException | PrintException e) {
+        } catch (PrintException e) {
             ioManager.exitProcess();
             throw new WrongArgumentException("");
         }
     }
 
-    private Serializable parseUpdate(String commandArguments) throws WrongArgumentException, PrintException, IOException, ClassNotFoundException {
+    private Serializable parseUpdate(String commandArguments) throws WrongArgumentException, PrintException, SendException, GetServerMessageException {
         if (argumentParser.checkIfTheArgsEmpty(commandArguments)) {
             throw new WrongArgumentException("Неверные аргументы");
         }
+        ServerMessage serverMessage;
         connectionManager.sendToServer(new DragonByIdCommand(), Integer.parseInt(commandArguments));
-        ServerMessage serverMessage = connectionManager.getMessage();
+        serverMessage = connectionManager.getMessage();
+
         if (serverMessage.getResponseStatus().equals(ResponseCode.OK)) {
             Dragon dragon = (Dragon) readAddArgs();
             dragon.addAttributes(new Date(), Integer.parseInt(commandArguments));
@@ -162,7 +168,7 @@ public class App {
             throw new WrongArgumentException(serverMessage.getArguments().toString());
         }
     }
-    private Serializable readAddArgs() throws IOException, PrintException {
+    private Serializable readAddArgs() throws PrintException {
         ArgumentReader argumentReader = new ArgumentReader(ioManager);
             String name = argumentReader.readName();
             Coordinates coordinates = argumentReader.readCoordinates();
