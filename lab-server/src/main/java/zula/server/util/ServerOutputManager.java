@@ -36,11 +36,12 @@ public class ServerOutputManager extends OutputManager {
         try {
             outputStreamWriter.write(serialize(serverMessage));
         } catch (IOException e) {
-            e.printStackTrace();
+            serverOutputLogger.severe("Ошибка сериализации");
         }
 
 
     }
+    @Override
     public void writeWithResponse(Serializable arg, ResponseCode responseCode) {
         ServerMessage serverMessage;
         if (!(arg == null)) {
