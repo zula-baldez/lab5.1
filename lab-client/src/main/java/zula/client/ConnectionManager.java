@@ -16,8 +16,8 @@ import java.io.PipedOutputStream;
 import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.NotYetConnectedException;
 import java.nio.channels.SocketChannel;
+import java.util.Arrays;
 import java.util.logging.Logger;
 
 
@@ -73,7 +73,7 @@ public class ConnectionManager {
     public void connectToServer() throws PrintException, IOException {
         connect();
         objectSerializer = new ObjectOutputStream(objectSerializationBuffer);
-        writerToObjectDeserializationBuffer = new PipedInputStream(objectDeserializationBuffer, buffSize);
+        writerToObjectDeserializationBuffer = new PipedInputStream(objectDeserializationBuffer, buffSize*buffSize);
     }
 
 
@@ -81,32 +81,54 @@ public class ConnectionManager {
         try {
             countOfAccessAttemps = 0;
             ServerMessage serverMessage = new ServerMessage(command, args, ResponseCode.OK);
+            if (!client.finishConnect()) {
+                Thread.sleep(5);
+            }
+            if (!client.finishConnect()) {
+                throw new IOException();
+            }
             ByteBuffer byteBuffer = ByteBuffer.wrap(serialize(serverMessage));
-            client.write(byteBuffer);
+            while (byteBuffer.hasRemaining()) {
+                client.write(byteBuffer);
+            }
             CONNECTIONLOGGER.info("Успешная отправка на сервер");
         } catch (IOException e) {
             connectToServer();
             ServerMessage serverMessage = new ServerMessage(command, args, ResponseCode.OK);
             ByteBuffer byteBuffer = ByteBuffer.wrap(serialize(serverMessage));
-
-            client.write(byteBuffer);
-        } catch (NotYetConnectedException e) {
-            throw new IOException();
+            while (byteBuffer.hasRemaining()) {
+                client.write(byteBuffer); //todo
+            }
+        } catch (InterruptedException e) {
+            //
         }
         }
 
     public ServerMessage getMessage() throws IOException, ClassNotFoundException, WrongArgumentException {
-       try {
-            Thread.sleep(waitingTime); //ждем данных
-        } catch (InterruptedException e) {
-            throw new IOException();
+
+
+        ByteArrayOutputStream storageOfInputBytes = new ByteArrayOutputStream();
+        ByteBuffer connectionBuffer  = ByteBuffer.allocate(buffSize);
+        int amountOfReadBytes = 0;
+        int amountOfExpectedBytes = 0;
+        ByteBuffer intParserBuffer = ByteBuffer.allocate(4);
+        while (true) { //читаем первые 4 символа - количество байт во входных данных
+            if (client.read(intParserBuffer) > 0) {
+                intParserBuffer.flip();
+                amountOfExpectedBytes = intParserBuffer.getInt();
+                break;
+            }
         }
-        ByteBuffer byteBuffer  = ByteBuffer.allocate(buffSize);
-        client.read(byteBuffer);
-        byteBuffer.flip();
-        byte[] bytes = new byte[byteBuffer.limit()];
-        byteBuffer.get(bytes, 0, byteBuffer.limit());
-        return deserialize(bytes);
+        while (amountOfExpectedBytes > amountOfReadBytes) {
+            client.read(connectionBuffer);
+            connectionBuffer.flip();
+            byte[] readBytes = new byte[connectionBuffer.limit()];
+            amountOfReadBytes += readBytes.length;
+            connectionBuffer.get(readBytes, 0, connectionBuffer.limit());
+            storageOfInputBytes.write(readBytes);
+            connectionBuffer.clear();
+        }
+        return deserialize(storageOfInputBytes.toByteArray());
 
     }
 

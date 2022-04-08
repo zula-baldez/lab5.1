@@ -37,11 +37,11 @@ public class ServerApp {
                 serverMessage.getCommand().execute(ioManager, listManager, serverMessage.getArguments());
                 appLogger.info("Успешное выполнение команды");
             } catch (IOException e) {
-
+                appLogger.severe("");
             } catch (PrintException e) {
                 appLogger.severe("");
             } catch (ClassNotFoundException e) {
-                //TODO
+                appLogger.severe("");
             }
         }
     }

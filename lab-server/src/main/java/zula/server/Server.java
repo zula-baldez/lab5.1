@@ -1,6 +1,7 @@
 package zula.server;
 
 
+import zula.common.data.*;
 import zula.common.exceptions.PrintException;
 import zula.common.exceptions.WrongArgumentException;
 import zula.common.util.InputManager;
@@ -10,10 +11,7 @@ import zula.server.util.ListManager;
 import zula.server.util.ServerOutputManager;
 import zula.server.util.XmlManager;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.logging.Logger;
@@ -23,7 +21,7 @@ public final class Server {
     private static final Logger SERVERLOGGER = Logger.getLogger("Server logger");
     private static XmlManager xmlManager = null;
     private static ObjectInputStream in;
-    private static ObjectOutputStream out = null;
+    private static OutputStream out = null;
     private static int PORT;
     private static ListManager listManager = new ListManager();
     private static IoManager ioManager = null;
@@ -34,7 +32,6 @@ public final class Server {
 
 
     public static void main(String[] args) {
-
         try {
             if (args.length != 2 || args[0] == null) {
                 return;
@@ -46,7 +43,7 @@ public final class Server {
             ServerSocket server = new ServerSocket(PORT);
             Socket clientSocket = server.accept();
 
-            out = new ObjectOutputStream(clientSocket.getOutputStream());
+            out = clientSocket.getOutputStream();
             in = new ObjectInputStream(clientSocket.getInputStream());
             ioManager = new IoManager(new InputManager(new InputStreamReader(in)), new ServerOutputManager(out));
 
@@ -58,8 +55,10 @@ public final class Server {
             } catch (IOException e) {
                 Save save = new Save();
                 save.execute(ioManager, listManager);
+                SERVERLOGGER.severe("Проблема с соединением");
             } catch (NumberFormatException e) {
-            
+            SERVERLOGGER.severe("Неверные аргументы");
+
         }
 
     }
