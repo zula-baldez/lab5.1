@@ -67,7 +67,7 @@ public class ServerOutputManager extends OutputManager {
 
 
 
-    public byte[] serialize(ServerMessage serverMessage) throws IOException {
+    private byte[] serialize(ServerMessage serverMessage) throws IOException {
         serializer.writeObject(serverMessage);
         byte[] resultOfSerialization = new byte[serializationBuffer.size() + sizeOfIntInBytes];
         byte[] sizeOfPackage = ByteBuffer.allocate(sizeOfIntInBytes).putInt(serializationBuffer.size()).array();

@@ -23,7 +23,6 @@ import zula.util.CommandParser;
 
 import java.io.FileNotFoundException;
 import java.io.Serializable;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -157,7 +156,7 @@ public class App {
 
         if (serverMessage.getResponseStatus().equals(ResponseCode.OK)) {
             Dragon dragon = (Dragon) readAddArgs();
-            dragon.addAttributes(new Date(), Integer.parseInt(commandArguments));
+            dragon.addAttributes(null, Integer.parseInt(commandArguments)); //дата установится на сервере
             return dragon;
         } else {
             throw new WrongArgumentException(serverMessage.getArguments().toString());

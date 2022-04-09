@@ -11,6 +11,6 @@ public class Clear extends Command {
     @Override
     public void doInstructions(IoManager ioManager, CollectionManager collectionManager, Serializable argument) throws PrintException {
         collectionManager.clearDragons();
-        ioManager.getOutputManager().write("");
+        ioManager.getOutputManager().write("Команда выполнена!");
     }
 }

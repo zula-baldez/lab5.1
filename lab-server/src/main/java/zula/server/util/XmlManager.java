@@ -61,7 +61,7 @@ public class XmlManager {
         this.collectionManager = collectionManager1;
         this.ioManager = ioManager1;
     }
-    public void fromXML(String path) throws WrongArgumentException, IOException {
+    public void fromXML(String path) throws WrongArgumentException {
         if (!path.matches("^.*xml$")) {
             throw new WrongArgumentException();
         }
@@ -72,7 +72,7 @@ public class XmlManager {
             db = dbf.newDocumentBuilder();
             db.setErrorHandler(null);
             document = db.parse(path);
-        } catch (ParserConfigurationException | SAXException e) {
+        } catch (ParserConfigurationException | SAXException | IOException e) {
             throw new WrongArgumentException();
         }
         NodeList dragos = document.getDocumentElement().getElementsByTagName("data");

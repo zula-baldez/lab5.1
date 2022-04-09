@@ -49,6 +49,8 @@ public final class Server {
             SERVERLOGGER.info("успешное соединение");
             ServerApp serverApp = new ServerApp();
             serverApp.startApp(ioManager, in, listManager);
+            Save save = new Save();
+            save.execute(ioManager, listManager);
             } catch (WrongArgumentException e) {
                 SERVERLOGGER.severe("В пути к файлу или в его содержимом - ошибка");
             } catch (IOException e) {

@@ -33,8 +33,8 @@ public class ConnectionManager {
     private final int maxAttemps = 5;
     private ByteArrayOutputStream objectSerializationBuffer = new ByteArrayOutputStream(); //Нужны для сериализации и десериализации
     private ObjectOutputStream objectSerializer; //проблема в том, что у Object stream'ов при первом обращении существуют специальные символы
-    private final PipedOutputStream objectDeserializationBuffer = new PipedOutputStream(); //то есть первый поток байт отличается от последующих
-    private PipedInputStream writerToObjectDeserializationBuffer; //для этого приходится сохранять созданные объекты, чтобы потоки байт обрабатывались корректно
+    private final PipedOutputStream objectDeserializationBuffer = new PipedOutputStream(); //то есть первый поток байтов отличается от последующих
+    private PipedInputStream writerToObjectDeserializationBuffer; //для этого приходится сохранять созданные объекты, чтобы потоки байтов обрабатывались корректно
     private ObjectInputStream objectDeserializer; //А само использования этих объектов обусловлено тем, что в java нет специальных методов для сериализации напрямую
     private boolean isItNotFirstDeserialization = false;
     private boolean isItNotFirstSerialization = false;
@@ -99,8 +99,8 @@ public class ConnectionManager {
             int amountOfReadBytes = 0;
             int amountOfExpectedBytes = 0;
             int counter = maxIterationsOnTheWaitingLoop;
-            ByteBuffer intParserBuffer = ByteBuffer.allocate(intByteSize);
-            while (counter > 0) { //читаем первые 4 символа - количество байт во входных данных
+            ByteBuffer intParserBuffer = ByteBuffer.allocate(intByteSize); //парсит байты в инт
+            while (counter > 0) { //читаем первые 4 символа - количество байтов во входных данных
                 client.read(intParserBuffer);
                 if (intParserBuffer.position() == intByteSize) {
                     intParserBuffer.flip();

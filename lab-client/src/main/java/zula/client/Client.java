@@ -62,7 +62,7 @@ public final class Client {
             try {
                 app.startApp();
             } catch (ClassNotFoundException e) {
-                IO_MANAGER.getOutputManager().write("Неверные данные");
+                IO_MANAGER.getOutputManager().write("Ответ сервера не соответствует протоколу");
             }
 
     }

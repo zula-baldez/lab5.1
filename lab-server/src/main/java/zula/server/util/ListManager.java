@@ -64,8 +64,9 @@ public class ListManager implements CollectionManager {
 
     @Override
     public void updateId(Dragon dragon) {
-        removeById(dragon.getId());
-        addDragon(dragon);
+        dragons.removeIf(n -> n.getId() == dragon.getId());
+        dragon.addAttributes(new Date(), dragon.getId());
+        dragons.add(dragon);
     }
 
     @Override
@@ -111,16 +112,18 @@ public class ListManager implements CollectionManager {
         return usedId;
     }
 
-    public void addDragon(Dragon e) {
-        dragons.add(e);
+    public void addDragon(Dragon dragon) {
+        dragons.add(dragon);
+        dragon.addAttributes(new Date(), generateID());
+
     }
 
     public LinkedList<Dragon> getCopyOfList() {
         return (LinkedList<Dragon>) dragons.clone();
     }
 
-    public void deleteDragon(Dragon e) {
-        dragons.remove(e);
+    public void deleteDragon(Dragon dragon) {
+        dragons.remove(dragon);
     }
 
     public HashMap<String, Command> getCloneOfCommands() {
