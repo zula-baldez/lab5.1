@@ -82,15 +82,15 @@ public class App {
             ioManager.exitProcess();
         }
     }
-        private String parseCommand(String readLine)  throws WrongCommandException {
-            String command;
-                command = CommandParser.commandParse(readLine, ioManager);
-                if (!commands.containsKey(command)) {
-                    throw new WrongCommandException();
-                }
-            APPLOGGER.info("Из входных данных получена команда");
-            return command;
+    private String parseCommand(String readLine)  throws WrongCommandException {
+        String command;
+        command = CommandParser.commandParse(readLine, ioManager);
+        if (!commands.containsKey(command)) {
+            throw new WrongCommandException();
         }
+        APPLOGGER.info("Из входных данных получена команда");
+        return command;
+    }
     private String parseArgs(String command, String readLine) {
         String readLine1 = (readLine.replace(command, ""));
         if (readLine1.length() >= 1 && readLine1.charAt(0) == ' ') {
