@@ -30,7 +30,7 @@ public class ConnectionManager {
     private final String serverIp;
     private final int serverPort;
     private final IoManager ioManager;
-    private final int maxAttemps = 5;
+    private final int maxAttemps = 10;
     private ByteArrayOutputStream objectSerializationBuffer = new ByteArrayOutputStream(); //Нужны для сериализации и десериализации
     private ObjectOutputStream objectSerializer; //проблема в том, что у Object stream'ов при первом обращении существуют специальные символы
     private final PipedOutputStream objectDeserializationBuffer = new PipedOutputStream(); //то есть первый поток байтов отличается от последующих
@@ -42,37 +42,32 @@ public class ConnectionManager {
     private final int waitingTime = 1000;
     private final int maxIterationsOnTheWaitingLoop = 30; //ждем ответа не более 30 секунд
     private final int intByteSize = 4;
+
     public ConnectionManager(String ip, int port, IoManager ioManager1) {
         serverIp = ip;
         serverPort = port;
         ioManager = ioManager1;
     }
 
-    private void connect() throws PrintException, IOException {
+    private void connect() throws IOException {
 
-            client = SocketChannel.open();
-            client.configureBlocking(false);
-            client.connect(new InetSocketAddress(serverIp, serverPort));
-            client.finishConnect();
-            if (!client.isConnected()) {
-                countOfAccessAttemps++;
-                ioManager.getOutputManager().write("Попытка подключения...");
-                try {
-                    Thread.sleep(waitingTime);
-                } catch (InterruptedException ee) {
-                    return;
-                }
-                if (countOfAccessAttemps > maxAttemps) {
-                    CONNECTIONLOGGER.severe("Не удалось установить соединение");
-                    throw new IOException();
-                } else {
-                    connect();
-                }
-            }
+        client = SocketChannel.open();
+        client.configureBlocking(false);
+        client.connect(new InetSocketAddress(serverIp, serverPort));
+        client.finishConnect();
+        try {
+            Thread.sleep(waitingTime * maxAttemps);
+        } catch (InterruptedException ee) {
+            return;
+        }
+        if (!client.isConnected()) {
+            CONNECTIONLOGGER.severe("Не удалось установить соединение");
+            throw new IOException();
+        }
     }
 
 
-    public void connectToServer() throws PrintException, IOException {
+    public void connectToServer() throws IOException {
         connect();
         objectSerializer = new ObjectOutputStream(objectSerializationBuffer);
         writerToObjectDeserializationBuffer = new PipedInputStream(objectDeserializationBuffer, buffSize * buffSize);

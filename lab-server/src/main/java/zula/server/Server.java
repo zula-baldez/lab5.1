@@ -51,13 +51,13 @@ public final class Server {
             serverApp.startApp(ioManager, in, listManager);
             Save save = new Save();
             save.execute(ioManager, listManager);
-            } catch (WrongArgumentException e) {
-                SERVERLOGGER.severe("В пути к файлу или в его содержимом - ошибка");
-            } catch (IOException e) {
-                Save save = new Save();
-                save.execute(ioManager, listManager);
-                SERVERLOGGER.severe("Проблема с соединением");
-            } catch (NumberFormatException e) {
+        } catch (WrongArgumentException e) {
+            SERVERLOGGER.severe("В пути к файлу или в его содержимом - ошибка");
+        } catch (IOException e) {
+            Save save = new Save();
+            save.execute(ioManager, listManager);
+            SERVERLOGGER.severe("Проблема с соединением");
+        } catch (NumberFormatException e) {
             SERVERLOGGER.severe("Неверные аргументы");
 
         }
