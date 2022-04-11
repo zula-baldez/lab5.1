@@ -4,7 +4,6 @@ import zula.common.commands.Command;
 import zula.common.data.ResponseCode;
 import zula.common.data.ServerMessage;
 import zula.common.exceptions.GetServerMessageException;
-import zula.common.exceptions.PrintException;
 import zula.common.exceptions.SendException;
 import zula.common.util.IoManager;
 
@@ -18,6 +17,7 @@ import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.nio.channels.UnresolvedAddressException;
 import java.util.logging.Logger;
 
 
@@ -53,13 +53,18 @@ public class ConnectionManager {
 
         client = SocketChannel.open();
         client.configureBlocking(false);
-        client.connect(new InetSocketAddress(serverIp, serverPort));
-        client.finishConnect();
+        try {
+            client.connect(new InetSocketAddress(serverIp, serverPort));
+        } catch (UnresolvedAddressException e) {
+            CONNECTIONLOGGER.severe("Неверный адрес");
+            throw new IOException();
+        }
         try {
             Thread.sleep(waitingTime * maxAttemps);
         } catch (InterruptedException ee) {
             return;
         }
+        client.finishConnect();
         if (!client.isConnected()) {
             CONNECTIONLOGGER.severe("Не удалось установить соединение");
             throw new IOException();
@@ -72,8 +77,6 @@ public class ConnectionManager {
         objectSerializer = new ObjectOutputStream(objectSerializationBuffer);
         writerToObjectDeserializationBuffer = new PipedInputStream(objectDeserializationBuffer, buffSize * buffSize);
     }
-
-
     public void sendToServer(Command command, Serializable args) throws SendException {
         try {
             ServerMessage serverMessage = new ServerMessage(command, args, ResponseCode.OK);
