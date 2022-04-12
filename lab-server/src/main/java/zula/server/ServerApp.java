@@ -7,20 +7,21 @@ import zula.server.commands.Save;
 import zula.server.commands.ServerExit;
 import zula.server.util.ListManager;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
 import java.util.logging.Logger;
 
 public class ServerApp {
     private boolean serverStillWorks = true;
     private final Logger appLogger = Logger.getLogger("App logger");
-    private final BufferedReader scanner = new BufferedReader(new InputStreamReader(System.in));
+    private final Scanner scanner = new Scanner(System.in);
     public void startApp(IoManager ioManager, ObjectInputStream in, ListManager listManager) throws IOException, PrintException {
         while (ioManager.isProcessStillWorks()) {
+            try {
             if (System.in.available() > 0) {
-                String command = scanner.readLine();
+                String command = scanner.nextLine();
                 if ("exit".equals(command)) {
                     ServerExit serverExit = new ServerExit();
                     serverExit.execute(ioManager, listManager, "");
@@ -33,6 +34,10 @@ public class ServerApp {
                     save.execute(ioManager, listManager);
                     appLogger.info("Команда выполнена!");
                 }
+            }
+            } catch (NoSuchElementException e) {
+                serverStillWorks = false;
+                break;
             }
             try {
                 ServerMessage serverMessage = (ServerMessage) in.readObject();
