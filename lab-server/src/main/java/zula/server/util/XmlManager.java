@@ -87,7 +87,7 @@ public class XmlManager {
             if (flags.get("name") == 1 && flags.get("coordinates") == 1 && flags.get("creationDate") == 1 && flags.get("age") == 1 && flags.get("wingspan") == 1 && flags.get("color") == 1 && flags.get("type") == 1 && flags.get("cave") == 1 && flags.get("id") == 1) {
                 Dragon drago = new Dragon(name, coordinates, age, wingspan, color, type, cave);
                 drago.addAttributes(creationDate, id);
-               collectionManager.addDragon(drago);
+                collectionManager.addDragonWithoutGeneratingId(drago);
             } else {
                 throw new WrongArgumentException();
             }

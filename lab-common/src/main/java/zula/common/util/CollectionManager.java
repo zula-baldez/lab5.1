@@ -11,6 +11,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 public interface CollectionManager {
+    void addDragonWithoutGeneratingId(Dragon dragon);
+
     void updateId(Dragon dragon);
 
     List<Float> printFieldAscendingWingspan();

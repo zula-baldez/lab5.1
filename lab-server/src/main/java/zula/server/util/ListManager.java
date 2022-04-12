@@ -112,6 +112,11 @@ public class ListManager implements CollectionManager {
         return usedId;
     }
 
+    public void addDragonWithoutGeneratingId(Dragon dragon) {
+        dragons.add(dragon);
+    }
+
+
     public void addDragon(Dragon dragon) {
         dragons.add(dragon);
         dragon.addAttributes(new Date(), generateID());
@@ -147,8 +152,8 @@ public class ListManager implements CollectionManager {
             if (id < 0) {
                 return false;
             }
-            maxId = id + 1;
             usedId.add(id);
+            maxId = id + 1;
             return true;
         }
     }

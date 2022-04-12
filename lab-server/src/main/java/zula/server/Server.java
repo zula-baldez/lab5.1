@@ -1,6 +1,7 @@
 package zula.server;
 
 
+import zula.common.exceptions.PrintException;
 import zula.common.exceptions.WrongArgumentException;
 import zula.common.util.InputManager;
 import zula.common.util.IoManager;
@@ -15,6 +16,7 @@ import java.io.ObjectInputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Scanner;
 import java.util.logging.Logger;
 
 
@@ -26,6 +28,8 @@ public final class Server {
     private static int port;
     private static ListManager listManager = new ListManager();
     private static IoManager ioManager = null;
+    private static boolean serverStillWorks = true;
+    private static Scanner scanner  = new Scanner(System.in);
 
     private Server() {
         throw new UnsupportedOperationException("This is an utility class and can not be instantiated");
@@ -41,26 +45,34 @@ public final class Server {
             listManager.setPath(args[0]);
             port = Integer.parseInt(args[1]);
             xmlManager.fromXML(args[0]);
-            ServerSocket server = new ServerSocket(port);
-            Socket clientSocket = server.accept();
-            out = clientSocket.getOutputStream();
-            in = new ObjectInputStream(clientSocket.getInputStream());
-            ioManager = new IoManager(new InputManager(new InputStreamReader(in)), new ServerOutputManager(out));
-            SERVERLOGGER.info("успешное соединение");
-            ServerApp serverApp = new ServerApp();
-            serverApp.startApp(ioManager, in, listManager);
-            Save save = new Save();
-            save.execute(ioManager, listManager);
+
+            while (serverStillWorks) {
+                try {
+                    ServerSocket server = new ServerSocket(port);
+                    Socket clientSocket = server.accept();
+                    out = clientSocket.getOutputStream();
+                    in = new ObjectInputStream(clientSocket.getInputStream());
+                    ioManager = new IoManager(new InputManager(new InputStreamReader(in)), new ServerOutputManager(out));
+                    SERVERLOGGER.info("успешное соединение");
+                    ServerApp serverApp = new ServerApp();
+                    serverApp.startApp(ioManager, in, listManager);
+                    Save save = new Save();
+                    save.execute(ioManager, listManager);
+                    serverStillWorks = serverApp.isServerStillWorks();
+                } catch (IOException e) {
+                    Save save = new Save();
+                    save.execute(ioManager, listManager);
+                } catch (PrintException e) {
+                    SERVERLOGGER.severe("Запись невозможна");
+                }
+            }
         } catch (WrongArgumentException e) {
             SERVERLOGGER.severe("В пути к файлу или в его содержимом - ошибка");
-        } catch (IOException e) {
-            Save save = new Save();
-            save.execute(ioManager, listManager);
-            SERVERLOGGER.severe("Проблема с соединением");
         } catch (NumberFormatException e) {
             SERVERLOGGER.severe("Неверные аргументы");
-
         }
-
     }
+
+
+
 }

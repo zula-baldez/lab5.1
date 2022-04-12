@@ -7,31 +7,34 @@ import zula.server.commands.Save;
 import zula.server.commands.ServerExit;
 import zula.server.util.ListManager;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
-import java.util.Scanner;
 import java.util.logging.Logger;
 
 public class ServerApp {
+    private boolean serverStillWorks = true;
     private final Logger appLogger = Logger.getLogger("App logger");
-    private final Scanner scanner = new Scanner(System.in);
-    public void startApp(IoManager ioManager, ObjectInputStream in, ListManager listManager) {
+    private final BufferedReader scanner = new BufferedReader(new InputStreamReader(System.in));
+    public void startApp(IoManager ioManager, ObjectInputStream in, ListManager listManager) throws IOException, PrintException {
         while (ioManager.isProcessStillWorks()) {
-            try {
-                if (System.in.available() > 0) {
-                    String command = scanner.nextLine();
-                    if ("exit".equals(command)) {
-                        ServerExit serverExit = new ServerExit();
-                        serverExit.execute(ioManager, listManager, "");
-                        appLogger.info("До свидания!");
-                        continue;
-                    }
-                    if ("save".equals(command)) {
-                        Save save = new Save();
-                        save.execute(ioManager, listManager);
-                        appLogger.info("Команда выполнена!");
-                    }
+            if (System.in.available() > 0) {
+                String command = scanner.readLine();
+                if ("exit".equals(command)) {
+                    ServerExit serverExit = new ServerExit();
+                    serverExit.execute(ioManager, listManager, "");
+                    appLogger.info("До свидания!");
+                    serverStillWorks = false;
+                    break;
                 }
+                if ("save".equals(command)) {
+                    Save save = new Save();
+                    save.execute(ioManager, listManager);
+                    appLogger.info("Команда выполнена!");
+                }
+            }
+            try {
                 ServerMessage serverMessage = (ServerMessage) in.readObject();
                 serverMessage.getCommand().execute(ioManager, listManager, serverMessage.getArguments());
                 appLogger.info("Успешное выполнение команды");
@@ -45,4 +48,10 @@ public class ServerApp {
             }
         }
     }
+
+    public boolean isServerStillWorks() {
+        return serverStillWorks;
+    }
+
+
 }
