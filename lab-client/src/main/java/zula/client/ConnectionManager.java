@@ -39,7 +39,7 @@ public class ConnectionManager {
     private boolean isItNotFirstDeserialization = false;
     private boolean isItNotFirstSerialization = false;
     private final int buffSize = 5555;
-    private final int waitingTime = 1000;
+    private final int waitingTime = 100;
     private final int maxIterationsOnTheWaitingLoop = 30; //ждем ответа не более 30 секунд
     private final int intByteSize = 4;
 
@@ -59,15 +59,17 @@ public class ConnectionManager {
             CONNECTIONLOGGER.severe("Неверный адрес");
             throw new IOException();
         }
-        try {
-            Thread.sleep(waitingTime * maxAttemps);
-        } catch (InterruptedException ee) {
-            return;
-        }
+
         client.finishConnect();
         if (!client.isConnected()) {
-            CONNECTIONLOGGER.severe("Не удалось установить соединение");
-            throw new IOException();
+            try {
+                Thread.sleep(waitingTime * maxAttemps);
+            } catch (InterruptedException ee) {
+                return;
+            }
+            if (!client.isConnected()) {
+                throw new IOException();
+            }
         }
     }
 
@@ -77,6 +79,7 @@ public class ConnectionManager {
         objectSerializer = new ObjectOutputStream(objectSerializationBuffer);
         writerToObjectDeserializationBuffer = new PipedInputStream(objectDeserializationBuffer, buffSize * buffSize);
     }
+
     public void sendToServer(Command command, Serializable args) throws SendException {
         try {
             ServerMessage serverMessage = new ServerMessage(command, args, ResponseCode.OK);
@@ -85,7 +88,7 @@ public class ConnectionManager {
                 client.write(byteBuffer);
             }
             CONNECTIONLOGGER.info("Успешная отправка на сервер");
-        }  catch (IOException e) {
+        } catch (IOException e) {
             throw new SendException();
         }
     }
@@ -107,9 +110,10 @@ public class ConnectionManager {
                 }
                 counter--;
                 try {
+
                     Thread.sleep(waitingTime);
                 } catch (InterruptedException e) {
-                    CONNECTIONLOGGER.severe("Something happened???");
+                    throw new GetServerMessageException();
                 }
             }
             if (counter == 0) {
@@ -147,13 +151,18 @@ public class ConnectionManager {
     }
 
     public byte[] serialize(ServerMessage serverMessage) throws IOException {
-        if (isItNotFirstSerialization) {
-            objectSerializationBuffer.reset();
-        }
         objectSerializer.writeObject(serverMessage);
-        isItNotFirstSerialization = true;
-        return objectSerializationBuffer.toByteArray();
-    }
+        byte[] resultOfSerialization = new byte[objectSerializationBuffer.size() + intByteSize];
+        byte[] sizeOfPackage = ByteBuffer.allocate(intByteSize).putInt(objectSerializationBuffer.size()).array();
+        System.arraycopy(sizeOfPackage, 0, resultOfSerialization, 0, intByteSize);
+        for (int i = intByteSize; i < resultOfSerialization.length; i++) {
+            resultOfSerialization[i] = objectSerializationBuffer.toByteArray()[i - intByteSize];
+        }
+        objectSerializationBuffer.reset();
+        return resultOfSerialization;
 
+    }
 }
+
+
 

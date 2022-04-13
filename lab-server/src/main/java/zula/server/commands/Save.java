@@ -2,15 +2,15 @@ package zula.server.commands;
 
 
 import zula.common.util.CollectionManager;
-import zula.common.util.IoManager;
 import zula.server.util.XmlManager;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 public class Save  {
-    public void execute(IoManager ioManager, CollectionManager collectionManager) {
+    public void execute(XmlManager xmlManager, CollectionManager collectionManager, String path) {
         try {
-            new XmlManager(collectionManager, ioManager).toXML(collectionManager.getCopyOfList(), collectionManager.getPath());
+            xmlManager.toXML(collectionManager.getCopyOfList(), path);
+            System.out.println("Успешное сохранение!");
         } catch (ParserConfigurationException e) {
             return;
         }

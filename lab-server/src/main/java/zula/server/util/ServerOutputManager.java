@@ -77,5 +77,6 @@ public class ServerOutputManager extends OutputManager {
         }
         serializationBuffer.reset();
         return resultOfSerialization;
+
     }
 }
