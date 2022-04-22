@@ -153,7 +153,7 @@ public class ListManager implements CollectionManager {
                 return false;
             }
             usedId.add(id);
-            maxId = id + 1;
+            maxId = Math.max(id + 1, maxId + 1);
             return true;
         }
     }

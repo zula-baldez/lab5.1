@@ -15,10 +15,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.OutputStream;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.SocketTimeoutException;
+import java.net.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.logging.Logger;
@@ -54,7 +53,10 @@ public final class Server {
             listManager.setPath(args[0]);
             port = Integer.parseInt(args[1]);
             xmlManager.fromXML(args[0]);
-            server = new ServerSocket(port);
+            server = new ServerSocket();
+            server.bind(new InetSocketAddress("0.0.0.0", 4004));
+
+            System.out.println((server.getInetAddress()));
             while (serverStillWorks) {
                 try {
                     checkForConsoleCommands();
@@ -73,9 +75,11 @@ public final class Server {
             }
         } catch (WrongArgumentException e) {
             SERVERLOGGER.severe("В пути к файлу или в его содержимом - ошибка");
-        } catch (NumberFormatException e) {
+        } catch (IllegalArgumentException e) {
             SERVERLOGGER.severe("Неверные аргументы");
         } catch (IOException e) {
+            e.printStackTrace();
+
             SERVERLOGGER.severe("Не удалось запустить сервер");
         }
     }

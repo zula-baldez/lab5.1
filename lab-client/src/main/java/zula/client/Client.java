@@ -22,7 +22,7 @@ public final class Client {
     private static String ip;
     private static final Logger CLIENTLOGGER = Logger.getLogger("ClientLogger");
     private static final IoManager IO_MANAGER = new IoManager(new InputManager(new InputStreamReader(System.in)), new OutputManager(new OutputStreamWriter(System.out)));
-
+    private static  ConnectionManager connectionManager;
     private Client() {
         throw new UnsupportedOperationException("This is an utility class and can not be instantiated");
     }
@@ -35,10 +35,12 @@ public final class Client {
             ip = args[0];
             try {
                 port = Integer.parseInt(args[1]);
-            } catch (NumberFormatException ex) {
+                connectionManager = new ConnectionManager(ip, port, IO_MANAGER);
+            } catch(IllegalArgumentException ex){
                 IO_MANAGER.getOutputManager().write("Неверные аргументы командной строки");
+                return;
             }
-            ConnectionManager connectionManager = new ConnectionManager(ip, port, IO_MANAGER);
+
             try {
                 connectionManager.connectToServer();
                 CLIENTLOGGER.info("Подключение установлено");
