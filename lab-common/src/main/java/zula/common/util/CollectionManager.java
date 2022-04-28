@@ -27,7 +27,6 @@ public interface CollectionManager {
 
     HashSet<Integer> getUsedId();
 
-    void addDragon(Dragon dragon);
 
     LinkedList<Dragon> getCopyOfList();
 
@@ -41,11 +40,10 @@ public interface CollectionManager {
 
     String getPath();
 
-    boolean validateId(int id);
 
-    int generateID();
+    void clearDragons(int userId);
 
-    void clearDragons();
+    int getIdOfLast();
 
     ServerMessage deleteLast();
 
@@ -53,7 +51,7 @@ public interface CollectionManager {
 
     ServerMessage getById(int id);
 
-    ServerMessage removeLower(int id);
+    ServerMessage removeLower(int id, int userId);
 
     void reverseList();
 

@@ -2,8 +2,7 @@ package zula.app;
 
 
 import zula.client.ConnectionManager;
-import zula.common.commands.Command;
-import zula.common.commands.DragonByIdCommand;
+import zula.common.commands.*;
 import zula.common.data.Color;
 import zula.common.data.Coordinates;
 import zula.common.data.Dragon;
@@ -11,11 +10,7 @@ import zula.common.data.DragonCave;
 import zula.common.data.DragonType;
 import zula.common.data.ResponseCode;
 import zula.common.data.ServerMessage;
-import zula.common.exceptions.GetServerMessageException;
-import zula.common.exceptions.PrintException;
-import zula.common.exceptions.SendException;
-import zula.common.exceptions.WrongArgumentException;
-import zula.common.exceptions.WrongCommandException;
+import zula.common.exceptions.*;
 import zula.common.util.ArgumentParser;
 import zula.common.util.IoManager;
 import zula.util.ArgumentReader;
@@ -33,25 +28,73 @@ public class App {
     private static final Logger APPLOGGER = Logger.getLogger("App logger");
     private final IoManager ioManager;
     private final ConnectionManager connectionManager;
-    private final HashMap<String, Command> commands;
+    private HashMap<String, Command> commands;
     private final ArgumentParser argumentParser = new ArgumentParser();
-
-    public App(IoManager ioManager1, ConnectionManager connectionManager1, HashMap<String, Command> commands1) {
+    private String login;
+    private String password;
+    public App(IoManager ioManager1, ConnectionManager connectionManager1) {
         ioManager = ioManager1;
         connectionManager = connectionManager1;
-        commands = commands1;
     }
 
     public void startApp() throws PrintException, ClassNotFoundException {
+
+        try {
+            authenticate();
+        } catch (WrongArgumentException e) {
+            return;
+        }
+        try {
+            connectionManager.sendToServer(new GetListOfCommands(),  new Serializable[]{""});
+            ServerMessage serverMessage = connectionManager.getMessage();
+            commands = (HashMap<String, Command>) serverMessage.getArguments()[0];
+        } catch (SendException | GetServerMessageException | ClassCastException e) {
+            ioManager.getOutputManager().write("Не удалось получить список доступных команд");
+            return;
+        }
         while (ioManager.isProcessStillWorks()) {
             readAndExecute();
         }
     }
+    private void authenticate() throws PrintException, WrongArgumentException {
+        try {
+            ioManager.getOutputManager().write("Если вы новый пользователь, зарегистрируйтесь, введя команду register, иначе введите login");
+            String command = ioManager.getInputManager().read(ioManager); //TODO зачем нужен ioManager в параметре
+            if ("login".equals(command)) {
+                LoginCommand loginCommand = new LoginCommand();
+                Serializable[] args = readArgsForLoginAndRegistration();
+                connectionManager.sendToServer(loginCommand, args);
+            } else if ("register".equals(command)) {
+                RegisterCommand registerCommand = new RegisterCommand();
+                Serializable[] args = readArgsForLoginAndRegistration();
+                connectionManager.sendToServer(registerCommand, args);
+            } else {
+                ioManager.getOutputManager().write("Неверная команда");
+                throw new WrongArgumentException();
+            }
+            connectionManager.setLogin(login);
+            connectionManager.setPassword(password);
+            ServerMessage serverMessage = connectionManager.getMessage();
+            if(serverMessage.getResponseStatus() == ResponseCode.OK) {
+                ioManager.getOutputManager().write(serverMessage.getArguments()[0]);
+            } else {
+                ioManager.getOutputManager().write(serverMessage.getArguments()[0]);
+                throw new WrongArgumentException();
+            }
+        } catch (SendException | GetServerMessageException e) {
+            e.printStackTrace();
+        }
+    }
+    private Serializable[] readArgsForLoginAndRegistration () throws PrintException {
+        ioManager.getOutputManager().write("Введите логин");
+        login = ioManager.getInputManager().read(ioManager);
+        ioManager.getOutputManager().write("Введите пароль");
+        password = ioManager.getInputManager().read(ioManager);
+        return new Serializable[]{login, password};
+    }
 
 
-
-
-    public void readAndExecute() throws PrintException {
+    private void readAndExecute() throws PrintException {
         try {
             ioManager.getOutputManager().write("Введите команду!");
             String readLine = ioManager.getInputManager().read(ioManager);
@@ -66,9 +109,9 @@ public class App {
             if ("exit".equals(command)) {
                 ioManager.exitProcess();
             }
-            connectionManager.sendToServer(commands.get(command), args);
+            connectionManager.sendToServer(commands.get(command), new Serializable[]{args});
             ServerMessage serverMessage = connectionManager.getMessage();
-            String answer = serverMessage.getArguments().toString();
+            String answer = serverMessage.getArguments()[0].toString();
             ioManager.getOutputManager().write(answer);
         } catch (NoSuchElementException e) {
             ioManager.exitProcess();
@@ -151,15 +194,15 @@ public class App {
             throw new WrongArgumentException("Неверные аргументы");
         }
         ServerMessage serverMessage;
-        connectionManager.sendToServer(new DragonByIdCommand(), Integer.parseInt(commandArguments));
+        connectionManager.sendToServer(new DragonByIdCommand(), new Serializable[]{Integer.parseInt(commandArguments)});
         serverMessage = connectionManager.getMessage();
 
         if (serverMessage.getResponseStatus().equals(ResponseCode.OK)) {
             Dragon dragon = (Dragon) readAddArgs();
-            dragon.addAttributes(null, Integer.parseInt(commandArguments)); //дата установится на сервере
+            dragon.setId(Integer.parseInt(commandArguments));
             return dragon;
         } else {
-            throw new WrongArgumentException(serverMessage.getArguments().toString());
+            throw new WrongArgumentException(serverMessage.getArguments()[0].toString());
         }
     }
     private Serializable readAddArgs() throws PrintException {

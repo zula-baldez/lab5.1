@@ -14,6 +14,7 @@ import zula.common.util.OutputManager;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
@@ -40,7 +41,6 @@ public final class Client {
                 IO_MANAGER.getOutputManager().write("Неверные аргументы командной строки");
                 return;
             }
-
             try {
                 connectionManager.connectToServer();
                 CLIENTLOGGER.info("Подключение установлено");
@@ -50,17 +50,9 @@ public final class Client {
                 return;
             }
             HashMap<String, Command> commands;
-            try {
-                connectionManager.sendToServer(new GetListOfCommands(), "");
-                ServerMessage serverMessage = connectionManager.getMessage();
-                commands = (HashMap<String, Command>) serverMessage.getArguments();
-            } catch (SendException | GetServerMessageException e) {
-                IO_MANAGER.getOutputManager().write("Не удалось получить список доступных команд");
-                return;
-            }
-            CLIENTLOGGER.info("Получен список доступных команд");
+
             IO_MANAGER.getOutputManager().write("Список существующих команд загружен успешно.");
-            App app = new App(IO_MANAGER, connectionManager, commands);
+            App app = new App(IO_MANAGER, connectionManager);
             try {
                 app.startApp();
             } catch (ClassNotFoundException e) {

@@ -1,3 +1,4 @@
+/*
 package zula.server.util;
 
 import org.w3c.dom.Document;
@@ -37,9 +38,11 @@ import java.util.LinkedList;
 import java.util.Objects;
 import java.util.function.Predicate;
 
+*/
 /**
  * class that contains methods that needs to save or download data
- */
+ *//*
+
 public class XmlManager {
     private String name = null;
     private Coordinates coordinates = null;
@@ -262,3 +265,4 @@ public class XmlManager {
     }
 
 }
+*/

@@ -1,7 +1,11 @@
 package zula.server;
 
+import zula.common.commands.LoginCommand;
+import zula.common.commands.RegisterCommand;
+import zula.common.data.ResponseCode;
 import zula.common.data.ServerMessage;
 import zula.common.exceptions.PrintException;
+import zula.common.util.SQLManager;
 import zula.server.util.Client;
 import zula.server.util.ListManager;
 
@@ -14,7 +18,8 @@ import java.util.logging.Logger;
 public class ServerApp {
     private final int intSize = 4;
     private final Logger appLogger = Logger.getLogger("App logger");
-    public void startApp(ListManager listManager, ArrayList<Client> clients) throws IOException, PrintException {
+
+    public void startApp(ListManager listManager, ArrayList<Client> clients, SQLManager sqlManager) throws IOException, PrintException {
         for (Client client : clients) {
             try {
                 if (client.getSocket().getInputStream().available() >= intSize && client.getExpectedBytes() == null) {
@@ -32,7 +37,13 @@ public class ServerApp {
                 }
                 if (client.getExpectedBytes() != null && client.getSocket().getInputStream().available() == client.getExpectedBytes()) {
                     ServerMessage serverMessage = (ServerMessage) client.getObjectInputStream().readObject();
-                    serverMessage.getCommand().execute(client.getIoManager(), listManager, serverMessage.getArguments());
+                    if (!(serverMessage.getCommand() instanceof LoginCommand || serverMessage.getCommand() instanceof RegisterCommand)) {
+                        if (sqlManager.login(serverMessage.getName(), serverMessage.getPassword(), client).getResponseStatus() == ResponseCode.ERROR) {
+                            client.getIoManager().getOutputManager().write("Ошибка при проверке пароля");
+                        }
+                    }
+
+                    serverMessage.getCommand().execute(client.getIoManager(), client, serverMessage.getArguments());
                     appLogger.info("Успешное выполнение команды");
                     client.setExpectedBytes(null);
                 }
@@ -45,6 +56,6 @@ public class ServerApp {
                 clients.remove(client);
             }
         }
-        }
+    }
 
 }

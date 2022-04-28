@@ -36,7 +36,6 @@ import java.util.stream.Collectors;
  * list of objects we work with
  */
 public class ListManager implements CollectionManager {
-    private int maxId = 1;
     private String path = "C:\\Users\\moyak\\IdeaProjects\\prog5test\\XMLL.xml";
     private final LinkedList<Dragon> dragons = new LinkedList<>();
     private final Date date = new Date();
@@ -59,13 +58,12 @@ public class ListManager implements CollectionManager {
         commands.put("print_ascending", new PrintAscending());
         commands.put("print_field_ascending_wingspan", new PrintFieldAscendingWingspan());
         commands.put("add", new Add());
-
     }
 
     @Override
     public void updateId(Dragon dragon) {
         dragons.removeIf(n -> n.getId() == dragon.getId());
-        dragon.addAttributes(new Date(), dragon.getId());
+        dragon.addAttributes(new Date(), dragon.getId(), dragon.getOwnerId());
         dragons.add(dragon);
     }
 
@@ -117,11 +115,7 @@ public class ListManager implements CollectionManager {
     }
 
 
-    public void addDragon(Dragon dragon) {
-        dragons.add(dragon);
-        dragon.addAttributes(new Date(), generateID());
 
-    }
 
     public LinkedList<Dragon> getCopyOfList() {
         return (LinkedList<Dragon>) dragons.clone();
@@ -139,53 +133,36 @@ public class ListManager implements CollectionManager {
         return date;
     }
 
+    public int getIdOfLast() {
+        return dragons.getLast().getId();
+    }
+
     public boolean idIsUsed(int id) {
         return usedId.contains(id);
     }
     public String getPath() {
         return path;
     }
-    public boolean validateId(int id) {
-        if (usedId.contains(id)) {
-            return false;
-        } else {
-            if (id < 0) {
-                return false;
-            }
-            usedId.add(id);
-            maxId = Math.max(id + 1, maxId + 1);
-            return true;
-        }
-    }
 
-    public int generateID() {
-        usedId.add(maxId);
-        maxId++;
-        return maxId - 1;
-    }
 
-    public void clearDragons() {
-        dragons.clear();
+
+    public void clearDragons(int userId) {
+        dragons.removeIf(x -> x.getOwnerId() == userId);
     }
 
     public ServerMessage deleteLast() {
         if (dragons.size() != 0) {
             dragons.removeLast();
-            return  new ServerMessage("Удаление проведено успешно", ResponseCode.OK);
+            return  new ServerMessage( "Удаление проведено успешно", ResponseCode.OK);
 
         } else {
           return new ServerMessage("Нечего удалять", ResponseCode.ERROR);
         }
     }
     public ServerMessage removeById(int id) {
-        if (idIsUsed(id)) {
             dragons.removeIf(n -> n.getId() == id);
-            usedId.remove(id);
             return  new ServerMessage("Удаление проведено успешно", ResponseCode.OK);
 
-        } else {
-          return new ServerMessage("Элемента с id=" + id + " не существует. Проверьте правильность введенных данных.", ResponseCode.ERROR);
-        }
     }
     public ServerMessage getById(int id) {
         for (Dragon e: dragons) {
@@ -195,14 +172,11 @@ public class ListManager implements CollectionManager {
         }
             return new ServerMessage("Элемента с заданным id не существует", ResponseCode.ERROR);
     }
-    public ServerMessage removeLower(int id) {
-        if (idIsUsed(id)) {
-            dragons.removeIf(n -> n.getId() < id);
+    public ServerMessage removeLower(int id, int userId) {
+
+            dragons.removeIf(n -> n.getId() < id && n.getOwnerId() == userId);
             usedId.remove(id);
            return new ServerMessage("Удаление проведено успешно", ResponseCode.OK);
-        } else {
-            return  new ServerMessage("Элемента с id=" + id + " не существует. Проверьте правильность введенных данных.", ResponseCode.ERROR);
-        }
     }
     public void reverseList() {
         Collections.reverse(dragons);

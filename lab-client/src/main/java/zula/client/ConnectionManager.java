@@ -42,7 +42,8 @@ public class ConnectionManager {
     private final int waitingTime = 100;
     private final int maxIterationsOnTheWaitingLoop = 30; //ждем ответа не более 30 секунд
     private final int intByteSize = 4;
-
+    private String login;
+    private String password;
     public ConnectionManager(String ip, int port, IoManager ioManager1) {
         serverIp = ip;
         serverPort = port;
@@ -80,9 +81,10 @@ public class ConnectionManager {
         writerToObjectDeserializationBuffer = new PipedInputStream(objectDeserializationBuffer, buffSize * buffSize);
     }
 
-    public void sendToServer(Command command, Serializable args) throws SendException {
+    public void sendToServer(Command command, Serializable[] args) throws SendException {
         try {
             ServerMessage serverMessage = new ServerMessage(command, args, ResponseCode.OK);
+            serverMessage.setIndentification(login, password);
             ByteBuffer byteBuffer = ByteBuffer.wrap(serialize(serverMessage));
             while (byteBuffer.hasRemaining()) {
                 client.write(byteBuffer);
@@ -161,6 +163,14 @@ public class ConnectionManager {
         objectSerializationBuffer.reset();
         return resultOfSerialization;
 
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }
 
