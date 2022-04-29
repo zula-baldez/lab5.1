@@ -7,6 +7,7 @@ import zula.common.util.SQLManager;
 
 import java.io.ObjectInputStream;
 import java.net.Socket;
+import java.util.Base64;
 
 public class Client extends AbstractClient {
     private int id = -1;
@@ -14,6 +15,7 @@ public class Client extends AbstractClient {
     private Integer expectedBytes = null;
     private  ObjectInputStream objectInputStream = null;
     private IoManager ioManager = null;
+
 
     public Client(Socket socket1, IoManager ioManager1, SQLManager sqlManager, CollectionManager collectionManager) {
         super(sqlManager, collectionManager);
