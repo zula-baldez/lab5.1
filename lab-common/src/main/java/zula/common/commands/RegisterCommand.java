@@ -6,7 +6,7 @@ import zula.common.util.IoManager;
 
 import java.io.Serializable;
 
-public class RegisterCommand extends Command{
+public class RegisterCommand extends Command {
     @Override
     public void doInstructions(IoManager ioManager, AbstractClient client, Serializable[] arguments) throws PrintException {
         String login = arguments[0].toString();

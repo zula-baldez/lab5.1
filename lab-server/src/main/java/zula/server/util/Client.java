@@ -7,12 +7,10 @@ import zula.common.util.SQLManager;
 
 import java.io.ObjectInputStream;
 import java.net.Socket;
-import java.util.Base64;
 
 public class Client extends AbstractClient {
     private int id = -1;
     private Socket socket;
-    private Integer expectedBytes = null;
     private  ObjectInputStream objectInputStream = null;
     private IoManager ioManager = null;
 
@@ -28,13 +26,6 @@ public class Client extends AbstractClient {
         return socket;
     }
 
-    public void setExpectedBytes(Integer expectedBytes) {
-        this.expectedBytes = expectedBytes;
-    }
-
-    public Integer getExpectedBytes() {
-        return expectedBytes;
-    }
 
     public IoManager getIoManager() {
         return ioManager;

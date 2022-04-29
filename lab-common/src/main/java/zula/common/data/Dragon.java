@@ -89,7 +89,7 @@ public class Dragon implements Comparable<Dragon>, Serializable {
                 + " " + coordinates.getY() + ", creationDate=" + creationDate
                 + ", age=" + age + ", wingspan=" + wingspan + ", color=" + color
                 + ", type=" + type + ", cave=" + cave.getDepth() + " "
-                + cave.getNumberOfTreasures() + ", userId = "+ownerId+'}';
+                + cave.getNumberOfTreasures() + ", userId = " + ownerId + '}';
     }
 
     @Override

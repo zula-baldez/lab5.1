@@ -153,8 +153,7 @@ public class ListManager implements CollectionManager {
     public ServerMessage deleteLast() {
         if (dragons.size() != 0) {
             dragons.removeLast();
-            return  new ServerMessage( "Удаление проведено успешно", ResponseCode.OK);
-
+            return new ServerMessage("Удаление проведено успешно", ResponseCode.OK);
         } else {
           return new ServerMessage("Нечего удалять", ResponseCode.ERROR);
         }

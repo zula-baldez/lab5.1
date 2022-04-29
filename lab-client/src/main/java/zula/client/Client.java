@@ -2,11 +2,7 @@ package zula.client;
 
 import zula.app.App;
 import zula.common.commands.Command;
-import zula.common.commands.GetListOfCommands;
-import zula.common.data.ServerMessage;
-import zula.common.exceptions.GetServerMessageException;
 import zula.common.exceptions.PrintException;
-import zula.common.exceptions.SendException;
 import zula.common.util.InputManager;
 import zula.common.util.IoManager;
 import zula.common.util.OutputManager;
@@ -14,7 +10,6 @@ import zula.common.util.OutputManager;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
@@ -37,7 +32,7 @@ public final class Client {
             try {
                 port = Integer.parseInt(args[1]);
                 connectionManager = new ConnectionManager(ip, port, IO_MANAGER);
-            } catch(IllegalArgumentException ex){
+            } catch (IllegalArgumentException e) {
                 IO_MANAGER.getOutputManager().write("Неверные аргументы командной строки");
                 return;
             }
@@ -51,7 +46,6 @@ public final class Client {
             }
             HashMap<String, Command> commands;
 
-            IO_MANAGER.getOutputManager().write("Список существующих команд загружен успешно.");
             App app = new App(IO_MANAGER, connectionManager);
             try {
                 app.startApp();

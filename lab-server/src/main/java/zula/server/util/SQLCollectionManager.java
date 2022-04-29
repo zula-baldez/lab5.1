@@ -1,49 +1,60 @@
 package zula.server.util;
 
-import zula.common.data.*;
-import zula.common.exceptions.WrongArgumentException;
-import zula.common.util.*;
+import zula.common.data.Color;
+import zula.common.data.Coordinates;
+import zula.common.data.Dragon;
+import zula.common.data.DragonCave;
+import zula.common.data.DragonType;
+import zula.common.data.ResponseCode;
+import zula.common.data.ServerMessage;
+import zula.common.util.AbstractClient;
+import zula.common.util.CollectionManager;
+import zula.common.util.SQLManager;
+import zula.common.util.StringConverterRealisation;
 
-import javax.swing.plaf.nimbus.State;
-import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Types;
 import java.util.Base64;
 import java.util.Date;
 import java.util.logging.Logger;
 
 public class SQLCollectionManager implements SQLManager {
+    private static final String ADD_ELEMENT = "";
+
+    private static final String REGISTER = "INSERT INTO USERS VALUES (?, default, ?) RETURNING id";
+    private static final String CREATE_TABLE =
+            "CREATE TABLE IF NOT EXISTS DRAGONS(\n"
+                    + "                        id SERIAL PRIMARY KEY ,\n"
+                    + "                        name VARCHAR(50),\n"
+                    + "                        x double precision CHECK(x >= -23) NOT NULL,\n"
+                    + "                        y int CHECK(y < 161),\n"
+                    + "                        creation_date  VARCHAR(50) NOT NULL,\n"
+                    + "                        age BIGINT,\n"
+                    + "                        wingspan FLOAT,\n"
+                    + "                        color VARCHAR(50),\n"
+                    + "                        type VARCHAR(50),\n"
+                    + "                        depth float4,\n"
+                    + "                        number_of_treasure DOUBLE PRECISION,\n"
+                    + "                        owner_id integer NOT NULL,\n"
+                    + "                        FOREIGN KEY(owner_id) REFERENCES users ON DELETE CASCADE)";
+    //TODO validation and don't work if table is deleted
     private Connection connection;
     private Logger logger = Logger.getLogger("SQLManager");
+
 
     public SQLCollectionManager(Connection connection1) {
         connection = connection1;
     }
 
-    private static final String ADD_ELEMENT = "";
-    private static final String CREATE_TABLE =
-            "CREATE TABLE IF NOT EXISTS DRAGONS(\n" +
-                    "                        id SERIAL PRIMARY KEY ,\n" +
-                    "                        name VARCHAR(50),\n" +
-                    "                        x double precision CHECK(x >= -23) NOT NULL,\n" +
-                    "                        y int CHECK(y < 161),\n" +
-                    "                        creation_date  VARCHAR(50) NOT NULL,\n" +
-                    "                        age BIGINT,\n" +
-                    "                        wingspan FLOAT,\n" +
-                    "                        color VARCHAR(50),\n" +
-                    "                        type VARCHAR(50),\n" +
-                    "                        depth float4,\n" +
-                    "                        number_of_treasure DOUBLE PRECISION,\n" +
-                    "                        owner_id integer NOT NULL,\n" +
-                    "                        FOREIGN KEY(owner_id) REFERENCES users ON DELETE CASCADE)";
-    //TODO validation and don't work if table is deleted
-
     public int remove(int id, int userId) {
-        System.out.println(userId);
-        System.out.println(id);
-        String query = "SELECT * FROM dragons WHERE id = " +id;
+        String query = "SELECT * FROM dragons WHERE id = " + id;
 
         try (Statement statement = connection.createStatement()) {
             ResultSet resultSet = statement.executeQuery(query);
@@ -65,7 +76,7 @@ public class SQLCollectionManager implements SQLManager {
 
     @Override
     public int removeUsersDragons(int userId) {
-        String query = "DELETE FROM dragons WHERE owner_id = " + userId+" RETURNING id";
+        String query = "DELETE FROM dragons WHERE owner_id = " + userId + " RETURNING id";
         try (Statement statement = connection.createStatement()) {
             statement.execute(query);
             statement.executeQuery(query);
@@ -78,11 +89,11 @@ public class SQLCollectionManager implements SQLManager {
     @Override
     public int removeLower(int userId, int id) {
 
-        String query1 = "SELECT FROM DRAGONS WHERE id = "+id;
-        String query2 = "DELETE FROM dragons WHERE owner_id = " + userId+" and id <"+id;
+        String query1 = "SELECT FROM DRAGONS WHERE id = " + id;
+        String query2 = "DELETE FROM dragons WHERE owner_id = " + userId + " and id <" + id;
         try (Statement statement = connection.createStatement()) {
             ResultSet resultSet = statement.executeQuery(query1);
-            if(!resultSet.next()) {
+            if (!resultSet.next()) {
                 throw new SQLException();
             }
             statement.execute(query2);
@@ -95,7 +106,8 @@ public class SQLCollectionManager implements SQLManager {
 
 
 
-    private void prepareStatement(PreparedStatement preparedStatement, int i, Dragon dragon) throws SQLException {
+    private void prepareStatement(PreparedStatement preparedStatement, int j, Dragon dragon) throws SQLException {
+        int i = j;
         if (dragon.getName() == null) {
             preparedStatement.setString(i++, "null");
         } else {
@@ -138,9 +150,6 @@ public class SQLCollectionManager implements SQLManager {
             return -1;
         }
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-
-
-
             int i = 1;
             preparedStatement.setInt(i++, dragon.getId());
             prepareStatement(preparedStatement, i, dragon);
@@ -180,7 +189,8 @@ public class SQLCollectionManager implements SQLManager {
                     if (dragon != null) {
                         collectionManager.addDragonWithoutGeneratingId(dragon);
                     } else {
-                        //TODO logger
+                        System.out.println("ERROR");
+                        return;
                     }
                 }
             }
@@ -191,13 +201,12 @@ public class SQLCollectionManager implements SQLManager {
         }
     }
 
-    String pepper = "kbc1325rvfc";
-    String salt = "vkshbdivh3bq";
+
     private String encodeHashWithSalt(String message) {
         try {
             Base64.Encoder encoder = Base64.getEncoder();
             MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] hash = md.digest((pepper + message + salt).getBytes(StandardCharsets.UTF_8));
+            byte[] hash = md.digest((message).getBytes(StandardCharsets.UTF_8));
             return encoder.encodeToString(hash);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
@@ -247,13 +256,11 @@ public class SQLCollectionManager implements SQLManager {
         }
     }
 
-
-    private static final String CREATE_USERS = "CREATE TABLE IF NOT EXISTS USERS (\n" +
-            "                                     UNIQUE NAME VARCHAR(50),\n" +
+   /* private static final String CREATE_USERS = "CREATE TABLE IF NOT EXISTS USERS (\n" +
+            "                                      NAME VARCHAR(50) UNIQUE,\n" +
             "                                     ID serial primary key,\n" +
             "                                     PASSWORD VARCHAR(64)\n" +
-            ")";
-    private static final String REGISTER = "INSERT INTO USERS VALUES (?, default, ?) RETURNING id";
+            ")";*/
 
     @Override
     public ServerMessage register(String login, String password, AbstractClient abstractClient) { //TODO unique name+passsword

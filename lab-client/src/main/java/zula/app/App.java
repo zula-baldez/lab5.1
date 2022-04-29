@@ -2,7 +2,11 @@ package zula.app;
 
 
 import zula.client.ConnectionManager;
-import zula.common.commands.*;
+import zula.common.commands.Command;
+import zula.common.commands.DragonByIdCommand;
+import zula.common.commands.GetListOfCommands;
+import zula.common.commands.LoginCommand;
+import zula.common.commands.RegisterCommand;
 import zula.common.data.Color;
 import zula.common.data.Coordinates;
 import zula.common.data.Dragon;
@@ -10,7 +14,11 @@ import zula.common.data.DragonCave;
 import zula.common.data.DragonType;
 import zula.common.data.ResponseCode;
 import zula.common.data.ServerMessage;
-import zula.common.exceptions.*;
+import zula.common.exceptions.GetServerMessageException;
+import zula.common.exceptions.PrintException;
+import zula.common.exceptions.SendException;
+import zula.common.exceptions.WrongArgumentException;
+import zula.common.exceptions.WrongCommandException;
 import zula.common.util.ArgumentParser;
 import zula.common.util.IoManager;
 import zula.util.ArgumentReader;
@@ -75,7 +83,7 @@ public class App {
             connectionManager.setLogin(login);
             connectionManager.setPassword(password);
             ServerMessage serverMessage = connectionManager.getMessage();
-            if(serverMessage.getResponseStatus() == ResponseCode.OK) {
+            if (serverMessage.getResponseStatus() == ResponseCode.OK) {
                 ioManager.getOutputManager().write(serverMessage.getArguments()[0]);
             } else {
                 ioManager.getOutputManager().write(serverMessage.getArguments()[0]);
@@ -85,7 +93,7 @@ public class App {
             e.printStackTrace();
         }
     }
-    private Serializable[] readArgsForLoginAndRegistration () throws PrintException {
+    private Serializable[] readArgsForLoginAndRegistration() throws PrintException {
         ioManager.getOutputManager().write("Введите логин");
         login = ioManager.getInputManager().read(ioManager);
         ioManager.getOutputManager().write("Введите пароль");

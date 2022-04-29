@@ -154,11 +154,9 @@ public class ConnectionManager {
 
     public byte[] serialize(ServerMessage serverMessage) throws IOException {
         objectSerializer.writeObject(serverMessage);
-        byte[] resultOfSerialization = new byte[objectSerializationBuffer.size() + intByteSize];
-        byte[] sizeOfPackage = ByteBuffer.allocate(intByteSize).putInt(objectSerializationBuffer.size()).array();
-        System.arraycopy(sizeOfPackage, 0, resultOfSerialization, 0, intByteSize);
-        for (int i = intByteSize; i < resultOfSerialization.length; i++) {
-            resultOfSerialization[i] = objectSerializationBuffer.toByteArray()[i - intByteSize];
+        byte[] resultOfSerialization = new byte[objectSerializationBuffer.size()];
+        for (int i = 0; i < resultOfSerialization.length; i++) {
+            resultOfSerialization[i] = objectSerializationBuffer.toByteArray()[i];
         }
         objectSerializationBuffer.reset();
         return resultOfSerialization;

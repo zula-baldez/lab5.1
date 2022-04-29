@@ -1,7 +1,6 @@
 package zula.common.util;
 
 import zula.common.data.Dragon;
-import zula.common.data.ResponseCode;
 import zula.common.data.ServerMessage;
 
 public interface SQLManager {
