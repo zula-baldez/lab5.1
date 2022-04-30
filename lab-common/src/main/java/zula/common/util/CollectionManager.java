@@ -6,7 +6,6 @@ import zula.common.data.ServerMessage;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -23,9 +22,6 @@ public interface CollectionManager {
 
     double getAverageOfWingspan();
 
-    void setPath(String path1);
-
-    HashSet<Integer> getUsedId();
 
 
     LinkedList<Dragon> getCopyOfList();

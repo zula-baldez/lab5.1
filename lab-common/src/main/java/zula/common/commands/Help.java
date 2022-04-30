@@ -1,6 +1,8 @@
 package zula.common.commands;
 
 
+import zula.common.data.ResponseCode;
+import zula.common.data.ServerMessage;
 import zula.common.exceptions.PrintException;
 import zula.common.util.AbstractClient;
 import zula.common.util.IoManager;
@@ -9,8 +11,8 @@ import java.io.Serializable;
 
 public class Help extends Command {
     @Override
-    public void doInstructions(IoManager ioManager, AbstractClient client, Serializable[] arguments) throws PrintException {
-        ioManager.getOutputManager().write("help : вывести справку по доступным командам\n"
+    public ServerMessage doInstructions(IoManager ioManager, AbstractClient client, Serializable[] arguments) throws PrintException {
+        return new ServerMessage("help : вывести справку по доступным командам\n"
                 + "info : вывести в стандартный поток вывода информацию о коллекции (тип, дата инициализации, количество элементов и т.д.)\n"
                 + "show : вывести в стандартный поток вывода все элементы коллекции в строковом представлении\n"
                 + "add {element} : добавить новый элемент в коллекцию\n"
@@ -24,7 +26,7 @@ public class Help extends Command {
                 + "reorder : отсортировать коллекцию в порядке, обратном нынешнему\n"
                 + "average_of_wingspan : вывести среднее значение поля wingspan для всех элементов коллекции\n"
                 + "print_ascending : вывести элементы коллекции в порядке возрастания\n"
-                + "print_field_ascending_wingspan : вывести значения поля wingspan всех элементов в порядке возрастания");
+                + "print_field_ascending_wingspan : вывести значения поля wingspan всех элементов в порядке возрастания", ResponseCode.OK);
     }
 
 

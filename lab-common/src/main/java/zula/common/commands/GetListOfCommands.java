@@ -12,7 +12,7 @@ import java.io.Serializable;
 public class GetListOfCommands extends Command {
 
     @Override
-    public void doInstructions(IoManager ioManager, AbstractClient client, Serializable[] arguments) throws PrintException {
-       ioManager.getOutputManager().writeServerMessage(new ServerMessage(new Serializable[]{client.getCollectionManager().getCloneOfCommands()}, ResponseCode.OK));
+    public ServerMessage doInstructions(IoManager ioManager, AbstractClient client, Serializable[] arguments) throws PrintException {
+      return (new ServerMessage(new Serializable[]{client.getCollectionManager().getCloneOfCommands()}, ResponseCode.OK));
     }
 }

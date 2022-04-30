@@ -27,6 +27,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
 
@@ -41,6 +44,7 @@ public class ListManager implements CollectionManager {
     private final Date date = new Date();
     private final HashSet<Integer> usedId = new HashSet<>();
     private final HashMap<String, Command> commands = new HashMap<>();
+    private ReadWriteLock lock = new ReentrantReadWriteLock(true);
 
     public ListManager() {
         commands.put("help", new Help());
@@ -62,125 +66,214 @@ public class ListManager implements CollectionManager {
 
     @Override
     public void updateId(Dragon dragon) {
-        dragons.removeIf(n -> n.getId() == dragon.getId());
-        dragon.addAttributes(new Date(), dragon.getId(), dragon.getOwnerId());
-        dragons.add(dragon);
+        Lock lock1 = lock.writeLock();
+        try {
+            lock1.lock();
+            lock.writeLock();
+            dragons.removeIf(n -> n.getId() == dragon.getId());
+            dragon.addAttributes(new Date(), dragon.getId(), dragon.getOwnerId());
+            dragons.add(dragon);
+        } finally {
+            lock1.unlock();
+        }
     }
 
     @Override
     public List<Float> printFieldAscendingWingspan() {
-        return getCopyOfList().stream().map(Dragon::getWingspan).sorted((o1, o2) -> (int) (o1 - o2)).collect(Collectors.toList());
+        Lock lock1 = lock.writeLock();
+        try {
+            return getCopyOfList().stream().map(Dragon::getWingspan).sorted((o1, o2) -> (int) (o1 - o2)).collect(Collectors.toList());
+        } finally {
+            lock1.unlock();
+        }
     }
 
     @Override
     public List<Dragon> printAscending() {
-        List<Dragon> toSort = getCopyOfList();
-        toSort = toSort.stream().sorted((o1, o2) -> (int) (o1.getWingspan() - o2.getWingspan())).collect(Collectors.toList());
-        return toSort;
+        Lock lock1 = lock.writeLock();
+        try {
+            List<Dragon> toSort = getCopyOfList();
+            toSort = toSort.stream().sorted((o1, o2) -> (int) (o1.getWingspan() - o2.getWingspan())).collect(Collectors.toList());
+            return toSort;
+        } finally {
+            lock1.unlock();
+        }
     }
 
     @Override
     public String show() {
-        List<Dragon> toSort = getCopyOfList();
-        toSort = toSort.stream().sorted((o1, o2) -> {
-            if (o1.getName().length() != o2.getName().length()) {
-                return o1.getName().length() - o2.getName().length();
-            } else {
-                return o1.getName().compareTo(o2.getName());
-            }
-        }).collect(Collectors.toList());
-        StringBuilder result = new StringBuilder();
+        Lock lock1 = lock.writeLock();
+        try {
+            List<Dragon> toSort = getCopyOfList();
+            toSort = toSort.stream().sorted((o1, o2) -> {
+                if (o1.getName().length() != o2.getName().length()) {
+                    return o1.getName().length() - o2.getName().length();
+                } else {
+                    return o1.getName().compareTo(o2.getName());
+                }
+            }).collect(Collectors.toList());
+            StringBuilder result = new StringBuilder();
 
-        for (Dragon e: toSort) {
-            result.append(e.toString()).append('\n');
+            for (Dragon e : toSort) {
+                result.append(e.toString()).append('\n');
+            }
+            return result.toString();
+        } finally {
+            lock1.unlock();
         }
-        return result.toString();
     }
 
     @Override
     public double getAverageOfWingspan() {
-        return getCopyOfList().stream().mapToDouble(d -> (double) d.getWingspan()).average().orElse(0);
+        Lock lock1 = lock.writeLock();
+        try {
+            return getCopyOfList().stream().mapToDouble(d -> (double) d.getWingspan()).average().orElse(0);
+        } finally {
+            lock1.unlock();
+        }
     }
 
-    public void setPath(String path1) {
-        this.path = path1;
-    }
-
-    public HashSet<Integer> getUsedId() {
-        return usedId;
-    }
 
     public void addDragonWithoutGeneratingId(Dragon dragon) {
-        dragons.add(dragon);
+        Lock lock1 = lock.writeLock();
+        try {
+            dragons.add(dragon);
+        } finally {
+            lock1.unlock();
+        }
     }
-
-
 
 
     public LinkedList<Dragon> getCopyOfList() {
-        return (LinkedList<Dragon>) dragons.clone();
+        Lock lock1 = lock.writeLock();
+        try {
+            return (LinkedList<Dragon>) dragons.clone();
+        } finally {
+            lock1.unlock();
+        }
     }
 
     public void deleteDragon(Dragon dragon) {
-        dragons.remove(dragon);
+        Lock lock1 = lock.writeLock();
+        try {
+            dragons.remove(dragon);
+        } finally {
+            lock1.unlock();
+        }
     }
 
     public HashMap<String, Command> getCloneOfCommands() {
-        return (HashMap<String, Command>) commands.clone();
+        Lock lock1 = lock.writeLock();
+        try {
+            return (HashMap<String, Command>) commands.clone();
+        } finally {
+            lock1.unlock();
+        }
     }
 
     public Date getDate() {
-        return date;
+        Lock lock1 = lock.writeLock();
+        try {
+            return date;
+        } finally {
+            lock1.unlock();
+        }
     }
 
     public int getIdOfLast() {
-        return dragons.getLast().getId();
+        Lock lock1 = lock.writeLock();
+        try {
+            return dragons.getLast().getId();
+        } finally {
+            lock1.unlock();
+        }
     }
 
     public boolean idIsUsed(int id) {
-        return usedId.contains(id);
-    }
-    public String getPath() {
-        return path;
+        Lock lock1 = lock.writeLock();
+        try {
+            return usedId.contains(id);
+        } finally {
+            lock1.unlock();
+        }
     }
 
+    public String getPath() {
+        Lock lock1 = lock.writeLock();
+        try {
+            return path;
+        } finally {
+            lock1.unlock();
+        }
+    }
 
 
     public void clearDragons(int userId) {
-        dragons.removeIf(x -> x.getOwnerId() == userId);
+        Lock lock1 = lock.writeLock();
+        try {
+            dragons.removeIf(x -> x.getOwnerId() == userId);
+        } finally {
+            lock1.unlock();
+        }
     }
 
     public ServerMessage deleteLast() {
-        if (dragons.size() != 0) {
-            dragons.removeLast();
-            return new ServerMessage("Удаление проведено успешно", ResponseCode.OK);
-        } else {
-          return new ServerMessage("Нечего удалять", ResponseCode.ERROR);
-        }
-    }
-    public ServerMessage removeById(int id) {
-            dragons.removeIf(n -> n.getId() == id);
-            return  new ServerMessage("Удаление проведено успешно", ResponseCode.OK);
-
-    }
-    public ServerMessage getById(int id) {
-        for (Dragon e: dragons) {
-            if (e.getId() == id) {
-                return new ServerMessage("", ResponseCode.OK);
+        Lock lock1 = lock.writeLock();
+        try {
+            if (dragons.size() != 0) {
+                dragons.removeLast();
+                return new ServerMessage("Удаление проведено успешно", ResponseCode.OK);
+            } else {
+                return new ServerMessage("Нечего удалять", ResponseCode.ERROR);
             }
+        } finally {
+            lock1.unlock();
         }
-            return new ServerMessage("Элемента с заданным id не существует", ResponseCode.ERROR);
     }
-    public ServerMessage removeLower(int id, int userId) {
 
+    public ServerMessage removeById(int id) {
+        Lock lock1 = lock.writeLock();
+        try {
+            dragons.removeIf(n -> n.getId() == id);
+            return new ServerMessage("Удаление проведено успешно", ResponseCode.OK);
+        } finally {
+            lock1.unlock();
+        }
+    }
+
+    public ServerMessage getById(int id) {
+        Lock lock1 = lock.writeLock();
+        try {
+            for (Dragon e : dragons) {
+                if (e.getId() == id) {
+                    return new ServerMessage("", ResponseCode.OK);
+                }
+            }
+            return new ServerMessage("Элемента с заданным id не существует", ResponseCode.ERROR);
+        } finally {
+            lock1.unlock();
+        }
+    }
+
+    public ServerMessage removeLower(int id, int userId) {
+        Lock lock1 = lock.writeLock();
+        try {
             dragons.removeIf(n -> n.getId() < id && n.getOwnerId() == userId);
             usedId.remove(id);
-           return new ServerMessage("Удаление проведено успешно", ResponseCode.OK);
-    }
-    public void reverseList() {
-        Collections.reverse(dragons);
+            return new ServerMessage("Удаление проведено успешно", ResponseCode.OK);
+        } finally {
+            lock1.unlock();
+        }
     }
 
+    public void reverseList() {
+        Lock lock1 = lock.writeLock();
+        try {
+            Collections.reverse(dragons);
+        } finally {
+            lock1.unlock();
+        }
+    }
 
 
 }

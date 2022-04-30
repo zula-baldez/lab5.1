@@ -44,9 +44,14 @@ public class SQLCollectionManager implements SQLManager {
                     + "                        number_of_treasure DOUBLE PRECISION,\n"
                     + "                        owner_id integer NOT NULL,\n"
                     + "                        FOREIGN KEY(owner_id) REFERENCES users ON DELETE CASCADE)";
-    //TODO validation and don't work if table is deleted
+    private static final String CREATE_USERS = "CREATE TABLE IF NOT EXISTS USERS (\n"
+            + "                                     NAME VARCHAR(50) UNIQUE,\n"
+            + "                                     ID serial primary key,\n"
+            + "                                     PASSWORD VARCHAR(64)\n"
+            + ")";
     private Connection connection;
     private Logger logger = Logger.getLogger("SQLManager");
+
 
 
     public SQLCollectionManager(Connection connection1) {
@@ -161,7 +166,6 @@ public class SQLCollectionManager implements SQLManager {
             return -1;
         }
     }
-
     public int add(Dragon dragon) {
         String query = "INSERT INTO dragons VALUES (default,?,?,?,?,?,?,?,?,?,?,?) RETURNING id";
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -178,10 +182,10 @@ public class SQLCollectionManager implements SQLManager {
             return -1;
         }
     }
-
     public void start(CollectionManager collectionManager) {
         try {
             Statement statement = connection.createStatement();
+            statement.execute(CREATE_USERS);
             statement.execute(CREATE_TABLE);
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM DRAGONS ")) {
                 while (resultSet.next()) {
@@ -202,7 +206,7 @@ public class SQLCollectionManager implements SQLManager {
     }
 
 
-    private String encodeHashWithSalt(String message) {
+    private String encodeHash(String message) {
         try {
             Base64.Encoder encoder = Base64.getEncoder();
             MessageDigest md = MessageDigest.getInstance("SHA-256");
@@ -256,18 +260,14 @@ public class SQLCollectionManager implements SQLManager {
         }
     }
 
-   /* private static final String CREATE_USERS = "CREATE TABLE IF NOT EXISTS USERS (\n" +
-            "                                      NAME VARCHAR(50) UNIQUE,\n" +
-            "                                     ID serial primary key,\n" +
-            "                                     PASSWORD VARCHAR(64)\n" +
-            ")";*/
+
 
     @Override
     public ServerMessage register(String login, String password, AbstractClient abstractClient) { //TODO unique name+passsword
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(REGISTER)) {
             preparedStatement.setString(1, login);
-            preparedStatement.setString(2, encodeHashWithSalt(password));
+            preparedStatement.setString(2, encodeHash(password));
             preparedStatement.execute();
             login(login, password, abstractClient);
             return new ServerMessage("Успешная регистрация!", ResponseCode.OK);
@@ -279,7 +279,7 @@ public class SQLCollectionManager implements SQLManager {
 
     @Override
     public ServerMessage login(String login, String password, AbstractClient client) {
-        String loginQuery = "SELECT id FROM users WHERE name = " + "\'" + login + "\'" + " AND password = " + "\'" + encodeHashWithSalt(password) + "\'";
+        String loginQuery = "SELECT id FROM users WHERE name = " + "\'" + login + "\'" + " AND password = " + "\'" + encodeHash(password) + "\'";
         try (Statement statement = connection.createStatement()) {
             ResultSet resultSet = statement.executeQuery(loginQuery);
             resultSet.next();

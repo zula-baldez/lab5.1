@@ -8,15 +8,19 @@ import zula.common.exceptions.PrintException;
 import zula.server.util.Client;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Logger;
 
 public class ServerApp {
+    private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock(true);
     private final Logger appLogger = Logger.getLogger("App logger");
 
     public void startApp(Client client) throws IOException, PrintException {
         try {
             while (true) {
-
                 ServerMessage serverMessage = (ServerMessage) client.getObjectInputStream().readObject();
                 if (!(serverMessage.getCommand() instanceof LoginCommand || serverMessage.getCommand() instanceof RegisterCommand)) {
                     if (client.getSqlManager().login(serverMessage.getName(), serverMessage.getPassword(), client).getResponseStatus() == ResponseCode.ERROR) {
@@ -24,7 +28,8 @@ public class ServerApp {
                     }
                 }
 
-                serverMessage.getCommand().execute(client.getIoManager(), client, serverMessage.getArguments());
+                ServerMessage answer = serverMessage.getCommand().execute(client.getIoManager(), client, serverMessage.getArguments());
+                answerForResponse(answer, client);
                 appLogger.info("Успешное выполнение команды");
 
             }
@@ -38,6 +43,17 @@ public class ServerApp {
             //только при readObject() => считывание данных больше невозможно
         }
     }
+    private synchronized void answerForResponse(ServerMessage serverMessage, Client client) throws PrintException {
+        ExecutorService service = Executors.newFixedThreadPool(2 * 2 * 2);
+        service.submit(() -> {
+            try {
+                client.getIoManager().getOutputManager().writeServerMessage(serverMessage);
+            } catch (PrintException e) {
+                service.shutdown();
 
+            }
+        }
+        );
+    }
 }
 

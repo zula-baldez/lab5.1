@@ -48,6 +48,7 @@ public final class Server {
 
 
     public static void main(String[] args) {
+        listManager = new ListManager();
         if (args.length != FIVE || args[0] == null) {
             return;
         }
@@ -59,6 +60,7 @@ public final class Server {
         try (Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/" + name, user, password)) {
             sqlCollectionManager = new SQLCollectionManager(connection);
             sqlCollectionManager.start(listManager);
+            System.out.println(listManager.getCopyOfList());
             server = new ServerSocket(port);
             while (serverStillWorks) {
                 checkForConsoleCommands();
@@ -70,10 +72,6 @@ public final class Server {
                     continue;
                 }
                 IoManager ioManager1 = new IoManager(new InputManager(new InputStreamReader(clientSocket.getInputStream())), new ServerOutputManager(clientSocket.getOutputStream()));
-/*
-                ListManager listManager1 = new ListManager();
-*/
-                sqlCollectionManager.start(listManager);
                 Client client = new Client(clientSocket, ioManager1, sqlCollectionManager, listManager);
                 clientSocket.getInputStream();
                 ObjectInputStream objectInputStream = new ObjectInputStream(clientSocket.getInputStream());

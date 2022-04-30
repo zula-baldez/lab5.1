@@ -11,6 +11,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Logger;
 
 public class ServerOutputManager extends OutputManager {
@@ -67,7 +68,8 @@ public class ServerOutputManager extends OutputManager {
 
 
 
-    private byte[] serialize(ServerMessage serverMessage) throws IOException {
+    private synchronized byte[] serialize(ServerMessage serverMessage) throws IOException {
+        new ReentrantLock().lock();
         serializer.writeObject(serverMessage);
         byte[] resultOfSerialization = new byte[serializationBuffer.size() + sizeOfIntInBytes];
         byte[] sizeOfPackage = ByteBuffer.allocate(sizeOfIntInBytes).putInt(serializationBuffer.size()).array();
