@@ -219,7 +219,7 @@ public class SQLCollectionManager implements SQLManager {
     }
 
 
-    private Dragon parseDragon(ResultSet resultSet) { //TODO NULL's
+    private Dragon parseDragon(ResultSet resultSet) {
         try {
             int id = resultSet.getInt("id");
             String name = resultSet.getString("name");
@@ -263,7 +263,7 @@ public class SQLCollectionManager implements SQLManager {
 
 
     @Override
-    public ServerMessage register(String login, String password, AbstractClient abstractClient) { //TODO unique name+passsword
+    public ServerMessage register(String login, String password, AbstractClient abstractClient) {
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(REGISTER)) {
             preparedStatement.setString(1, login);

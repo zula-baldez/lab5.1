@@ -67,7 +67,7 @@ public class App {
     private void authenticate() throws PrintException, WrongArgumentException {
         try {
             ioManager.getOutputManager().write("Если вы новый пользователь, зарегистрируйтесь, введя команду register, иначе введите login");
-            String command = ioManager.getInputManager().read(ioManager); //TODO зачем нужен ioManager в параметре
+            String command = ioManager.getInputManager().read(ioManager);
             if ("login".equals(command)) {
                 LoginCommand loginCommand = new LoginCommand();
                 Serializable[] args = readArgsForLoginAndRegistration();
