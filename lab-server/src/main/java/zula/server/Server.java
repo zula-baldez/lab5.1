@@ -72,7 +72,6 @@ public final class Server {
                 }
                 IoManager ioManager1 = new IoManager(new InputManager(new InputStreamReader(clientSocket.getInputStream())), new ServerOutputManager(clientSocket.getOutputStream()));
                 Client client = new Client(clientSocket, ioManager1, sqlCollectionManager, listManager);
-                clientSocket.getInputStream();
                 ObjectInputStream objectInputStream = new ObjectInputStream(clientSocket.getInputStream());
                 client.setObjectInputStream(objectInputStream);
                 ClientThread clientThread = new ClientThread(client);
