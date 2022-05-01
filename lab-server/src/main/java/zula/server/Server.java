@@ -57,7 +57,7 @@ public final class Server {
         String user = args[2];
         String password = args[THREE];
         port = Integer.parseInt(args[FOUR]);
-        try (Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/" + name, user, password)) {
+        try (Connection connection = DriverManager.getConnection(filePath + name, user, password)) {
             sqlCollectionManager = new SQLCollectionManager(connection);
             sqlCollectionManager.start(listManager);
             server = new ServerSocket(port);
@@ -80,6 +80,7 @@ public final class Server {
             }
         } catch (SQLException | PrintException e) {
             SERVERLOGGER.severe("Не удалось начать работу");
+            e.printStackTrace();
         } catch (IllegalArgumentException e) {
             SERVERLOGGER.severe("Неверные аргументы");
         } catch (IOException e) {

@@ -37,11 +37,10 @@
 						<artifactId>checkstyle</artifactId>
 						<version>8.37</version>
 					</dependency>
-
 					<dependency>
-							<groupId>org.postgresql</groupId>
-							<artifactId>postgresql</artifactId>
-							<version>42.3.4</version>
+						<groupId>org.postgresql</groupId>
+						<artifactId>postgresql</artifactId>
+						<version>42.3.4</version>
 					</dependency>
 				</dependencies>
 			</plugin>
