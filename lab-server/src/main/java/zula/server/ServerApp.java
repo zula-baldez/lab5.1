@@ -18,7 +18,7 @@ public class ServerApp {
     private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock(true);
     private final Logger appLogger = Logger.getLogger("App logger");
     private boolean isClientAlive = true;
-    public void startApp(Client client) throws IOException, PrintException {
+    public void startApp(Client client) throws PrintException {
         try {
             while (isClientAlive) {
                 ServerMessage serverMessage = (ServerMessage) client.getObjectInputStream().readObject();

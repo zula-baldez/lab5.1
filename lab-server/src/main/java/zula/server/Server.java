@@ -57,7 +57,7 @@ public final class Server {
         String user = args[2];
         String password = args[THREE];
         port = Integer.parseInt(args[FOUR]);
-        try (Connection connection = DriverManager.getConnection(filePath + name, user, password)) {
+            try (Connection connection = DriverManager.getConnection(filePath + name, user, password)) {
             sqlCollectionManager = new SQLCollectionManager(connection);
             sqlCollectionManager.start(listManager);
             server = new ServerSocket(port);
