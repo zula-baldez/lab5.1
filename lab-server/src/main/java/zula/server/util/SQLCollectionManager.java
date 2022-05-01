@@ -150,8 +150,6 @@ public class SQLCollectionManager implements SQLManager {
     public int updateId(int userId, Dragon dragon) {
         String query = "INSERT INTO dragons VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
         if (remove(dragon.getId(), userId) < 0) {
-            System.out.println(dragon.getId());
-            System.out.println(userId);
             return -1;
         }
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -183,8 +181,7 @@ public class SQLCollectionManager implements SQLManager {
         }
     }
     public void start(CollectionManager collectionManager) {
-        try {
-            Statement statement = connection.createStatement();
+        try (Statement statement = connection.createStatement();) {
             statement.execute(CREATE_USERS);
             statement.execute(CREATE_TABLE);
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM DRAGONS ")) {
