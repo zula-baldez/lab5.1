@@ -272,8 +272,7 @@ public class SQLCollectionManager implements SQLManager {
             login(login, password, abstractClient);
             return new ServerMessage("Успешная регистрация!", ResponseCode.OK);
         } catch (SQLException e) {
-            e.printStackTrace();
-            return new ServerMessage("Не удалось зарегистрировать нового пользователя", ResponseCode.ERROR);
+            return new ServerMessage("Данный логин уже занят, попробуйте другой", ResponseCode.ERROR);
         }
     }
 

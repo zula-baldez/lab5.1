@@ -17,10 +17,10 @@ import java.util.logging.Logger;
 public class ServerApp {
     private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock(true);
     private final Logger appLogger = Logger.getLogger("App logger");
-
+    private boolean isClientAlive = true;
     public void startApp(Client client) throws IOException, PrintException {
         try {
-            while (true) {
+            while (isClientAlive) {
                 ServerMessage serverMessage = (ServerMessage) client.getObjectInputStream().readObject();
                 if (!(serverMessage.getCommand() instanceof LoginCommand || serverMessage.getCommand() instanceof RegisterCommand)) {
                     if (client.getSqlManager().login(serverMessage.getName(), serverMessage.getPassword(), client).getResponseStatus() == ResponseCode.ERROR) {
@@ -41,6 +41,7 @@ public class ServerApp {
             appLogger.severe("Ошибка соединения");
             //тут, наверное, стоит завершить работу приложения, так как IOException может возникнуть
             //только при readObject() => считывание данных больше невозможно
+            isClientAlive = false;
         }
     }
     private synchronized void answerForResponse(ServerMessage serverMessage, Client client) throws PrintException {

@@ -82,6 +82,7 @@ public class ListManager implements CollectionManager {
     public List<Float> printFieldAscendingWingspan() {
         Lock lock1 = lock.writeLock();
         try {
+            lock1.lock();
             return getCopyOfList().stream().map(Dragon::getWingspan).sorted((o1, o2) -> (int) (o1 - o2)).collect(Collectors.toList());
         } finally {
             lock1.unlock();
@@ -92,6 +93,7 @@ public class ListManager implements CollectionManager {
     public List<Dragon> printAscending() {
         Lock lock1 = lock.writeLock();
         try {
+            lock1.lock();
             List<Dragon> toSort = getCopyOfList();
             toSort = toSort.stream().sorted((o1, o2) -> (int) (o1.getWingspan() - o2.getWingspan())).collect(Collectors.toList());
             return toSort;
@@ -104,6 +106,7 @@ public class ListManager implements CollectionManager {
     public String show() {
         Lock lock1 = lock.writeLock();
         try {
+            lock1.lock();
             List<Dragon> toSort = getCopyOfList();
             toSort = toSort.stream().sorted((o1, o2) -> {
                 if (o1.getName().length() != o2.getName().length()) {
@@ -127,6 +130,7 @@ public class ListManager implements CollectionManager {
     public double getAverageOfWingspan() {
         Lock lock1 = lock.writeLock();
         try {
+            lock1.lock();
             return getCopyOfList().stream().mapToDouble(d -> (double) d.getWingspan()).average().orElse(0);
         } finally {
             lock1.unlock();
@@ -137,6 +141,7 @@ public class ListManager implements CollectionManager {
     public void addDragonWithoutGeneratingId(Dragon dragon) {
         Lock lock1 = lock.writeLock();
         try {
+            lock1.lock();
             dragons.add(dragon);
         } finally {
             lock1.unlock();
@@ -147,6 +152,7 @@ public class ListManager implements CollectionManager {
     public LinkedList<Dragon> getCopyOfList() {
         Lock lock1 = lock.writeLock();
         try {
+            lock1.lock();
             return (LinkedList<Dragon>) dragons.clone();
         } finally {
             lock1.unlock();
@@ -156,6 +162,7 @@ public class ListManager implements CollectionManager {
     public void deleteDragon(Dragon dragon) {
         Lock lock1 = lock.writeLock();
         try {
+            lock1.lock();
             dragons.remove(dragon);
         } finally {
             lock1.unlock();
@@ -165,6 +172,7 @@ public class ListManager implements CollectionManager {
     public HashMap<String, Command> getCloneOfCommands() {
         Lock lock1 = lock.writeLock();
         try {
+            lock1.lock();
             return (HashMap<String, Command>) commands.clone();
         } finally {
             lock1.unlock();
@@ -174,6 +182,7 @@ public class ListManager implements CollectionManager {
     public Date getDate() {
         Lock lock1 = lock.writeLock();
         try {
+            lock1.lock();
             return date;
         } finally {
             lock1.unlock();
@@ -183,6 +192,7 @@ public class ListManager implements CollectionManager {
     public int getIdOfLast() {
         Lock lock1 = lock.writeLock();
         try {
+            lock1.lock();
             return dragons.getLast().getId();
         } finally {
             lock1.unlock();
@@ -192,6 +202,7 @@ public class ListManager implements CollectionManager {
     public boolean idIsUsed(int id) {
         Lock lock1 = lock.writeLock();
         try {
+            lock1.lock();
             return usedId.contains(id);
         } finally {
             lock1.unlock();
@@ -201,6 +212,7 @@ public class ListManager implements CollectionManager {
     public String getPath() {
         Lock lock1 = lock.writeLock();
         try {
+            lock1.lock();
             return path;
         } finally {
             lock1.unlock();
@@ -211,6 +223,7 @@ public class ListManager implements CollectionManager {
     public void clearDragons(int userId) {
         Lock lock1 = lock.writeLock();
         try {
+            lock1.lock();
             dragons.removeIf(x -> x.getOwnerId() == userId);
         } finally {
             lock1.unlock();
@@ -220,6 +233,7 @@ public class ListManager implements CollectionManager {
     public ServerMessage deleteLast() {
         Lock lock1 = lock.writeLock();
         try {
+            lock1.lock();
             if (dragons.size() != 0) {
                 dragons.removeLast();
                 return new ServerMessage("Удаление проведено успешно", ResponseCode.OK);
@@ -234,6 +248,7 @@ public class ListManager implements CollectionManager {
     public ServerMessage removeById(int id) {
         Lock lock1 = lock.writeLock();
         try {
+            lock1.lock();
             dragons.removeIf(n -> n.getId() == id);
             return new ServerMessage("Удаление проведено успешно", ResponseCode.OK);
         } finally {
@@ -244,6 +259,7 @@ public class ListManager implements CollectionManager {
     public ServerMessage getById(int id) {
         Lock lock1 = lock.writeLock();
         try {
+            lock1.lock();
             for (Dragon e : dragons) {
                 if (e.getId() == id) {
                     return new ServerMessage("", ResponseCode.OK);
@@ -258,6 +274,7 @@ public class ListManager implements CollectionManager {
     public ServerMessage removeLower(int id, int userId) {
         Lock lock1 = lock.writeLock();
         try {
+            lock1.lock();
             dragons.removeIf(n -> n.getId() < id && n.getOwnerId() == userId);
             usedId.remove(id);
             return new ServerMessage("Удаление проведено успешно", ResponseCode.OK);
@@ -269,6 +286,7 @@ public class ListManager implements CollectionManager {
     public void reverseList() {
         Lock lock1 = lock.writeLock();
         try {
+            lock1.lock();
             Collections.reverse(dragons);
         } finally {
             lock1.unlock();

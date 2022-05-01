@@ -60,7 +60,6 @@ public final class Server {
         try (Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/" + name, user, password)) {
             sqlCollectionManager = new SQLCollectionManager(connection);
             sqlCollectionManager.start(listManager);
-            System.out.println(listManager.getCopyOfList());
             server = new ServerSocket(port);
             while (serverStillWorks) {
                 checkForConsoleCommands();
@@ -80,7 +79,7 @@ public final class Server {
                 clientThread.start();
             }
         } catch (SQLException | PrintException e) {
-            e.printStackTrace();
+            SERVERLOGGER.severe("Не удалось начать работу");
         } catch (IllegalArgumentException e) {
             SERVERLOGGER.severe("Неверные аргументы");
         } catch (IOException e) {
@@ -89,38 +88,14 @@ public final class Server {
     }
 
 
-  /*  public static void checkForNewClients() throws IOException {
-        while (true) {
-            try {
-                server.setSoTimeout(TIMEOUT);
-                Socket clientSocket = server.accept();
-                IoManager ioManager1 = new IoManager(new InputManager(new InputStreamReader(clientSocket.getInputStream())), new ServerOutputManager(clientSocket.getOutputStream()));
-                ListManager listManager1 = new ListManager();
-                sqlCollectionManager.start(listManager1);
-                Client client = new Client(clientSocket, ioManager1, sqlCollectionManager, listManager1);
-                clients.add(client);
-            } catch (SocketTimeoutException e) {
-                return;
-            }
-        }
-    }
-*/
+
     public static boolean checkForConsoleCommands() throws IOException, PrintException {
         if (System.in.available() > 0) {
             String command = scanner.nextLine();
             if ("exit".equals(command)) {
-/*
-                save.execute(xmlManager, listManager, filePath);
-*/
                 SERVERLOGGER.info("До свидания!");
                 serverStillWorks = false;
                 return false;
-            }
-            if ("save".equals(command)) {
-/*
-                save.execute(xmlManager, listManager, filePath);
-*/
-                SERVERLOGGER.info("Команда выполнена!");
             }
         }
         return true;
