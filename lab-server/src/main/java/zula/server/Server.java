@@ -80,7 +80,6 @@ public final class Server {
             }
         } catch (SQLException | PrintException e) {
             SERVERLOGGER.severe("Не удалось начать работу");
-            e.printStackTrace();
         } catch (IllegalArgumentException e) {
             SERVERLOGGER.severe("Неверные аргументы");
         } catch (IOException e) {
