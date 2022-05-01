@@ -44,10 +44,11 @@ public class SQLCollectionManager implements SQLManager {
                     + "                        number_of_treasure DOUBLE PRECISION,\n"
                     + "                        owner_id integer NOT NULL,\n"
                     + "                        FOREIGN KEY(owner_id) REFERENCES users ON DELETE CASCADE)";
-    private static final String CREATE_USERS = "CREATE TABLE IF NOT EXISTS USERS (\n"
-                    + "                                     NAME VARCHAR(50) UNIQUE,\n"
-                    + "                                     ID serial primary key,\n"
-                    + "                                     PASSWORD VARCHAR(64)\n"
+    private static final String CREATE_USERS =
+            "CREATE TABLE IF NOT EXISTS USERS (\n"
+                    + "                        NAME VARCHAR(50) UNIQUE,\n"
+                    + "                        ID serial primary key,\n"
+                    + "                        PASSWORD VARCHAR(64)\n"
                     + ")";
     private Connection connection;
     private Logger logger = Logger.getLogger("SQLManager");
