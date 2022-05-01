@@ -75,7 +75,6 @@ public class SQLCollectionManager implements SQLManager {
                 return -1;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
             return -1;
         }
     }
@@ -194,7 +193,6 @@ public class SQLCollectionManager implements SQLManager {
                     if (dragon != null) {
                         collectionManager.addDragonWithoutGeneratingId(dragon);
                     } else {
-                        System.out.println("ERROR");
                         return;
                     }
                 }
@@ -214,7 +212,6 @@ public class SQLCollectionManager implements SQLManager {
             byte[] hash = md.digest((message).getBytes(StandardCharsets.UTF_8));
             return encoder.encodeToString(hash);
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
             return null;
         }
     }
@@ -256,7 +253,6 @@ public class SQLCollectionManager implements SQLManager {
             dragon.addAttributes(creationDate, id, userId);
             return dragon;
         } catch (SQLException e) {
-            e.printStackTrace();
             return null;
         }
     }
@@ -288,7 +284,6 @@ public class SQLCollectionManager implements SQLManager {
             return new ServerMessage("Успешная авторизация!", ResponseCode.OK);
 
         } catch (SQLException e) {
-            e.printStackTrace();
 
             return new ServerMessage("Не удалось авторизоваться, проверьте правильность введенных данных", ResponseCode.ERROR);
 
