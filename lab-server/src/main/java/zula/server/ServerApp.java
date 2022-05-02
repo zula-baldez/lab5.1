@@ -23,7 +23,7 @@ public class ServerApp {
             while (isClientAlive) {
                 ServerMessage serverMessage = (ServerMessage) client.getObjectInputStream().readObject();
                 if (!(serverMessage.getCommand() instanceof LoginCommand || serverMessage.getCommand() instanceof RegisterCommand)) {
-                    if (client.getSqlManager().login(serverMessage.getName(), serverMessage.getPassword(), client).getResponseStatus() == ResponseCode.ERROR) {
+                    if (client.getSqlManager().login(serverMessage.getName(), serverMessage.getPassword(), client) == ResponseCode.ERROR) {
                         client.getIoManager().getOutputManager().write("Ошибка при проверке пароля");
                     }
                 }
@@ -37,7 +37,6 @@ public class ServerApp {
             e.printStackTrace();
             appLogger.severe("Ошибка выполнения команды");
         } catch (IOException e) {
-            e.printStackTrace();
             appLogger.severe("Ошибка соединения");
             //тут, наверное, стоит завершить работу приложения, так как IOException может возникнуть
             //только при readObject() => считывание данных больше невозможно

@@ -1,5 +1,6 @@
 package zula.common.commands;
 
+import zula.common.data.ResponseCode;
 import zula.common.data.ServerMessage;
 import zula.common.exceptions.PrintException;
 import zula.common.util.AbstractClient;
@@ -12,8 +13,12 @@ public class RegisterCommand extends Command {
     public ServerMessage doInstructions(IoManager ioManager, AbstractClient client, Serializable[] arguments) throws PrintException {
         String login = arguments[0].toString();
         String password = arguments[1].toString();
+        if (client.getSqlManager().register(login, password, client) == ResponseCode.OK) {
+            return new ServerMessage("Успешная регистрация", ResponseCode.OK);
+        } else {
+            return new ServerMessage("Ошибка при регистрации", ResponseCode.OK);
 
-        return (client.getSqlManager().register(login, password, client));
+        }
 
 
     }

@@ -15,7 +15,7 @@ public class RemoveById extends Command {
     public ServerMessage doInstructions(IoManager ioManager, AbstractClient client, Serializable[] arguments) throws PrintException {
 
         int id = Integer.parseInt(arguments[0].toString());
-        if (client.getSqlManager().remove(id, client.getUserId()) >= 0) {
+        if (client.getSqlManager().remove(id, client.getUserId()) == ResponseCode.OK) {
             client.getCollectionManager().removeById(id);
             return new ServerMessage("Удаление проведено успешно!", ResponseCode.OK);
         } else {

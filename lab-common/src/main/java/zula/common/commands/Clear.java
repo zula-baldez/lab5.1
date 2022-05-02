@@ -12,7 +12,7 @@ import java.io.Serializable;
 public class Clear extends Command {
     @Override
     public ServerMessage doInstructions(IoManager ioManager, AbstractClient client, Serializable[] arguments) throws PrintException {
-        if (client.getSqlManager().removeUsersDragons(client.getUserId()) >= 1) {
+        if (client.getSqlManager().removeUsersDragons(client.getUserId()) == ResponseCode.OK) {
             client.getCollectionManager().clearDragons(client.getUserId());
             return new ServerMessage("Команда выполнена!", ResponseCode.OK);
         } else {

@@ -13,13 +13,11 @@ import zula.server.util.ServerOutputManager;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
-import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.logging.Logger;
 
@@ -27,40 +25,33 @@ import java.util.logging.Logger;
 public final class Server {
     private static final int TIMEOUT = 10;
     private static final Logger SERVERLOGGER = Logger.getLogger("Server logger");
-    private static ObjectInputStream in;
-    private static OutputStream out = null;
-    private static int port;
-    private static ListManager listManager;
-    private static IoManager ioManager = null;
     private static boolean serverStillWorks = true;
-    private static Scanner scanner = new Scanner(System.in);
-    private static ArrayList<Client> clients = new ArrayList<>();
-    private static ServerSocket server;
-    private static String filePath;
-    private static SQLCollectionManager sqlCollectionManager;
-    private static final int FIVE = 5;
-    private static final int FOUR = 4;
-    private static final int THREE = 3;
+    private static final Scanner SCANNER = new Scanner(System.in);
+    private static final int AMOUNT_OF_ARGUMENTS = 5;
+    private static final int PORT_ARGUMENT_INDEX = 4;
+    private static final int PASSWORD_ARGUMENT_INDEX = 3;
+    private static final int USER_ARGUMENT_INDEX = 2;
+    private static final int NAME_ARGUMENT_INDEX = 1;
+    private static final int PATH_ARGUMENT_INDEX = 0;
     private Server() {
         throw new UnsupportedOperationException("This is an utility class and can not be instantiated");
     }
 
 
-
     public static void main(String[] args) {
-        listManager = new ListManager();
-        if (args.length != FIVE || args[0] == null) {
+        ListManager listManager = new ListManager();
+        if (args.length != AMOUNT_OF_ARGUMENTS || args[0] == null) {
             return;
         }
-        filePath = args[0];
-        String name = args[1];
-        String user = args[2];
-        String password = args[THREE];
-        port = Integer.parseInt(args[FOUR]);
-            try (Connection connection = DriverManager.getConnection(filePath + name, user, password)) {
-            sqlCollectionManager = new SQLCollectionManager(connection);
+        String path = args[PATH_ARGUMENT_INDEX];
+        String name = args[NAME_ARGUMENT_INDEX];
+        String user = args[USER_ARGUMENT_INDEX];
+        String password = args[PASSWORD_ARGUMENT_INDEX];
+        int port = Integer.parseInt(args[PORT_ARGUMENT_INDEX]);
+        try (Connection connection = DriverManager.getConnection(path + name, user, password)) {
+            SQLCollectionManager sqlCollectionManager = new SQLCollectionManager(connection);
             sqlCollectionManager.start(listManager);
-            server = new ServerSocket(port);
+            ServerSocket server = new ServerSocket(port);
             while (serverStillWorks) {
                 checkForConsoleCommands();
                 server.setSoTimeout(TIMEOUT);
@@ -87,16 +78,16 @@ public final class Server {
     }
 
 
-
     public static boolean checkForConsoleCommands() throws IOException, PrintException {
-        if (System.in.available() > 0) {
-            String command = scanner.nextLine();
-            if ("exit".equals(command)) {
-                SERVERLOGGER.info("До свидания!");
-                serverStillWorks = false;
-                return false;
+        //todo ctrl + d
+            if (System.in.available() > 0) {
+                String command = SCANNER.nextLine();
+                if ("exit".equals(command)) {
+                    SERVERLOGGER.info("До свидания!");
+                    serverStillWorks = false;
+                    return false;
+                }
             }
-        }
-        return true;
+            return true;
     }
 }

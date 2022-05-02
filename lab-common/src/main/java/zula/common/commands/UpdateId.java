@@ -18,7 +18,7 @@ public class UpdateId extends Command {
     public ServerMessage doInstructions(IoManager ioManager, AbstractClient client, Serializable[] arguments) throws PrintException {
         Dragon dragon = (Dragon) arguments[0];
         dragon.addAttributes(new Date(), client.getUserId());
-        if (client.getSqlManager().updateId(client.getUserId(), dragon) < 0) {
+        if (client.getSqlManager().updateId(client.getUserId(), dragon) == ResponseCode.ERROR) {
             return new ServerMessage("Объекта с таким id не существует или у вас нет прав доступа", ResponseCode.ERROR);
         } else {
             client.getCollectionManager().removeById(dragon.getId());

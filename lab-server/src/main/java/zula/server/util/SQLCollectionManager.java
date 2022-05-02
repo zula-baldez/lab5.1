@@ -6,27 +6,21 @@ import zula.common.data.Dragon;
 import zula.common.data.DragonCave;
 import zula.common.data.DragonType;
 import zula.common.data.ResponseCode;
-import zula.common.data.ServerMessage;
 import zula.common.util.AbstractClient;
 import zula.common.util.CollectionManager;
 import zula.common.util.SQLManager;
 import zula.common.util.StringConverterRealisation;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
-import java.util.Base64;
 import java.util.Date;
 import java.util.logging.Logger;
 
 public class SQLCollectionManager implements SQLManager {
-    private static final String ADD_ELEMENT = "";
 
     private static final String REGISTER = "INSERT INTO USERS VALUES (?, default, ?) RETURNING id";
     private static final String CREATE_TABLE =
@@ -50,49 +44,47 @@ public class SQLCollectionManager implements SQLManager {
                     + "                        ID serial primary key,\n"
                     + "                        PASSWORD VARCHAR(64)\n"
                     + ")";
-    private Connection connection;
-    private Logger logger = Logger.getLogger("SQLManager");
-
+    private final Connection connection;
+    private final Logger logger = Logger.getLogger("SQLManager");
+    private final EncryptingManager encryptingManager = new EncryptingManager();
 
 
     public SQLCollectionManager(Connection connection1) {
         connection = connection1;
     }
 
-    public int remove(int id, int userId) {
+    public ResponseCode remove(int id, int userId) {
         String query = "SELECT * FROM dragons WHERE id = " + id;
 
         try (Statement statement = connection.createStatement()) {
             ResultSet resultSet = statement.executeQuery(query);
             resultSet.next();
-            System.out.println(resultSet);
             if (resultSet.getInt("owner_id") == userId) {
                 query = "DELETE FROM dragons WHERE id = " + id;
                 statement.execute(query);
-
-                return 1;
+                return ResponseCode.OK;
             } else {
-                return -1;
+                return ResponseCode.ERROR;
             }
         } catch (SQLException e) {
-            return -1;
+            return ResponseCode.ERROR;
         }
     }
 
     @Override
-    public int removeUsersDragons(int userId) {
+    public ResponseCode removeUsersDragons(int userId) {
         String query = "DELETE FROM dragons WHERE owner_id = " + userId + " RETURNING id";
         try (Statement statement = connection.createStatement()) {
             statement.execute(query);
             statement.executeQuery(query);
-            return 1;
+            return ResponseCode.OK;
         } catch (SQLException e) {
-            return -1;
+            return ResponseCode.ERROR;
         }
     }
 
     @Override
-    public int removeLower(int userId, int id) {
+    public ResponseCode removeLower(int userId, int id) {
 
         String query1 = "SELECT FROM DRAGONS WHERE id = " + id;
         String query2 = "DELETE FROM dragons WHERE owner_id = " + userId + " and id <" + id;
@@ -102,9 +94,9 @@ public class SQLCollectionManager implements SQLManager {
                 throw new SQLException();
             }
             statement.execute(query2);
-            return 1;
+            return ResponseCode.OK;
         } catch (SQLException e) {
-            return -1;
+            return ResponseCode.ERROR;
         }
     }
 
@@ -147,24 +139,24 @@ public class SQLCollectionManager implements SQLManager {
     }
 
     @Override
-    public int updateId(int userId, Dragon dragon) {
+    public ResponseCode updateId(int userId, Dragon dragon) {
         String query = "INSERT INTO dragons VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
-        if (remove(dragon.getId(), userId) < 0) {
-            return -1;
+        if (remove(dragon.getId(), userId) == ResponseCode.ERROR) {
+            return ResponseCode.ERROR;
         }
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             int i = 1;
             preparedStatement.setInt(i++, dragon.getId());
             prepareStatement(preparedStatement, i, dragon);
             preparedStatement.execute();
-            return 1;
+            return ResponseCode.OK;
         } catch (SQLException e) {
             e.printStackTrace();
             logger.warning("impossible to update dragon with id" + dragon.getOwnerId());
-            return -1;
+            return ResponseCode.ERROR;
         }
     }
-    public int add(Dragon dragon) {
+    public int add(Dragon dragon) { //returns id that the database gave to the object
         String query = "INSERT INTO dragons VALUES (default,?,?,?,?,?,?,?,?,?,?,?) RETURNING id";
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             int i = 1;
@@ -175,7 +167,6 @@ public class SQLCollectionManager implements SQLManager {
 
             return resultSet.getInt("id");
         } catch (SQLException e) {
-            e.printStackTrace();
             logger.warning("impossible to add dragon with id" + dragon.getOwnerId());
             return -1;
         }
@@ -201,17 +192,6 @@ public class SQLCollectionManager implements SQLManager {
         }
     }
 
-
-    private String encodeHash(String message) {
-        try {
-            Base64.Encoder encoder = Base64.getEncoder();
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] hash = md.digest((message).getBytes(StandardCharsets.UTF_8));
-            return encoder.encodeToString(hash);
-        } catch (NoSuchAlgorithmException e) {
-            return null;
-        }
-    }
 
 
     private Dragon parseDragon(ResultSet resultSet) {
@@ -257,32 +237,30 @@ public class SQLCollectionManager implements SQLManager {
 
 
     @Override
-    public ServerMessage register(String login, String password, AbstractClient abstractClient) {
+    public ResponseCode register(String login, String password, AbstractClient abstractClient) {
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(REGISTER)) {
             preparedStatement.setString(1, login);
-            preparedStatement.setString(2, encodeHash(password));
+            preparedStatement.setString(2, encryptingManager.encodeHash(password));
             preparedStatement.execute();
             login(login, password, abstractClient);
-            return new ServerMessage("Успешная регистрация!", ResponseCode.OK);
+            return ResponseCode.OK;
         } catch (SQLException e) {
-            return new ServerMessage("Данный логин уже занят, попробуйте другой", ResponseCode.ERROR);
+            return ResponseCode.ERROR;
         }
     }
 
     @Override
-    public ServerMessage login(String login, String password, AbstractClient client) {
-        String loginQuery = "SELECT id FROM users WHERE name = " + "\'" + login + "\'" + " AND password = " + "\'" + encodeHash(password) + "\'";
+    public ResponseCode login(String login, String password, AbstractClient client) {
+        String loginQuery = "SELECT id FROM users WHERE name = " + "'" + login + "'" + " AND password = " + "'" + encryptingManager.encodeHash(password) + "'";
         try (Statement statement = connection.createStatement()) {
             ResultSet resultSet = statement.executeQuery(loginQuery);
             resultSet.next();
             int userId = resultSet.getInt("id");
             client.setUserId(userId);
-            return new ServerMessage("Успешная авторизация!", ResponseCode.OK);
-
+            return ResponseCode.OK;
         } catch (SQLException e) {
-
-            return new ServerMessage("Не удалось авторизоваться, проверьте правильность введенных данных", ResponseCode.ERROR);
+            return ResponseCode.ERROR;
 
         }
     }

@@ -16,7 +16,7 @@ public class RemoveLower extends Command {
     @Override
     public ServerMessage doInstructions(IoManager ioManager, AbstractClient client, Serializable[] arguments) throws PrintException {
         int id = Integer.parseInt(arguments[0].toString());
-        if (client.getSqlManager().removeLower(client.getUserId(), id) >= 0) {
+        if (client.getSqlManager().removeLower(client.getUserId(), id) == ResponseCode.OK) {
             return client.getCollectionManager().removeLower(id, client.getUserId());
         } else {
             return new ServerMessage("Элемента с заданным id не существует", ResponseCode.OK);

@@ -1,5 +1,6 @@
 package zula.common.commands;
 
+import zula.common.data.ResponseCode;
 import zula.common.data.ServerMessage;
 import zula.common.exceptions.PrintException;
 import zula.common.util.AbstractClient;
@@ -12,8 +13,11 @@ public class LoginCommand extends Command {
     public ServerMessage doInstructions(IoManager ioManager, AbstractClient client, Serializable[] arguments) throws PrintException {
         String login = arguments[0].toString();
         String password = arguments[1].toString();
-
-        return (client.getSqlManager().login(login, password, client));
+        if (client.getSqlManager().login(login, password, client) == ResponseCode.OK) {
+            return new ServerMessage("Успешная авторизация", ResponseCode.OK);
+        } else {
+            return new ServerMessage("Не удалось авторизоваться, проверьте корректность введенных данных", ResponseCode.ERROR);
+        }
 
 
     }

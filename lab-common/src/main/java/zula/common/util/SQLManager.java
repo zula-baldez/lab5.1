@@ -1,14 +1,14 @@
 package zula.common.util;
 
 import zula.common.data.Dragon;
-import zula.common.data.ServerMessage;
+import zula.common.data.ResponseCode;
 
 public interface SQLManager {
-    ServerMessage register(String login, String password, AbstractClient client);
-    ServerMessage login(String login, String password, AbstractClient client);
+    ResponseCode register(String login, String password, AbstractClient client);
+    ResponseCode login(String login, String password, AbstractClient client);
     int add(Dragon dragon);
-    int remove(int id, int userId);
-    int removeUsersDragons(int userId);
-    int removeLower(int userId, int id);
-    int updateId(int userId, Dragon dragon);
+    ResponseCode remove(int id, int userId);
+    ResponseCode removeUsersDragons(int userId);
+    ResponseCode removeLower(int userId, int id);
+    ResponseCode updateId(int userId, Dragon dragon);
 }
