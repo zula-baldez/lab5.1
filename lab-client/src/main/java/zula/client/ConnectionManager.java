@@ -26,18 +26,15 @@ import java.util.logging.Logger;
 public class ConnectionManager {
     private static final Logger CONNECTIONLOGGER = Logger.getLogger("Connection logger");
     private SocketChannel client;
-    private int countOfAccessAttemps = 0;
     private final String serverIp;
     private final int serverPort;
     private final IoManager ioManager;
-    private final int maxAttemps = 10;
-    private ByteArrayOutputStream objectSerializationBuffer = new ByteArrayOutputStream(); //Нужны для сериализации и десериализации
+    private final ByteArrayOutputStream objectSerializationBuffer = new ByteArrayOutputStream(); //Нужны для сериализации и десериализации
     private ObjectOutputStream objectSerializer; //проблема в том, что у Object stream'ов при первом обращении существуют специальные символы
     private final PipedOutputStream objectDeserializationBuffer = new PipedOutputStream(); //то есть первый поток байтов отличается от последующих
     private PipedInputStream writerToObjectDeserializationBuffer; //для этого приходится сохранять созданные объекты, чтобы потоки байтов обрабатывались корректно
     private ObjectInputStream objectDeserializer; //А само использования этих объектов обусловлено тем, что в java нет специальных методов для сериализации напрямую
     private boolean isItNotFirstDeserialization = false;
-    private boolean isItNotFirstSerialization = false;
     private final int buffSize = 5555;
     private final int waitingTime = 100;
     private final int maxIterationsOnTheWaitingLoop = 30; //ждем ответа не более 30 секунд
@@ -64,6 +61,7 @@ public class ConnectionManager {
         client.finishConnect();
         if (!client.isConnected()) {
             try {
+                int maxAttemps = 10;
                 Thread.sleep(waitingTime * maxAttemps);
             } catch (InterruptedException ee) {
                 return;

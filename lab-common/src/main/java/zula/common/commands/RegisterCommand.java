@@ -22,4 +22,8 @@ public class RegisterCommand extends Command {
 
 
     }
+    @Override
+    public boolean isNeedsLoginCheck() {
+        return false;
+    }
 }

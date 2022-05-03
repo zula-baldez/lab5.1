@@ -1,13 +1,13 @@
 package zula.server;
 
 import zula.common.commands.LoginCommand;
-import zula.common.commands.RegisterCommand;
 import zula.common.data.ResponseCode;
 import zula.common.data.ServerMessage;
 import zula.common.exceptions.PrintException;
 import zula.server.util.Client;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
@@ -15,7 +15,12 @@ import java.util.logging.Logger;
 public class ServerApp {
     private final Logger appLogger = Logger.getLogger("App logger");
     private boolean isClientAlive = true;
-
+    private final ExecutorService service = Executors.newFixedThreadPool(2 * 2 * 2, r -> {
+                Thread t = Executors.defaultThreadFactory().newThread(r);
+                t.setDaemon(true);
+                return t;
+            }
+    );
     public void startApp(Client client) throws PrintException {
         try {
             while (isClientAlive) {
@@ -36,21 +41,25 @@ public class ServerApp {
         private void requestHandle(ServerMessage serverMessage, Client client) {
             Thread thread = new Thread(() -> {
                 try {
-                    if (!(serverMessage.getCommand() instanceof LoginCommand || serverMessage.getCommand() instanceof RegisterCommand)) {
-                        if (client.getSqlManager().login(serverMessage.getName(), serverMessage.getPassword(), client) == ResponseCode.ERROR) {
-                            client.getIoManager().getOutputManager().write("Ошибка при проверке пароля");
+                    if (serverMessage.getCommand().isNeedsLoginCheck()) {
+                        LoginCommand loginCommand = new LoginCommand();
+                        ServerMessage answer = loginCommand.doInstructions(client.getIoManager(), client, new Serializable[]{serverMessage.getName(), serverMessage.getPassword()});
+                        if (answer.getResponseStatus() == ResponseCode.ERROR) {
+                            answerForResponse(serverMessage, client);
+                            return;
                         }
                     }
 
                     ServerMessage answer = serverMessage.getCommand().execute(client.getIoManager(), client, serverMessage.getArguments());
                     answerForResponse(answer, client);
-                } catch (PrintException printException) {
-                    printException.printStackTrace();
+                } catch (PrintException e) {
+                    appLogger.severe("Ошибка при отправке ответа");
                 }
             });
+            thread.setDaemon(true);
             thread.start();
         }
-        private final ExecutorService service = Executors.newFixedThreadPool(2 * 2 * 2);
+
 
         private synchronized void answerForResponse (ServerMessage serverMessage, Client client) throws PrintException {
             service.submit(() -> {

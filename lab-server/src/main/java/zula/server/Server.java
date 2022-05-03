@@ -66,6 +66,7 @@ public final class Server {
                 ObjectInputStream objectInputStream = new ObjectInputStream(clientSocket.getInputStream());
                 client.setObjectInputStream(objectInputStream);
                 ClientThread clientThread = new ClientThread(client);
+                clientThread.setDaemon(true); //to make exit works
                 clientThread.start();
             }
         } catch (SQLException | PrintException e) {
@@ -78,16 +79,14 @@ public final class Server {
     }
 
 
-    public static boolean checkForConsoleCommands() throws IOException, PrintException {
+    public static void checkForConsoleCommands() throws IOException, PrintException {
         //todo ctrl + d
             if (System.in.available() > 0) {
                 String command = SCANNER.nextLine();
                 if ("exit".equals(command)) {
                     SERVERLOGGER.info("До свидания!");
                     serverStillWorks = false;
-                    return false;
                 }
             }
-            return true;
     }
 }

@@ -25,7 +25,6 @@ public class SQLCollectionManager implements SQLManager {
     private static final String REGISTER = "INSERT INTO USERS VALUES (?, default, ?) RETURNING id";
     private static final String CREATE_TABLE =
             "CREATE TABLE IF NOT EXISTS DRAGONS(\n"
-                    + "                        id SERIAL PRIMARY KEY ,\n"
                     + "                        name VARCHAR(50),\n"
                     + "                        x double precision CHECK(x >= -23) NOT NULL,\n"
                     + "                        y int CHECK(y < 161),\n"
@@ -37,13 +36,30 @@ public class SQLCollectionManager implements SQLManager {
                     + "                        depth float4,\n"
                     + "                        number_of_treasure DOUBLE PRECISION,\n"
                     + "                        owner_id integer NOT NULL,\n"
-                    + "                        FOREIGN KEY(owner_id) REFERENCES users ON DELETE CASCADE)";
+                    + "                        FOREIGN KEY(owner_id) REFERENCES users ON DELETE CASCADE,"
+                    + "                        id SERIAL PRIMARY KEY)\n";
     private static final String CREATE_USERS =
             "CREATE TABLE IF NOT EXISTS USERS (\n"
                     + "                        NAME VARCHAR(50) UNIQUE,\n"
                     + "                        ID serial primary key,\n"
                     + "                        PASSWORD VARCHAR(64)\n"
                     + ")";
+
+    private static final int NAME_COLUMN_INDEX = 1;
+    private static final int X_COORDINATE_COLUMN_INDEX = 2;
+    private static final int Y_COORDINATE_COLUMN_INDEX = 3;
+    private static final  int DATE_COLUMN_INDEX = 4;
+    private static final  int AGE_COLUMN_INDEX = 5;
+    private static final int WINGSPAN_COLUMN_INDEX = 6;
+    private static final int COLOR_COLUMN_INDEX = 7;
+    private static final int TYPE_COLUMN_INDEX = 8;
+    private static final int DEPTH_COLUMN_INDEX = 9;
+    private static final int NUMBER_OF_TREASURE_COLUMN_INDEX = 10;
+    private static final int OWNER_ID_COLUMN_INDEX = 11;
+    private static final int ID_COLUMN_INDEX = 12;
+
+
+
     private final Connection connection;
     private final Logger logger = Logger.getLogger("SQLManager");
     private final EncryptingManager encryptingManager = new EncryptingManager();
@@ -54,14 +70,18 @@ public class SQLCollectionManager implements SQLManager {
     }
 
     public ResponseCode remove(int id, int userId) {
-        String query = "SELECT * FROM dragons WHERE id = " + id;
+        String query = "SELECT * FROM dragons WHERE id = ?";
 
-        try (Statement statement = connection.createStatement()) {
-            ResultSet resultSet = statement.executeQuery(query);
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, id);
+            ResultSet resultSet = statement.executeQuery();
             resultSet.next();
             if (resultSet.getInt("owner_id") == userId) {
-                query = "DELETE FROM dragons WHERE id = " + id;
-                statement.execute(query);
+                query = "DELETE FROM dragons WHERE id = ?";
+                try (PreparedStatement preparedStatement = connection.prepareStatement(query)){
+                    preparedStatement.setInt(1, id);
+                    preparedStatement.execute();
+                }
                 return ResponseCode.OK;
             } else {
                 return ResponseCode.ERROR;
@@ -73,29 +93,43 @@ public class SQLCollectionManager implements SQLManager {
 
     @Override
     public ResponseCode removeUsersDragons(int userId) {
-        String query = "DELETE FROM dragons WHERE owner_id = " + userId + " RETURNING id";
-        try (Statement statement = connection.createStatement()) {
-            statement.execute(query);
-            statement.executeQuery(query);
+        String query = "DELETE FROM dragons WHERE owner_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, userId);
+            statement.executeQuery();
             return ResponseCode.OK;
         } catch (SQLException e) {
             return ResponseCode.ERROR;
         }
     }
+
+
 
     @Override
     public ResponseCode removeLower(int userId, int id) {
-
-        String query1 = "SELECT FROM DRAGONS WHERE id = " + id;
-        String query2 = "DELETE FROM dragons WHERE owner_id = " + userId + " and id <" + id;
-        try (Statement statement = connection.createStatement()) {
-            ResultSet resultSet = statement.executeQuery(query1);
+        String checkIfIdExistsQuery = "SELECT * FROM dragons WHERE id = ?";
+        String getAllDragonsQuery = "SELECT * FROM dragons";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(checkIfIdExistsQuery)) {
+            preparedStatement.setInt(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            Dragon dragonWithSelectedId;
             if (!resultSet.next()) {
                 throw new SQLException();
+            } else {
+                dragonWithSelectedId = parseDragon(resultSet);
             }
-            statement.execute(query2);
-            return ResponseCode.OK;
+            try (PreparedStatement statement = connection.prepareStatement(getAllDragonsQuery)) {
+                resultSet = statement.executeQuery();
+                while(resultSet.next()) {
+                    Dragon dragon = parseDragon(resultSet);
+                    if (dragonWithSelectedId.compareTo(dragon) > 0) {
+                        remove(dragon.getId(), userId);
+                    }
+                }
+                return ResponseCode.OK;
+            }
         } catch (SQLException e) {
+            e.printStackTrace();
             return ResponseCode.ERROR;
         }
     }
@@ -103,39 +137,38 @@ public class SQLCollectionManager implements SQLManager {
 
 
 
-    private void prepareStatement(PreparedStatement preparedStatement, int j, Dragon dragon) throws SQLException {
-        int i = j;
+    private void prepareStatement(PreparedStatement preparedStatement, Dragon dragon) throws SQLException {
         if (dragon.getName() == null) {
-            preparedStatement.setString(i++, "null");
+            preparedStatement.setNull(NAME_COLUMN_INDEX, Types.ARRAY);
         } else {
-            preparedStatement.setString(i++, dragon.getName());
+            preparedStatement.setString(NAME_COLUMN_INDEX, dragon.getName());
         }
-        preparedStatement.setDouble(i++, dragon.getCoordinates().getX());
-        preparedStatement.setInt(i++, dragon.getCoordinates().getY());
-        preparedStatement.setString(i++, dragon.getCreationDate().toString());
-        preparedStatement.setLong(i++, dragon.getAge());
-        preparedStatement.setFloat(i++, dragon.getWingspan());
+        preparedStatement.setDouble(X_COORDINATE_COLUMN_INDEX, dragon.getCoordinates().getX());
+        preparedStatement.setInt(Y_COORDINATE_COLUMN_INDEX, dragon.getCoordinates().getY());
+        preparedStatement.setString(DATE_COLUMN_INDEX, dragon.getCreationDate().toString());
+        preparedStatement.setLong(AGE_COLUMN_INDEX, dragon.getAge());
+        preparedStatement.setFloat(WINGSPAN_COLUMN_INDEX, dragon.getWingspan());
         if (dragon.getColor() == null) {
-            preparedStatement.setNull(i++, Types.ARRAY);
+            preparedStatement.setNull(COLOR_COLUMN_INDEX, Types.ARRAY);
         } else {
-            preparedStatement.setString(i++, dragon.getColor().toString());
+            preparedStatement.setString(COLOR_COLUMN_INDEX, dragon.getColor().toString());
         }
 
 
-        preparedStatement.setString(i++, dragon.getType().toString());
+        preparedStatement.setString(TYPE_COLUMN_INDEX, dragon.getType().toString());
 
 
         if (dragon.getCave().getDepth() == null) {
-            preparedStatement.setNull(i++, Types.DOUBLE);
+            preparedStatement.setNull(DEPTH_COLUMN_INDEX, Types.DOUBLE);
         } else {
-            preparedStatement.setDouble(i++, dragon.getCave().getDepth());
+            preparedStatement.setDouble(DEPTH_COLUMN_INDEX, dragon.getCave().getDepth());
         }
         if (dragon.getCave().getNumberOfTreasures() == null) {
-            preparedStatement.setNull(i++, Types.ARRAY);
+            preparedStatement.setNull(NUMBER_OF_TREASURE_COLUMN_INDEX, Types.ARRAY);
         } else {
-            preparedStatement.setDouble(i++, dragon.getCave().getNumberOfTreasures());
+            preparedStatement.setDouble(NUMBER_OF_TREASURE_COLUMN_INDEX, dragon.getCave().getNumberOfTreasures());
         }
-        preparedStatement.setInt(i++, dragon.getOwnerId());
+        preparedStatement.setInt(OWNER_ID_COLUMN_INDEX, dragon.getOwnerId());
     }
 
     @Override
@@ -145,22 +178,19 @@ public class SQLCollectionManager implements SQLManager {
             return ResponseCode.ERROR;
         }
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            int i = 1;
-            preparedStatement.setInt(i++, dragon.getId());
-            prepareStatement(preparedStatement, i, dragon);
+            preparedStatement.setInt(ID_COLUMN_INDEX, dragon.getId());
+            prepareStatement(preparedStatement, dragon);
             preparedStatement.execute();
             return ResponseCode.OK;
         } catch (SQLException e) {
-            e.printStackTrace();
             logger.warning("impossible to update dragon with id" + dragon.getOwnerId());
             return ResponseCode.ERROR;
         }
     }
-    public int add(Dragon dragon) { //returns id that the database gave to the object
-        String query = "INSERT INTO dragons VALUES (default,?,?,?,?,?,?,?,?,?,?,?) RETURNING id";
+    public int add(Dragon dragon) { //returns id that the database has given to the object
+        String query = "INSERT INTO dragons VALUES (?,?,?,?,?,?,?,?,?,?,?, default) RETURNING id";
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            int i = 1;
-            prepareStatement(preparedStatement, i, dragon);
+            prepareStatement(preparedStatement, dragon);
 
             ResultSet resultSet = preparedStatement.executeQuery();
             resultSet.next();
@@ -172,7 +202,7 @@ public class SQLCollectionManager implements SQLManager {
         }
     }
     public void start(CollectionManager collectionManager) {
-        try (Statement statement = connection.createStatement();) {
+        try (Statement statement = connection.createStatement()) {
             statement.execute(CREATE_USERS);
             statement.execute(CREATE_TABLE);
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM DRAGONS ")) {
@@ -185,9 +215,8 @@ public class SQLCollectionManager implements SQLManager {
                     }
                 }
             }
-
-
         } catch (SQLException e) {
+            logger.severe("Failed to start the server");
             e.printStackTrace();
         }
     }
@@ -252,14 +281,17 @@ public class SQLCollectionManager implements SQLManager {
 
     @Override
     public ResponseCode login(String login, String password, AbstractClient client) {
-        String loginQuery = "SELECT id FROM users WHERE name = " + "'" + login + "'" + " AND password = " + "'" + encryptingManager.encodeHash(password) + "'";
-        try (Statement statement = connection.createStatement()) {
-            ResultSet resultSet = statement.executeQuery(loginQuery);
+        String loginQuery = "SELECT id FROM users WHERE name = ? AND password = ?";
+        try (PreparedStatement statement =  connection.prepareStatement(loginQuery)) {
+            statement.setString(1, login);
+            statement.setString(2, encryptingManager.encodeHash(password));
+            ResultSet resultSet = statement.executeQuery();
             resultSet.next();
             int userId = resultSet.getInt("id");
             client.setUserId(userId);
             return ResponseCode.OK;
         } catch (SQLException e) {
+            e.printStackTrace();
             return ResponseCode.ERROR;
 
         }

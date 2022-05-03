@@ -21,4 +21,8 @@ public class LoginCommand extends Command {
 
 
     }
+    @Override
+    public boolean isNeedsLoginCheck() {
+        return false;
+    }
 }
