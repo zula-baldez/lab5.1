@@ -32,9 +32,7 @@ public interface CollectionManager {
 
     Date getDate();
 
-    boolean idIsUsed(int id);
 
-    String getPath();
 
 
     void clearDragons(int userId);
