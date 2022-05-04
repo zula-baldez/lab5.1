@@ -20,9 +20,9 @@ public class ServerOutputManager extends OutputManager {
     private final ByteArrayOutputStream serializationBuffer = new ByteArrayOutputStream(); //нужен для получения количества символов в сериализованном потоке
     private final int sizeOfIntInBytes = 4;
     private final Logger serverOutputLogger = Logger.getLogger("ServerOutput");
-    public ServerOutputManager(OutputStream outputStream1) throws IOException {
-        super(new OutputStreamWriter(outputStream1));
-        outputStreamWriter = outputStream1;
+    public ServerOutputManager(OutputStream outputStream) throws IOException {
+        super(new OutputStreamWriter(outputStream));
+        outputStreamWriter = outputStream;
         serializer = new ObjectOutputStream(serializationBuffer);
     }
     @Override

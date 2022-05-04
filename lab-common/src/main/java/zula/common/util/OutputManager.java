@@ -10,8 +10,8 @@ import java.io.Serializable;
 
 public class OutputManager {
     private OutputStreamWriter outputStreamWriter;
-    public OutputManager(OutputStreamWriter outputStream1) {
-        this.outputStreamWriter = outputStream1;
+    public OutputManager(OutputStreamWriter outputStream) {
+        this.outputStreamWriter = outputStream;
     }
     public void write(Serializable arg) throws PrintException {
         try {

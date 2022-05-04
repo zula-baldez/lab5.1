@@ -4,9 +4,9 @@ public class AbstractClient {
     private SQLManager sqlManager;
     private CollectionManager collectionManager;
     private int userId;
-    public AbstractClient(SQLManager sqlManager1, CollectionManager collectionManager1) {
-        this.sqlManager = sqlManager1;
-        this.collectionManager = collectionManager1;
+    public AbstractClient(SQLManager sqlManager, CollectionManager collectionManager) {
+        this.sqlManager = sqlManager;
+        this.collectionManager = collectionManager;
     }
     public SQLManager getSqlManager() {
         return sqlManager;

@@ -77,7 +77,7 @@ public class ListManager implements CollectionManager {
         Lock readLock = lock.readLock();
         try {
             readLock.lock();
-            return dragons.stream().map(Dragon::getWingspan).sorted((o1, o2) -> (int) (o1 - o2)).collect(Collectors.toList());
+            return dragons.stream().map(Dragon::getWingspan).sorted((first, second) -> (int) (first - second)).collect(Collectors.toList());
         } finally {
             readLock.unlock();
         }
@@ -89,7 +89,7 @@ public class ListManager implements CollectionManager {
         try {
             readLock.lock();
             List<Dragon> toSort;
-            toSort = dragons.stream().sorted((o1, o2) -> (int) (o1.getWingspan() - o2.getWingspan())).collect(Collectors.toList());
+            toSort = dragons.stream().sorted((first, second) -> (int) (first.getWingspan() - second.getWingspan())).collect(Collectors.toList());
             return toSort;
         } finally {
             readLock.unlock();
@@ -101,11 +101,11 @@ public class ListManager implements CollectionManager {
         Lock readLock = lock.readLock();
         try {
             readLock.lock();
-            List<Dragon> toSort = dragons.stream().sorted((o1, o2) -> {
-                if (o1.getName().length() != o2.getName().length()) {
-                    return o1.getName().length() - o2.getName().length();
+            List<Dragon> toSort = dragons.stream().sorted((firstDragon, secondDragon) -> {
+                if (firstDragon.getName().length() != secondDragon.getName().length()) {
+                    return firstDragon.getName().length() - secondDragon.getName().length();
                 } else {
-                    return o1.getName().compareTo(o2.getName());
+                    return firstDragon.getName().compareTo(secondDragon.getName());
                 }
             }).collect(Collectors.toList());
             StringBuilder result = new StringBuilder();

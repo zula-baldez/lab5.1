@@ -58,11 +58,11 @@ public class XmlManager {
     private final DragonValidator dragonValidator;
     private final CollectionManager collectionManager;
     private final IoManager ioManager;
-    public XmlManager(CollectionManager collectionManager1, IoManager ioManager1) {
+    public XmlManager(CollectionManager collectionManager, IoManager ioManager) {
         this.argumentParser = new ArgumentParser();
         this.dragonValidator = new DragonValidator();
-        this.collectionManager = collectionManager1;
-        this.ioManager = ioManager1;
+        this.collectionManager = collectionManager;
+        this.ioManager = ioManager;
     }
     public void fromXML(String path) throws WrongArgumentException {
         if (!path.matches("^.*xml$")) {
