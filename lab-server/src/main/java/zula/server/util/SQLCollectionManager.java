@@ -64,7 +64,7 @@ public class SQLCollectionManager implements SQLManager {
                 return ResponseCode.ERROR;
             }
         } catch (SQLException e) {
-            logger.severe("Exception in remove command");
+            logger.severe(e.getMessage());
             return ResponseCode.ERROR;
         }
     }
@@ -77,7 +77,7 @@ public class SQLCollectionManager implements SQLManager {
             statement.executeQuery();
             return ResponseCode.OK;
         } catch (SQLException e) {
-            logger.severe("Exception in removeUsersDragons command");
+            logger.severe(e.getMessage());
             return ResponseCode.ERROR;
         }
     }
@@ -108,6 +108,7 @@ public class SQLCollectionManager implements SQLManager {
                 return ResponseCode.OK;
             }
         } catch (SQLException e) {
+            logger.severe(e.getMessage());
             return ResponseCode.ERROR;
         }
     }
@@ -155,7 +156,7 @@ public class SQLCollectionManager implements SQLManager {
             preparedStatement.execute();
             return ResponseCode.OK;
         } catch (SQLException e) {
-            logger.warning("impossible to update dragon with id" + dragon.getOwnerId());
+            logger.severe(e.getMessage());
             return ResponseCode.ERROR;
         }
     }
@@ -169,7 +170,7 @@ public class SQLCollectionManager implements SQLManager {
 
             return resultSet.getInt("id");
         } catch (SQLException e) {
-            logger.warning("impossible to add dragon with id" + dragon.getOwnerId());
+            logger.severe(e.getMessage());
             return -1;
         }
     }
@@ -246,7 +247,7 @@ public class SQLCollectionManager implements SQLManager {
             dragon.addAttributes(creationDate, id, userId);
             return dragon;
         } catch (SQLException e) {
-            logger.severe("Exception in parsing data from server");
+            logger.severe(e.getMessage());
             return null;
         }
     }
@@ -264,7 +265,7 @@ public class SQLCollectionManager implements SQLManager {
             login(login, password, abstractClient);
             return ResponseCode.OK;
         } catch (SQLException e) {
-            logger.severe("Exception in register command, maybe this login already exist");
+            logger.severe(e.getMessage());
             return ResponseCode.ERROR;
         }
     }
@@ -281,7 +282,7 @@ public class SQLCollectionManager implements SQLManager {
             client.setUserId(userId);
             return ResponseCode.OK;
         } catch (SQLException e) {
-            logger.severe("Exception in login command");
+            logger.severe(e.getMessage());
             return ResponseCode.ERROR;
 
         }
