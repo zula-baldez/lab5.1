@@ -18,7 +18,6 @@ import zula.common.commands.Show;
 import zula.common.commands.UpdateId;
 import zula.common.data.Dragon;
 import zula.common.data.ResponseCode;
-import zula.common.data.ServerMessage;
 import zula.common.util.CollectionManager;
 
 import java.util.Collections;
@@ -42,23 +41,22 @@ public class ListManager implements CollectionManager {
     private final Date date = new Date();
     private final HashMap<String, Command> commands = new HashMap<>();
     private final ReadWriteLock lock = new ReentrantReadWriteLock(true);
-
-            public ListManager() {
-                commands.put("help", new Help());
-                commands.put("info", new Info());
-                commands.put("show", new Show());
-                commands.put("update_id", new UpdateId());
-                commands.put("remove_by_id", new RemoveById());
-                commands.put("clear", new Clear());
-                commands.put("execute_script", new ExecuteScript());
-                commands.put("exit", new Exit());
-                commands.put("remove_last", new RemoveLast());
-                commands.put("remove_lower", new RemoveLower());
-                commands.put("reorder", new Reorder());
-                commands.put("average_of_wingspan", new AverageOfWingspan());
-                commands.put("print_ascending", new PrintAscending());
-                commands.put("print_field_ascending_wingspan", new PrintFieldAscendingWingspan());
-                commands.put("add", new Add());
+    public ListManager() {
+        commands.put("help", new Help());
+        commands.put("info", new Info());
+        commands.put("show", new Show());
+        commands.put("update_id", new UpdateId());
+        commands.put("remove_by_id", new RemoveById());
+        commands.put("clear", new Clear());
+        commands.put("execute_script", new ExecuteScript());
+        commands.put("exit", new Exit());
+        commands.put("remove_last", new RemoveLast());
+        commands.put("remove_lower", new RemoveLower());
+        commands.put("reorder", new Reorder());
+        commands.put("average_of_wingspan", new AverageOfWingspan());
+        commands.put("print_ascending", new PrintAscending());
+        commands.put("print_field_ascending_wingspan", new PrintFieldAscendingWingspan());
+        commands.put("add", new Add());
     }
 
     @Override
@@ -165,13 +163,7 @@ public class ListManager implements CollectionManager {
     }
 
     public HashMap<String, Command> getCloneOfCommands() {
-        Lock readLock = lock.readLock();
-        try {
-            readLock.lock();
             return (HashMap<String, Command>) commands.clone();
-        } finally {
-            readLock.unlock();
-        }
     }
 
     public Date getDate() {
@@ -191,7 +183,6 @@ public class ListManager implements CollectionManager {
             readLock.unlock();
         }
     }
-
 
 
     public void clearDragons(int userId) {
@@ -236,7 +227,7 @@ public class ListManager implements CollectionManager {
             readLock.lock();
             for (Dragon e : dragons) {
                 if (e.getId() == id) {
-                    return  ResponseCode.OK;
+                    return ResponseCode.OK;
                 }
             }
             return ResponseCode.ERROR;

@@ -3,7 +3,6 @@ package zula.common.util;
 import zula.common.commands.Command;
 import zula.common.data.Dragon;
 import zula.common.data.ResponseCode;
-import zula.common.data.ServerMessage;
 
 import java.util.Date;
 import java.util.HashMap;
