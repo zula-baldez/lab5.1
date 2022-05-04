@@ -16,7 +16,7 @@ public class RegisterCommand extends Command {
         if (client.getSqlManager().register(login, password, client) == ResponseCode.OK) {
             return new ServerMessage("Успешная регистрация", ResponseCode.OK);
         } else {
-            return new ServerMessage("Ошибка при регистрации", ResponseCode.OK);
+            return new ServerMessage("Ошибка при регистрации, попробуйте другой логин", ResponseCode.ERROR);
 
         }
 

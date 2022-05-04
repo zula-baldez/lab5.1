@@ -268,6 +268,7 @@ public class SQLCollectionManager implements SQLManager {
             login(login, password, abstractClient);
             return ResponseCode.OK;
         } catch (SQLException e) {
+            e.printStackTrace();
             logger.severe("Exception in register command");
 
             return ResponseCode.ERROR;
