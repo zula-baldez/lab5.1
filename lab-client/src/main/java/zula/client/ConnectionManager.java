@@ -42,10 +42,10 @@ public class ConnectionManager {
     private final int intByteSize = 4;
     private String login;
     private String password;
-    public ConnectionManager(String ip, int port, IoManager ioManager1) {
+    public ConnectionManager(String ip, int port, IoManager ioManager) {
         serverIp = ip;
         serverPort = port;
-        ioManager = ioManager1;
+        this.ioManager = ioManager;
     }
 
     private void connect() throws IOException {

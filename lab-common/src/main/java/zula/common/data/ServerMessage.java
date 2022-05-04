@@ -25,9 +25,9 @@ public class ServerMessage implements Serializable {
         responseCode = respCode;
     }
 
-    public void setIndentification(String name1, String password1) {
-        name = name1;
-        password = password1;
+    public void setIndentification(String name, String password) {
+        this.name = name;
+        this.password = password;
     }
 
     public String getName() {

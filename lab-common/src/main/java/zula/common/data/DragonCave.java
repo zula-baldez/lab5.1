@@ -4,8 +4,8 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class DragonCave implements Serializable {
-    private Float depth; //Поле может быть null
-    private Double numberOfTreasures; //Поле может быть null, Значение поля должно быть больше 0
+    private final Float depth; //Поле может быть null
+    private final Double numberOfTreasures; //Поле может быть null, Значение поля должно быть больше 0
     public DragonCave(Float depth, Double numberOfTreasures) {
         this.depth = depth;
         this.numberOfTreasures = numberOfTreasures;

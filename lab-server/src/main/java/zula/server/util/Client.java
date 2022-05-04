@@ -15,10 +15,10 @@ public class Client extends AbstractClient {
     private IoManager ioManager = null;
 
 
-    public Client(Socket socket1, IoManager ioManager1, SQLManager sqlManager, CollectionManager collectionManager) {
+    public Client(Socket socket, IoManager ioManager, SQLManager sqlManager, CollectionManager collectionManager) {
         super(sqlManager, collectionManager);
-        socket = socket1;
-        ioManager = ioManager1;
+        this.socket = socket;
+        this.ioManager = ioManager;
 
     }
 

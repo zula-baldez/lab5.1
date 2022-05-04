@@ -5,8 +5,8 @@ import zula.server.ServerApp;
 
 public class ClientThread extends Thread {
     private Client client;
-    public ClientThread(Client client1) {
-        client = client1;
+    public ClientThread(Client client) {
+        this.client = client;
     }
     @Override
     public void run() {

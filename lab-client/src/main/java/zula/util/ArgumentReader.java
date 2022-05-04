@@ -14,9 +14,9 @@ import java.util.function.Predicate;
 public class ArgumentReader {
     private final IoManager ioManager;
     private final DragonValidator dragonValidator;
-    public ArgumentReader(IoManager ioManager1) {
+    public ArgumentReader(IoManager ioManager) {
 
-        this.ioManager = ioManager1;
+        this.ioManager = ioManager;
         this.dragonValidator = new DragonValidator();
     }
     private <T> T readArg(Predicate<T> predicate, StringConverter<T> stringConverter) throws PrintException {

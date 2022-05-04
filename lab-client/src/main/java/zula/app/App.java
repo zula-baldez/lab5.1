@@ -40,9 +40,9 @@ public class App {
     private final ArgumentParser argumentParser = new ArgumentParser();
     private String login;
     private String password;
-    public App(IoManager ioManager1, ConnectionManager connectionManager1) {
-        ioManager = ioManager1;
-        connectionManager = connectionManager1;
+    public App(IoManager ioManager, ConnectionManager connectionManager) {
+        this.ioManager = ioManager;
+        this.connectionManager = connectionManager;
     }
 
     public void startApp() throws PrintException, ClassNotFoundException {
@@ -143,15 +143,15 @@ public class App {
         return command;
     }
     private String parseArgs(String command, String readLine) {
-        String readLine1 = (readLine.replace(command, ""));
-        if (readLine1.length() >= 1 && readLine1.charAt(0) == ' ') {
-            readLine1 = readLine1.substring(1);
+        String newLine = (readLine.replace(command, ""));
+        if (newLine.length() >= 1 && newLine.charAt(0) == ' ') {
+            newLine = newLine.substring(1);
         }
-        return readLine1;
+        return newLine;
     }
 
-    private Serializable readArgs(String command, String commandArguments1) throws WrongArgumentException, PrintException, GetServerMessageException, SendException {
-        String commandArguments = parseArgs(command, commandArguments1);
+    private Serializable readArgs(String command, String argument) throws WrongArgumentException, PrintException, GetServerMessageException, SendException {
+        String commandArguments = parseArgs(command, argument);
         Serializable arguments = commandArguments;
         if ("add".equals(command)) {
           arguments = parseAdd(commandArguments);
