@@ -66,7 +66,6 @@ public class ListManager implements CollectionManager {
         Lock writeLock = lock.writeLock();
         try {
             writeLock.lock();
-            lock.writeLock();
             dragons.removeIf(n -> n.getId() == dragon.getId());
             dragon.addAttributes(new Date(), dragon.getId(), dragon.getOwnerId());
             dragons.add(dragon);
@@ -104,8 +103,7 @@ public class ListManager implements CollectionManager {
         Lock readLock = lock.readLock();
         try {
             readLock.lock();
-            List<Dragon> toSort;
-            toSort = dragons.stream().sorted((o1, o2) -> {
+            List<Dragon> toSort = dragons.stream().sorted((o1, o2) -> {
                 if (o1.getName().length() != o2.getName().length()) {
                     return o1.getName().length() - o2.getName().length();
                 } else {
@@ -147,12 +145,12 @@ public class ListManager implements CollectionManager {
 
 
     public LinkedList<Dragon> getCopyOfList() {
-        Lock writeLock = lock.writeLock();
+        Lock readLock = lock.readLock();
         try {
-            writeLock.lock();
+            readLock.lock();
             return (LinkedList<Dragon>) dragons.clone();
         } finally {
-            writeLock.unlock();
+            readLock.unlock();
         }
     }
 
@@ -184,33 +182,16 @@ public class ListManager implements CollectionManager {
         Lock readLock = lock.readLock();
         try {
             readLock.lock();
-            return dragons.getLast().getId();
+            if (dragons.size() != 0) {
+                return dragons.getLast().getId();
+            } else {
+                return -1;
+            }
         } finally {
             readLock.unlock();
         }
     }
-/*
-    public boolean idIsUsed(int id) {
-        Lock writeLock = lock.writeLock();
-        try {
-            writeLock.lock();
-            return usedId.contains(id);
-        } finally {
-            writeLock.unlock();
-        }
-    }*/
-/*
 
-    public String getPath() {
-        Lock writeLock = lock.writeLock();
-        try {
-            writeLock.lock();
-            return path;
-        } finally {
-            writeLock.unlock();
-        }
-    }
-*/
 
 
     public void clearDragons(int userId) {
@@ -223,53 +204,53 @@ public class ListManager implements CollectionManager {
         }
     }
 
-    public ServerMessage deleteLast() {
+    public String deleteLast() {
         Lock writeLock = lock.writeLock();
         try {
             writeLock.lock();
             if (dragons.size() != 0) {
                 dragons.removeLast();
-                return new ServerMessage("Удаление проведено успешно", ResponseCode.OK);
+                return "Удаление проведено успешно";
             } else {
-                return new ServerMessage("Нечего удалять", ResponseCode.ERROR);
+                return "Нечего удалять";
             }
         } finally {
             writeLock.unlock();
         }
     }
 
-    public ServerMessage removeById(int id) {
+    public String removeById(int id) {
         Lock writeLock = lock.writeLock();
         try {
             writeLock.lock();
             dragons.removeIf(n -> n.getId() == id);
-            return new ServerMessage("Удаление проведено успешно", ResponseCode.OK);
+            return "Удаление проведено успешно";
         } finally {
             writeLock.unlock();
         }
     }
 
-    public ServerMessage getById(int id) {
+    public ResponseCode getById(int id) {
         Lock readLock = lock.readLock();
         try {
             readLock.lock();
             for (Dragon e : dragons) {
                 if (e.getId() == id) {
-                    return new ServerMessage("", ResponseCode.OK);
+                    return  ResponseCode.OK;
                 }
             }
-            return new ServerMessage("Элемента с заданным id не существует", ResponseCode.ERROR);
+            return ResponseCode.ERROR;
         } finally {
             readLock.unlock();
         }
     }
 
-    public ServerMessage removeLower(int id, int userId) {
+    public ResponseCode removeLower(int id, int userId) {
         Lock writeLock = lock.writeLock();
         try {
             writeLock.lock();
             dragons.removeIf(n -> n.getId() < id && n.getOwnerId() == userId);
-            return new ServerMessage("Удаление проведено успешно", ResponseCode.OK);
+            return ResponseCode.OK;
         } finally {
             writeLock.unlock();
         }

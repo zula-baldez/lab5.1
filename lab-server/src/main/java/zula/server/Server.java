@@ -25,14 +25,13 @@ import java.util.logging.Logger;
 public final class Server {
     private static final int TIMEOUT = 10;
     private static final Logger SERVERLOGGER = Logger.getLogger("Server logger");
-    private static boolean serverStillWorks = true;
     private static final Scanner SCANNER = new Scanner(System.in);
     private static final int AMOUNT_OF_ARGUMENTS = 5;
     private static final int PORT_ARGUMENT_INDEX = 4;
     private static final int PASSWORD_ARGUMENT_INDEX = 3;
     private static final int USER_ARGUMENT_INDEX = 2;
     private static final int NAME_ARGUMENT_INDEX = 1;
-    private static final int PATH_ARGUMENT_INDEX = 0;
+    private static final int URL_ARGUMENT_INDEX = 0;
     private Server() {
         throw new UnsupportedOperationException("This is an utility class and can not be instantiated");
     }
@@ -41,9 +40,9 @@ public final class Server {
     public static void main(String[] args) {
         ListManager listManager = new ListManager();
         if (args.length != AMOUNT_OF_ARGUMENTS || args[0] == null) {
-            return;
+            throw new IllegalArgumentException();
         }
-        String path = args[PATH_ARGUMENT_INDEX];
+        String path = args[URL_ARGUMENT_INDEX];
         String name = args[NAME_ARGUMENT_INDEX];
         String user = args[USER_ARGUMENT_INDEX];
         String password = args[PASSWORD_ARGUMENT_INDEX];
@@ -52,8 +51,7 @@ public final class Server {
             SQLCollectionManager sqlCollectionManager = new SQLCollectionManager(connection);
             sqlCollectionManager.start(listManager);
             ServerSocket server = new ServerSocket(port);
-            while (serverStillWorks) {
-                checkForConsoleCommands();
+            while (checkForConsoleCommands()) {
                 server.setSoTimeout(TIMEOUT);
                 Socket clientSocket;
                 try {
@@ -61,33 +59,34 @@ public final class Server {
                 } catch (IOException e) {
                     continue;
                 }
-                IoManager ioManager1 = new IoManager(new InputManager(new InputStreamReader(clientSocket.getInputStream())), new ServerOutputManager(clientSocket.getOutputStream()));
-                Client client = new Client(clientSocket, ioManager1, sqlCollectionManager, listManager);
+                IoManager ioManager = new IoManager(new InputManager(new InputStreamReader(clientSocket.getInputStream())), new ServerOutputManager(clientSocket.getOutputStream()));
+                Client client = new Client(clientSocket, ioManager, sqlCollectionManager, listManager);
                 ObjectInputStream objectInputStream = new ObjectInputStream(clientSocket.getInputStream());
                 client.setObjectInputStream(objectInputStream);
                 ClientThread clientThread = new ClientThread(client);
                 clientThread.setDaemon(true); //to make exit works
                 clientThread.start();
             }
-        } catch (SQLException | PrintException e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            SERVERLOGGER.severe("Не удалось подключиться к БД");
         } catch (IllegalArgumentException e) {
             SERVERLOGGER.severe("Неверные аргументы");
         } catch (IOException e) {
-            e.printStackTrace();
             SERVERLOGGER.severe("Не удалось запустить сервер");
+        } catch (PrintException e) {
+            SERVERLOGGER.severe("Отправка стала невозможной");
         }
     }
 
 
-    public static void checkForConsoleCommands() throws IOException, PrintException {
-        //todo ctrl + d
+    public static boolean checkForConsoleCommands() throws IOException, PrintException {
             if (System.in.available() > 0) {
                 String command = SCANNER.nextLine();
                 if ("exit".equals(command)) {
                     SERVERLOGGER.info("До свидания!");
-                    serverStillWorks = false;
+                    return false;
                 }
             }
+            return true;
     }
 }

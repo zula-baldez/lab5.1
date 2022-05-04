@@ -16,9 +16,9 @@ public class ServerApp {
     private final Logger appLogger = Logger.getLogger("App logger");
     private boolean isClientAlive = true;
     private final ExecutorService service = Executors.newFixedThreadPool(2 * 2 * 2, r -> {
-                Thread t = Executors.defaultThreadFactory().newThread(r);
-                t.setDaemon(true);
-                return t;
+                Thread thread = Executors.defaultThreadFactory().newThread(r);
+                thread.setDaemon(true);
+                return thread;
             }
     );
     public void startApp(Client client) throws PrintException {

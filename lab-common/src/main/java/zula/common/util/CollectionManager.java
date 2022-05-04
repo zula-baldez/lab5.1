@@ -2,6 +2,7 @@ package zula.common.util;
 
 import zula.common.commands.Command;
 import zula.common.data.Dragon;
+import zula.common.data.ResponseCode;
 import zula.common.data.ServerMessage;
 
 import java.util.Date;
@@ -39,13 +40,13 @@ public interface CollectionManager {
 
     int getIdOfLast();
 
-    ServerMessage deleteLast();
+    String deleteLast();
 
-    ServerMessage removeById(int id);
+    String removeById(int id);
 
-    ServerMessage getById(int id);
+    ResponseCode getById(int id);
 
-    ServerMessage removeLower(int id, int userId);
+    ResponseCode removeLower(int id, int userId);
 
     void reverseList();
 

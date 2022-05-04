@@ -22,34 +22,11 @@ import java.util.logging.Logger;
 
 public class SQLCollectionManager implements SQLManager {
 
-    private static final String REGISTER = "INSERT INTO USERS VALUES (?, default, ?) RETURNING id";
-    private static final String CREATE_TABLE =
-            "CREATE TABLE IF NOT EXISTS DRAGONS(\n"
-                    + "                        name VARCHAR(50),\n"
-                    + "                        x double precision CHECK(x >= -23) NOT NULL,\n"
-                    + "                        y int CHECK(y < 161),\n"
-                    + "                        creation_date  VARCHAR(50) NOT NULL,\n"
-                    + "                        age BIGINT,\n"
-                    + "                        wingspan FLOAT,\n"
-                    + "                        color VARCHAR(50),\n"
-                    + "                        type VARCHAR(50),\n"
-                    + "                        depth float4,\n"
-                    + "                        number_of_treasure DOUBLE PRECISION,\n"
-                    + "                        owner_id integer NOT NULL,\n"
-                    + "                        FOREIGN KEY(owner_id) REFERENCES users ON DELETE CASCADE,"
-                    + "                        id SERIAL PRIMARY KEY)\n";
-    private static final String CREATE_USERS =
-            "CREATE TABLE IF NOT EXISTS USERS (\n"
-                    + "                        NAME VARCHAR(50) UNIQUE,\n"
-                    + "                        ID serial primary key,\n"
-                    + "                        PASSWORD VARCHAR(64)\n"
-                    + ")";
-
     private static final int NAME_COLUMN_INDEX = 1;
     private static final int X_COORDINATE_COLUMN_INDEX = 2;
     private static final int Y_COORDINATE_COLUMN_INDEX = 3;
-    private static final  int DATE_COLUMN_INDEX = 4;
-    private static final  int AGE_COLUMN_INDEX = 5;
+    private static final int DATE_COLUMN_INDEX = 4;
+    private static final int AGE_COLUMN_INDEX = 5;
     private static final int WINGSPAN_COLUMN_INDEX = 6;
     private static final int COLOR_COLUMN_INDEX = 7;
     private static final int TYPE_COLUMN_INDEX = 8;
@@ -65,8 +42,8 @@ public class SQLCollectionManager implements SQLManager {
     private final EncryptingManager encryptingManager = new EncryptingManager();
 
 
-    public SQLCollectionManager(Connection connection1) {
-        connection = connection1;
+    public SQLCollectionManager(Connection connection) {
+        this.connection = connection;
     }
 
     public ResponseCode remove(int id, int userId) {
@@ -87,6 +64,7 @@ public class SQLCollectionManager implements SQLManager {
                 return ResponseCode.ERROR;
             }
         } catch (SQLException e) {
+            logger.severe("Exception in remove command");
             return ResponseCode.ERROR;
         }
     }
@@ -99,6 +77,7 @@ public class SQLCollectionManager implements SQLManager {
             statement.executeQuery();
             return ResponseCode.OK;
         } catch (SQLException e) {
+            logger.severe("Exception in removeUsersDragons command");
             return ResponseCode.ERROR;
         }
     }
@@ -129,7 +108,6 @@ public class SQLCollectionManager implements SQLManager {
                 return ResponseCode.OK;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
             return ResponseCode.ERROR;
         }
     }
@@ -153,10 +131,7 @@ public class SQLCollectionManager implements SQLManager {
         } else {
             preparedStatement.setString(COLOR_COLUMN_INDEX, dragon.getColor().toString());
         }
-
-
         preparedStatement.setString(TYPE_COLUMN_INDEX, dragon.getType().toString());
-
 
         if (dragon.getCave().getDepth() == null) {
             preparedStatement.setNull(DEPTH_COLUMN_INDEX, Types.DOUBLE);
@@ -202,23 +177,39 @@ public class SQLCollectionManager implements SQLManager {
             return -1;
         }
     }
-    public void start(CollectionManager collectionManager) {
+    public void start(CollectionManager collectionManager) throws SQLException {
         try (Statement statement = connection.createStatement()) {
-            statement.execute(CREATE_USERS);
-            statement.execute(CREATE_TABLE);
+            String createUsers = "CREATE TABLE IF NOT EXISTS USERS (\n"
+                    + "                        NAME VARCHAR(50) UNIQUE,\n"
+                    + "                        ID serial primary key,\n"
+                    + "                        PASSWORD VARCHAR(64)\n"
+                    + ")";
+            statement.execute(createUsers);
+            String createTable = "CREATE TABLE IF NOT EXISTS DRAGONS(\n"
+                    + "                        name VARCHAR(50) NOT NULL,\n"
+                    + "                        x double precision CHECK(x >= -23) NOT NULL,\n"
+                    + "                        y int CHECK(y < 161) NOT NULL,\n"
+                    + "                        creation_date  VARCHAR(50) NOT NULL,\n"
+                    + "                        age BIGINT NOT NULL,\n"
+                    + "                        wingspan FLOAT NOT NULL,\n"
+                    + "                        color VARCHAR(50),\n"
+                    + "                        type VARCHAR(50) NOT NULL,\n"
+                    + "                        depth float4,\n"
+                    + "                        number_of_treasure DOUBLE PRECISION,\n"
+                    + "                        owner_id integer NOT NULL,\n"
+                    + "                        FOREIGN KEY(owner_id) REFERENCES users ON DELETE CASCADE,"
+                    + "                        id SERIAL PRIMARY KEY)\n";
+            statement.execute(createTable);
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM DRAGONS ")) {
                 while (resultSet.next()) {
                     Dragon dragon = parseDragon(resultSet);
                     if (dragon != null) {
                         collectionManager.addDragonWithoutGeneratingId(dragon);
                     } else {
-                        return;
+                        throw new SQLException();
                     }
                 }
             }
-        } catch (SQLException e) {
-            logger.severe("Failed to start the server");
-            e.printStackTrace();
         }
     }
 
@@ -253,13 +244,13 @@ public class SQLCollectionManager implements SQLManager {
             } else {
                 numberOfTreasure = null;
             }
-
             int userId = resultSet.getInt("owner_id");
             DragonCave dragonCave = new DragonCave(depth, numberOfTreasure);
             Dragon dragon = new Dragon(name, coordinates, age, wingspan, color, type, dragonCave);
             dragon.addAttributes(creationDate, id, userId);
             return dragon;
         } catch (SQLException e) {
+            logger.severe("Exception in parsing data from server");
             return null;
         }
     }
@@ -269,13 +260,16 @@ public class SQLCollectionManager implements SQLManager {
     @Override
     public ResponseCode register(String login, String password, AbstractClient abstractClient) {
 
-        try (PreparedStatement preparedStatement = connection.prepareStatement(REGISTER)) {
+        String register = "INSERT INTO USERS VALUES (?, default, ?) RETURNING id";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(register)) {
             preparedStatement.setString(1, login);
             preparedStatement.setString(2, encryptingManager.encodeHash(password));
             preparedStatement.execute();
             login(login, password, abstractClient);
             return ResponseCode.OK;
         } catch (SQLException e) {
+            logger.severe("Exception in register command");
+
             return ResponseCode.ERROR;
         }
     }
@@ -292,7 +286,7 @@ public class SQLCollectionManager implements SQLManager {
             client.setUserId(userId);
             return ResponseCode.OK;
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.severe("Exception in login command");
             return ResponseCode.ERROR;
 
         }
