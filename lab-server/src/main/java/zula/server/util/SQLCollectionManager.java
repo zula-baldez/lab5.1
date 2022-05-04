@@ -93,7 +93,7 @@ public class SQLCollectionManager implements SQLManager {
             ResultSet resultSet = preparedStatement.executeQuery();
             Dragon dragonWithSelectedId;
             if (!resultSet.next()) {
-                throw new SQLException();
+                return ResponseCode.ERROR;
             } else {
                 dragonWithSelectedId = parseDragon(resultSet);
             }
