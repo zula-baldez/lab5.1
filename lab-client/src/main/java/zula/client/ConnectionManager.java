@@ -37,6 +37,7 @@ public class ConnectionManager {
     private boolean isItNotFirstDeserialization = false;
     private final int buffSize = 5555;
     private final int waitingTime = 100;
+    private final int maxAttemps = 10;
     private final int maxIterationsOnTheWaitingLoop = 30; //ждем ответа не более 30 секунд
     private final int intByteSize = 4;
     private String login;
@@ -61,7 +62,6 @@ public class ConnectionManager {
         client.finishConnect();
         if (!client.isConnected()) {
             try {
-                int maxAttemps = 10;
                 Thread.sleep(waitingTime * maxAttemps);
             } catch (InterruptedException ee) {
                 return;

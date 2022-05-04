@@ -70,10 +70,11 @@ public final class Server {
                 clientThread.start();
             }
         } catch (SQLException | PrintException e) {
-            SERVERLOGGER.severe("Не удалось начать работу");
+            e.printStackTrace();
         } catch (IllegalArgumentException e) {
             SERVERLOGGER.severe("Неверные аргументы");
         } catch (IOException e) {
+            e.printStackTrace();
             SERVERLOGGER.severe("Не удалось запустить сервер");
         }
     }

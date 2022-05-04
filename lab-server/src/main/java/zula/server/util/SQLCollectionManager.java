@@ -36,7 +36,8 @@ public class SQLCollectionManager implements SQLManager {
                     + "                        depth float4,\n"
                     + "                        number_of_treasure DOUBLE PRECISION,\n"
                     + "                        owner_id integer NOT NULL,\n"
-                    + "                        FOREIGN KEY(owner_id) REFERENCES users ON DELETE CASCADE,"
+                    + "                        FOREIGN " +
+                    "KEY(owner_id) REFERENCES users ON DELETE CASCADE,"
                     + "                        id SERIAL PRIMARY KEY)\n";
     private static final String CREATE_USERS =
             "CREATE TABLE IF NOT EXISTS USERS (\n"
@@ -78,7 +79,7 @@ public class SQLCollectionManager implements SQLManager {
             resultSet.next();
             if (resultSet.getInt("owner_id") == userId) {
                 query = "DELETE FROM dragons WHERE id = ?";
-                try (PreparedStatement preparedStatement = connection.prepareStatement(query)){
+                try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
                     preparedStatement.setInt(1, id);
                     preparedStatement.execute();
                 }
@@ -120,7 +121,7 @@ public class SQLCollectionManager implements SQLManager {
             }
             try (PreparedStatement statement = connection.prepareStatement(getAllDragonsQuery)) {
                 resultSet = statement.executeQuery();
-                while(resultSet.next()) {
+                while (resultSet.next()) {
                     Dragon dragon = parseDragon(resultSet);
                     if (dragonWithSelectedId.compareTo(dragon) > 0) {
                         remove(dragon.getId(), userId);
@@ -197,6 +198,7 @@ public class SQLCollectionManager implements SQLManager {
 
             return resultSet.getInt("id");
         } catch (SQLException e) {
+            e.printStackTrace();
             logger.warning("impossible to add dragon with id" + dragon.getOwnerId());
             return -1;
         }

@@ -43,22 +43,22 @@ public class ListManager implements CollectionManager {
     private final HashMap<String, Command> commands = new HashMap<>();
     private final ReadWriteLock lock = new ReentrantReadWriteLock(true);
 
-    public ListManager() {
-        commands.put("help", new Help());
-        commands.put("info", new Info());
-        commands.put("show", new Show());
-        commands.put("update_id", new UpdateId());
-        commands.put("remove_by_id", new RemoveById());
-        commands.put("clear", new Clear());
-        commands.put("execute_script", new ExecuteScript());
-        commands.put("exit", new Exit());
-        commands.put("remove_last", new RemoveLast());
-        commands.put("remove_lower", new RemoveLower());
-        commands.put("reorder", new Reorder());
-        commands.put("average_of_wingspan", new AverageOfWingspan());
-        commands.put("print_ascending", new PrintAscending());
-        commands.put("print_field_ascending_wingspan", new PrintFieldAscendingWingspan());
-        commands.put("add", new Add());
+            public ListManager() {
+                commands.put("help", new Help());
+                commands.put("info", new Info());
+                commands.put("show", new Show());
+                commands.put("update_id", new UpdateId());
+                commands.put("remove_by_id", new RemoveById());
+                commands.put("clear", new Clear());
+                commands.put("execute_script", new ExecuteScript());
+                commands.put("exit", new Exit());
+                commands.put("remove_last", new RemoveLast());
+                commands.put("remove_lower", new RemoveLower());
+                commands.put("reorder", new Reorder());
+                commands.put("average_of_wingspan", new AverageOfWingspan());
+                commands.put("print_ascending", new PrintAscending());
+                commands.put("print_field_ascending_wingspan", new PrintFieldAscendingWingspan());
+                commands.put("add", new Add());
     }
 
     @Override

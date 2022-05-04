@@ -8,6 +8,8 @@ import zula.common.util.IoManager;
 import java.io.Serializable;
 
 public abstract class Command implements Serializable {
+
+
       public ServerMessage execute(IoManager ioManager, AbstractClient client, Serializable[] arguments) throws PrintException {
          return doInstructions(ioManager, client, arguments);
 
@@ -15,6 +17,9 @@ public abstract class Command implements Serializable {
 
       public abstract ServerMessage doInstructions(IoManager ioManager, AbstractClient client, Serializable[] arguments) throws PrintException;
 
+      public boolean isNeedsLoginCheck() {
+          return true;
+      }
 
 
 }

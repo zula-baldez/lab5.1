@@ -39,29 +39,33 @@ public class ServerApp {
     }
 
         private void requestHandle(ServerMessage serverMessage, Client client) {
-            Thread thread = new Thread(() -> {
-                try {
-                    if (serverMessage.getCommand().isNeedsLoginCheck()) {
-                        LoginCommand loginCommand = new LoginCommand();
-                        ServerMessage answer = loginCommand.doInstructions(client.getIoManager(), client, new Serializable[]{serverMessage.getName(), serverMessage.getPassword()});
-                        if (answer.getResponseStatus() == ResponseCode.ERROR) {
-                            answerForResponse(serverMessage, client);
-                            return;
+            Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        if (serverMessage.getCommand().isNeedsLoginCheck()) {
+                            LoginCommand loginCommand = new LoginCommand();
+                            ServerMessage answer = loginCommand.doInstructions(client.getIoManager(), client, new Serializable[]{serverMessage.getName(), serverMessage.getPassword()});
+                            if (answer.getResponseStatus() == ResponseCode.ERROR) {
+                                answerForResponse(serverMessage, client);
+                                return;
+                            }
                         }
-                    }
 
-                    ServerMessage answer = serverMessage.getCommand().execute(client.getIoManager(), client, serverMessage.getArguments());
-                    answerForResponse(answer, client);
-                } catch (PrintException e) {
-                    appLogger.severe("Ошибка при отправке ответа");
+                        ServerMessage answer = serverMessage.getCommand().execute(client.getIoManager(), client, serverMessage.getArguments());
+                        answerForResponse(answer, client);
+                    } catch (PrintException e) {
+                        appLogger.severe("Ошибка при отправке ответа");
+                    }
                 }
-            });
+            }
+          );
             thread.setDaemon(true);
             thread.start();
         }
 
 
-        private synchronized void answerForResponse (ServerMessage serverMessage, Client client) throws PrintException {
+        private synchronized void answerForResponse(ServerMessage serverMessage, Client client) throws PrintException {
             service.submit(() -> {
                         try {
                             client.getIoManager().getOutputManager().writeServerMessage(serverMessage);
