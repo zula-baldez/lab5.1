@@ -36,8 +36,8 @@ public class SQLCollectionManager implements SQLManager {
                     + "                        depth float4,\n"
                     + "                        number_of_treasure DOUBLE PRECISION,\n"
                     + "                        owner_id integer NOT NULL,\n"
-                    + "                        FOREIGN " +
-                    "KEY(owner_id) REFERENCES users ON DELETE CASCADE,"
+                    + "                        FOREIGN "
+                    + "KEY(owner_id) REFERENCES users ON DELETE CASCADE,"
                     + "                        id SERIAL PRIMARY KEY)\n";
     private static final String CREATE_USERS =
             "CREATE TABLE IF NOT EXISTS USERS (\n"
