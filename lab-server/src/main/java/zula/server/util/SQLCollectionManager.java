@@ -116,11 +116,8 @@ public class SQLCollectionManager implements SQLManager {
 
 
     private void prepareStatement(PreparedStatement preparedStatement, Dragon dragon) throws SQLException {
-        if (dragon.getName() == null) {
-            preparedStatement.setNull(NAME_COLUMN_INDEX, Types.ARRAY);
-        } else {
-            preparedStatement.setString(NAME_COLUMN_INDEX, dragon.getName());
-        }
+
+        preparedStatement.setString(NAME_COLUMN_INDEX, dragon.getName());
         preparedStatement.setDouble(X_COORDINATE_COLUMN_INDEX, dragon.getCoordinates().getX());
         preparedStatement.setInt(Y_COORDINATE_COLUMN_INDEX, dragon.getCoordinates().getY());
         preparedStatement.setString(DATE_COLUMN_INDEX, dragon.getCreationDate().toString());
@@ -172,7 +169,6 @@ public class SQLCollectionManager implements SQLManager {
 
             return resultSet.getInt("id");
         } catch (SQLException e) {
-            e.printStackTrace();
             logger.warning("impossible to add dragon with id" + dragon.getOwnerId());
             return -1;
         }
@@ -268,9 +264,7 @@ public class SQLCollectionManager implements SQLManager {
             login(login, password, abstractClient);
             return ResponseCode.OK;
         } catch (SQLException e) {
-            e.printStackTrace();
-            logger.severe("Exception in register command");
-
+            logger.severe("Exception in register command, maybe this login already exist");
             return ResponseCode.ERROR;
         }
     }
