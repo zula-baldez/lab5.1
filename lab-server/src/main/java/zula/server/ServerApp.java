@@ -31,7 +31,7 @@ public class ServerApp {
         } catch (ClassNotFoundException e) {
             appLogger.severe("Ошибка выполнения команды");
         } catch (IOException e) {
-            appLogger.severe("Ошибка соединения");
+            appLogger.info("client disconnected");
             //тут, наверное, стоит завершить работу приложения, так как IOException может возникнуть
             //только при readObject() => считывание данных больше невозможно
             isClientAlive = false;

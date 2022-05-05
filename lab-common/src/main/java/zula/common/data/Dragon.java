@@ -28,14 +28,14 @@ public class Dragon implements Comparable<Dragon>, Serializable {
         this.type = type;
         this.cave = cave;
     }
-    public void addAttributes(Date date, int idArg, int ownerId) {
+    public void addAttributes(Date date, int idArg, int ownerIdArg) {
         this.id = idArg;
         this.creationDate = date;
-        this.ownerId = ownerId;
+        this.ownerId = ownerIdArg;
     }
-    public void addAttributes(Date date, int ownerId) {
+    public void addAttributes(Date date, int ownerIdArg) {
         this.creationDate = date;
-        this.ownerId = ownerId;
+        this.ownerId = ownerIdArg;
     }
     public int getId() {
         return id;
