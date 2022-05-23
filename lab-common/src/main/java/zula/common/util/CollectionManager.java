@@ -4,6 +4,7 @@ import zula.common.commands.Command;
 import zula.common.data.Dragon;
 import zula.common.data.ResponseCode;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -18,7 +19,7 @@ public interface CollectionManager {
 
     List<Dragon> printAscending();
 
-    String show();
+    Serializable[] show();
 
     double getAverageOfWingspan();
 
@@ -43,7 +44,7 @@ public interface CollectionManager {
 
     String removeById(int id);
 
-    ResponseCode getById(int id);
+    ResponseCode getById(int id, int userId);
 
     ResponseCode removeLower(int id, int userId);
 

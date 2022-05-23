@@ -1,7 +1,6 @@
 package zula.common.util;
 
 
-
 import zula.common.exceptions.EndOfFileException;
 import zula.common.exceptions.PrintException;
 
@@ -10,13 +9,24 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.Scanner;
+import java.util.ArrayDeque;
+import java.util.Queue;
 import java.util.Stack;
 
 public class InputManager {
+
+
+
+
+
+
+
+
+
+
     private Stack<InputStreamReader> readers = new Stack<>();
     private Stack<String> files = new Stack<>();
-    private final Scanner scanner = new Scanner(System.in);
+    private Queue<String> input = new ArrayDeque<>();
     private InputStreamReader currentInputStreamReader;
     private boolean fileReading = false;
     public InputManager(InputStreamReader inputStreamReader) {
@@ -32,15 +42,15 @@ public class InputManager {
                 return command;
                 } catch (EndOfFileException e) {
                   ioManager.getOutputManager().write("Конец файла. Переход на ручной ввод");
-                  return scanner.nextLine();
+                  return null;
                 } catch (IOException e) {
                 ioManager.getOutputManager().write("Ошибка при работе с файлом");
                 fileReading = false;
-                return scanner.nextLine();
+                return null;
             }
 
         } else {
-            return scanner.nextLine();
+            return input.poll();
         }
     }
     public boolean containsFileInStack(String path) {
@@ -91,6 +101,5 @@ public class InputManager {
 
 
     }
-
 
 }

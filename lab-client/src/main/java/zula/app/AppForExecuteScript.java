@@ -5,8 +5,6 @@ import zula.client.ConnectionManager;
 import zula.common.commands.Command;
 import zula.common.commands.DragonByIdCommand;
 import zula.common.commands.GetListOfCommands;
-import zula.common.commands.LoginCommand;
-import zula.common.commands.RegisterCommand;
 import zula.common.data.Color;
 import zula.common.data.Coordinates;
 import zula.common.data.Dragon;
@@ -32,7 +30,7 @@ import java.util.Objects;
 import java.util.logging.Logger;
 
 
-public class App {
+public class AppForExecuteScript {
     private static final Logger APPLOGGER = Logger.getLogger("App logger");
     private final IoManager ioManager;
     private final ConnectionManager connectionManager;
@@ -40,18 +38,18 @@ public class App {
     private final ArgumentParser argumentParser = new ArgumentParser();
     private String login;
     private String password;
-    public App(IoManager ioManager, ConnectionManager connectionManager) {
+    public AppForExecuteScript(IoManager ioManager, ConnectionManager connectionManager) {
         this.ioManager = ioManager;
         this.connectionManager = connectionManager;
     }
 
-    public void startApp() throws PrintException, ClassNotFoundException {
+    public void startApp() throws PrintException {
 
-        try {
+       /* try {
             authenticate();
         } catch (WrongArgumentException e) {
             return;
-        }
+        }*/
         try {
             connectionManager.sendToServer(new GetListOfCommands(),  new Serializable[]{""});
             ServerMessage serverMessage = connectionManager.getMessage();
@@ -64,7 +62,7 @@ public class App {
             readAndExecute();
         }
     }
-    private void authenticate() throws PrintException, WrongArgumentException {
+   /* private void authenticate() throws PrintException, WrongArgumentException {
         try {
             ioManager.getOutputManager().write("Если вы новый пользователь, зарегистрируйтесь, введя команду register, иначе введите login");
             String command = ioManager.getInputManager().read(ioManager);
@@ -92,7 +90,7 @@ public class App {
         } catch (SendException | GetServerMessageException e) {
             e.printStackTrace();
         }
-    }
+    }*/
     private Serializable[] readArgsForLoginAndRegistration() throws PrintException {
         ioManager.getOutputManager().write("Введите логин");
         login = ioManager.getInputManager().read(ioManager);
@@ -106,6 +104,10 @@ public class App {
         try {
             ioManager.getOutputManager().write("Введите команду!");
             String readLine = ioManager.getInputManager().read(ioManager);
+            if(readLine == null) {
+                ioManager.exitProcess();
+                return;
+            }
             String command = parseCommand(readLine);
             Serializable args;
             try {
@@ -209,9 +211,9 @@ public class App {
             Dragon dragon = (Dragon) readAddArgs();
             dragon.setId(Integer.parseInt(commandArguments));
             return dragon;
-        } else {
-            throw new WrongArgumentException(serverMessage.getArguments()[0].toString());
-        }
+            } else {
+                throw new WrongArgumentException(serverMessage.getArguments()[0].toString());
+            }
     }
     private Serializable readAddArgs() throws PrintException {
         ArgumentReader argumentReader = new ArgumentReader(ioManager);

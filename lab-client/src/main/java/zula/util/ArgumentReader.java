@@ -22,12 +22,12 @@ public class ArgumentReader {
     private <T> T readArg(Predicate<T> predicate, StringConverter<T> stringConverter) throws PrintException {
         while (true) {
             T t;
-            String readedLine = ioManager.getInputManager().read(ioManager);
-            if ("".equals(readedLine)) {
+            String readLine = ioManager.getInputManager().read(ioManager);
+            if ("".equals(readLine)) {
                 t = null;
             } else {
                 try {
-                    t = stringConverter.convert(readedLine);
+                    t = stringConverter.convert(readLine);
                 } catch (IllegalArgumentException e) {
                     ioManager.getOutputManager().write("Неверные входные данные");
 

@@ -12,11 +12,11 @@ public class DragonByIdCommand extends Command {
 
     @Override
     public ServerMessage doInstructions(IoManager ioManager, AbstractClient client, Serializable[] arguments) throws  PrintException {
-        ResponseCode responseCode = client.getCollectionManager().getById((Integer) arguments[0]);
+        ResponseCode responseCode = client.getCollectionManager().getById((Integer) arguments[0], client.getUserId());
         if (responseCode == ResponseCode.OK) {
             return new ServerMessage("", ResponseCode.OK);
         } else {
-            return new ServerMessage("Элемента с заданным id не существует", ResponseCode.ERROR);
+            return new ServerMessage("Элемента с заданным id не существует или не вы его создатель", ResponseCode.ERROR);
         }
     }
 }

@@ -10,6 +10,7 @@ import zula.server.util.ListManager;
 import zula.server.util.SQLCollectionManager;
 import zula.server.util.ServerOutputManager;
 
+import javax.sql.rowset.RowSetFactory;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
@@ -17,6 +18,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Scanner;
 import java.util.logging.Logger;
@@ -38,6 +40,7 @@ public final class Server {
 
 
     public static void main(String[] args) {
+
         ListManager listManager = new ListManager();
         if (args.length != AMOUNT_OF_ARGUMENTS || args[0] == null) {
             throw new IllegalArgumentException();
@@ -52,13 +55,10 @@ public final class Server {
             sqlCollectionManager.start(listManager);
             ServerSocket server = new ServerSocket(port);
             while (checkForConsoleCommands()) {
+                try {
                 server.setSoTimeout(TIMEOUT);
                 Socket clientSocket;
-                try {
-                    clientSocket = server.accept();
-                } catch (IOException e) {
-                    continue;
-                }
+                clientSocket = server.accept();
                 IoManager ioManager = new IoManager(new InputManager(new InputStreamReader(clientSocket.getInputStream())), new ServerOutputManager(clientSocket.getOutputStream()));
                 Client client = new Client(clientSocket, ioManager, sqlCollectionManager, listManager);
                 ObjectInputStream objectInputStream = new ObjectInputStream(clientSocket.getInputStream());
@@ -66,6 +66,9 @@ public final class Server {
                 ClientThread clientThread = new ClientThread(client);
                 clientThread.setDaemon(true); //to make exit works
                 clientThread.start();
+                } catch (IOException e) {
+                    System.out.print("");
+                }
             }
         } catch (SQLException e) {
             SERVERLOGGER.severe("Не удалось подключиться к БД");

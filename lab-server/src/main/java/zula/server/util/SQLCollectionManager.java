@@ -74,7 +74,7 @@ public class SQLCollectionManager implements SQLManager {
         String query = "DELETE FROM dragons WHERE owner_id = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, userId);
-            statement.executeQuery();
+            statement.execute();
             return ResponseCode.OK;
         } catch (SQLException e) {
             logger.severe(e.getMessage());
@@ -265,7 +265,6 @@ public class SQLCollectionManager implements SQLManager {
             login(login, password, abstractClient);
             return ResponseCode.OK;
         } catch (SQLException e) {
-            logger.severe(e.getMessage());
             return ResponseCode.ERROR;
         }
     }
@@ -282,7 +281,6 @@ public class SQLCollectionManager implements SQLManager {
             client.setUserId(userId);
             return ResponseCode.OK;
         } catch (SQLException e) {
-            logger.severe(e.getMessage());
             return ResponseCode.ERROR;
 
         }

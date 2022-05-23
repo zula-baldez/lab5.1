@@ -9,7 +9,7 @@ import java.io.OutputStreamWriter;
 import java.io.Serializable;
 
 public class OutputManager {
-    private OutputStreamWriter outputStreamWriter;
+    private final OutputStreamWriter outputStreamWriter;
     public OutputManager(OutputStreamWriter outputStream) {
         this.outputStreamWriter = outputStream;
     }

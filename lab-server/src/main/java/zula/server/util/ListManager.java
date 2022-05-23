@@ -20,6 +20,7 @@ import zula.common.data.Dragon;
 import zula.common.data.ResponseCode;
 import zula.common.util.CollectionManager;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -97,7 +98,7 @@ public class ListManager implements CollectionManager {
     }
 
     @Override
-    public String show() {
+    public Serializable[] show() {
         Lock readLock = lock.readLock();
         try {
             readLock.lock();
@@ -108,12 +109,12 @@ public class ListManager implements CollectionManager {
                     return firstDragon.getName().compareTo(secondDragon.getName());
                 }
             }).collect(Collectors.toList());
-            StringBuilder result = new StringBuilder();
 
-            for (Dragon e : toSort) {
-                result.append(e.toString()).append('\n');
+            Serializable[] arg = new Serializable[dragons.size()];
+            for (int i = 0; i < dragons.size(); i++) {
+                arg[i] = dragons.get(i);
             }
-            return result.toString();
+            return arg;
         } finally {
             readLock.unlock();
         }
@@ -221,12 +222,12 @@ public class ListManager implements CollectionManager {
         }
     }
 
-    public ResponseCode getById(int id) {
+    public ResponseCode getById(int id, int userId) {
         Lock readLock = lock.readLock();
         try {
             readLock.lock();
             for (Dragon e : dragons) {
-                if (e.getId() == id) {
+                if (e.getId() == id && e.getOwnerId() == userId) {
                     return ResponseCode.OK;
                 }
             }
