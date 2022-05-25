@@ -1,20 +1,10 @@
 package zula.gui;
 
 import zula.client.ConnectionManager;
+import zula.common.data.ResponseCode;
 import zula.util.Constants;
 
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
+import javax.swing.*;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -32,13 +22,14 @@ import java.util.ResourceBundle;
 public class MainScreen {
     private final int screenHeight = Toolkit.getDefaultToolkit().getScreenSize().height;
     private final int screenWidth = Toolkit.getDefaultToolkit().getScreenSize().width;
-    private final MainScreenLogics mainScreenLogics;
+    private final CommandExecutor commandExecutor;
     private final ConnectionAndLoginScreenFabric connectionAndLoginScreenFabric = new ConnectionAndLoginScreenFabric(Constants.ruBundle);
     private JFrame mainFrame;
     private JPanel northPanel;
     private JButton visualStyleButton;
-    private JComboBox<String> sortBy;
-    private JComboBox<String> filter;
+
+
+
     private JComboBox<String> languages = new JComboBox<>(Constants.languages);
     private JPanel centerPanel;
     private JPanel leftOfCenter;
@@ -49,7 +40,6 @@ public class MainScreen {
     private JPanel southPanel;
     private JTextField argumentTextField;
     private JPanel northOfCommandPanel;
-    private JPanel resultPanel;
     private JTextArea textResult;
     private JPanel southOfCommandPanel;
     private JTable jTable;
@@ -64,10 +54,17 @@ public class MainScreen {
     private final String[] commandNames = {"help", "info", "show", "update_id", "remove_by_id", "clear", "execute_script", "exit", "remove_last",
             "remove_lower", "reorder", "average_of_wingspan", "print_ascending", "print_field_ascending_wingspan", "add"};
     private JComboBox<String> commands;
-
+    private String[] mainSortPanel = {"Column to sort", "Type of sorting", "Sort"};
+    private String[] typesOfSorting = {"From a to z", "From z to a"};
+    private final JButton sortBy = new JButton("Sort!");
+    private final JButton filterButton = new JButton("Filter!");
+    private String[][] tableElements = {{}};
+    public void setTableValue(String[][] tableValue) {
+        tableElements = tableValue;
+    }
     public MainScreen(ConnectionManager connectionManager, JFrame mainFrame, ResourceBundle resourceBundle) {
         this.currentBundle = resourceBundle;
-        this.mainScreenLogics = new MainScreenLogics(connectionManager, mainFrame);
+        this.commandExecutor = new CommandExecutor(connectionManager, mainFrame);
         mainFrame.getContentPane().removeAll();
         this.mainFrame = mainFrame;
     }
@@ -75,8 +72,8 @@ public class MainScreen {
     public void initElements() {
         northPanel = new JPanel();
         visualStyleButton = new JButton();
-        sortBy = new JComboBox<String>(tableHeader);
-        filter = new JComboBox<>();
+        sortBy.setFont(Constants.mainFont);
+        filterButton.setFont(Constants.mainFont);
         centerPanel = new JPanel();
         leftOfCenter = new JPanel();
         rightOfCenter = new JPanel();
@@ -85,7 +82,6 @@ public class MainScreen {
         commandText = new JLabel();
         argumentTextField = new JTextField();
         northOfCommandPanel = new JPanel();
-        resultPanel = new JPanel();
         textResult = new JTextArea();
         southOfCommandPanel = new JPanel();
         argumentPanelText = new JLabel();
@@ -99,6 +95,26 @@ public class MainScreen {
         languages = new JComboBox<>(Constants.languages);
 
     }
+    private void setSettingsForSortPanel() {
+        sortBy.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+               SortFrame sortFrame = new SortFrame(mainFrame, commandExecutor.getConnectionManager(), currentBundle);
+               mainFrame.setEnabled(false);
+               sortFrame.drawSortPanel();
+            }
+        });
+    }
+    private void setSettingsForFilterPanel() {
+            filterButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                FilterFrame filterFrame = new FilterFrame(mainFrame, commandExecutor.getConnectionManager(), currentBundle);
+                mainFrame.setEnabled(false);
+                filterFrame.drawSortPanel();
+            }
+        });
+    }
 
 
     private void reprintArgumentPanel(JFileChooser jFileChooser) {
@@ -109,36 +125,21 @@ public class MainScreen {
         mainFrame.repaint();
     }
 
-/*    private void printArgumentPanel(JTextField argumentField) {
-        argumentPanel.removeAll();
-        argumentPanel.add(argumentPanelText);
-        argumentPanelText.setPreferredSize(new Dimension(screenWidth, screenHeight));
-
-        argumentPanel.add(argumentField);
-        argumentField.setPreferredSize(new Dimension(screenWidth, screenHeight));
-
-        argumentPanel.add(submitButton);
-        submitButton.setPreferredSize(new Dimension(screenWidth, screenHeight));
-
-        mainFrame.revalidate();
-        mainFrame.repaint();
-    }*/
-
     private void setListenerForVisualStyleButton() {
         visualStyleButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                VisualStyleMain visualStyleMain = new VisualStyleMain(mainFrame, mainScreenLogics.connectionManager, currentBundle);
+                VisualStyleMain visualStyleMain = new VisualStyleMain(mainFrame, commandExecutor.getConnectionManager(), currentBundle);
                 visualStyleMain.printGraphics();
             }
         });
     }
-    private void setListenerForFileChoose() {
+    private void setListenerForFileChooser() {
         executeScriptFileChooser.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 File file = executeScriptFileChooser.getSelectedFile();
-                mainScreenLogics.executeScript(textResult, file);
+                commandExecutor.executeScript(textResult, file);
             }
         });
     }
@@ -183,10 +184,10 @@ public class MainScreen {
         visualStyleButton.setFont(Constants.mainFont);
         visualStyleButton.setPreferredSize(new Dimension(screenWidth / 5, screenHeight / 20));
         sortBy.setPreferredSize(new Dimension(screenWidth / 5, screenHeight / 20));
-        filter.setPreferredSize(new Dimension(screenWidth / 5, screenHeight / 20));
+        filterButton.setPreferredSize(new Dimension(screenWidth / 5, screenHeight / 20));
         northPanel.add(visualStyleButton);
         northPanel.add(sortBy);
-        northPanel.add(filter);
+        northPanel.add(filterButton);
         northPanel.add(languages);
 
     }
@@ -265,61 +266,85 @@ public class MainScreen {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (commands.getSelectedItem().toString().equals("help")) {
-                    textResult.setText(mainScreenLogics.helpCommand());
+                    textResult.setText(commandExecutor.helpCommand());
                 }
                 if (commands.getSelectedItem().toString().equals("info")) {
-                    textResult.setText(mainScreenLogics.infoCommand());
+                    textResult.setText(commandExecutor.infoCommand());
                 }
                 if (commands.getSelectedItem().toString().equals("show")) {
-                    setSettingsForTable();
+                    setSettingsForTable(true);
                     textResult.setText("На таблице отображается корректный результат");
                 }
                 if (commands.getSelectedItem().toString().equals("print_ascending")) {
 
-                    textResult.setText(mainScreenLogics.printAscendingCommand());
+                    textResult.setText(commandExecutor.printAscendingCommand());
                 }
                 if (commands.getSelectedItem().toString().equals("print_field_ascending_wingspan")) {
-                    textResult.setText(mainScreenLogics.printFieldAscendingWingspanCommand());
+                    textResult.setText(commandExecutor.printFieldAscendingWingspanCommand());
                 }
                 if (commands.getSelectedItem().toString().equals("average_of_wingspan")) {
-                    textResult.setText(mainScreenLogics.averageOfWingspan());
+                    textResult.setText(commandExecutor.averageOfWingspan());
                 }
                 if (commands.getSelectedItem().toString().equals("remove_last")) {
-                    textResult.setText(mainScreenLogics.removeLastCommand());
+                    textResult.setText(commandExecutor.removeLastCommand());
                 }
                 if (commands.getSelectedItem().toString().equals("add")) {
-                    AddPanel addPanel = new AddPanel(mainFrame, mainScreenLogics.connectionManager, currentBundle);
-                    addPanel.drawAddPanel();
+                    AddPanel addPanel = new AddPanel(commandExecutor.getConnectionManager(), currentBundle);
+                    addPanel.drawPanel();
 
                 }
                 if (commands.getSelectedItem().toString().equals("remove_by_id")) {
                     try {
                         int id = Integer.parseInt(argumentTextField.getText());
-                        textResult.setText(mainScreenLogics.removeByIdCommand(id));
+                        textResult.setText(commandExecutor.removeByIdCommand(id));
                     } catch (NumberFormatException ee) {
                         System.out.println("TUT");
                         textResult.setText("Id must be a number!");
                     }
                 }
                 if (commands.getSelectedItem().toString().equals("exit")) {
-                    textResult.setText(mainScreenLogics.exitCommand());
+                    textResult.setText(commandExecutor.exitCommand());
 
 
                 }
                 if("clear".equals(commands.getSelectedItem().toString())) {
-                    textResult.setText(mainScreenLogics.clearCommand());
+                    textResult.setText(commandExecutor.clearCommand());
                 }
                 if("reorder".equals(commands.getSelectedItem().toString())) {
-                    textResult.setText(mainScreenLogics.reorder());
+                    textResult.setText(commandExecutor.reorder());
                 }
-
+                if("remove_lower".equals(commands.getSelectedItem().toString())) {
+                    try {
+                        int id = Integer.parseInt(argumentTextField.getText());
+                        textResult.setText(commandExecutor.removeLowerCommand(id));
+                    } catch (NumberFormatException ee) {
+                        textResult.setText("Id must be a number!");
+                    }
+                }
+                if(("update_id").equals(commands.getSelectedItem().toString())) {
+                    try {
+                        int id = Integer.parseInt(argumentTextField.getText());
+                        if(ResponseCode.OK == commandExecutor.getDragonById(id)) {
+                            UpdateIdPanel changeFieldsOfDragonPanel = new UpdateIdPanel(commandExecutor.getConnectionManager(), currentBundle, id);
+                            changeFieldsOfDragonPanel.drawPanel();
+                        } else {
+                            textResult.setText("Вы не его владелец(");
+                        }
+                    } catch (NumberFormatException ee) {
+                        System.out.println("TUT");
+                        textResult.setText("Id must be a number!");
+                    }
+                }
             }
         });
     }
 
-    private void setSettingsForTable() {
-        String[][] elements = mainScreenLogics.showCommand();
-        jTable = new JTable(elements, tableHeader);
+    private void setSettingsForTable(boolean isNeedsToInitTable) {
+        if(isNeedsToInitTable) {
+            jTable = new JTable(commandExecutor.showCommand(), tableHeader);
+        } else {
+            jTable = new JTable(tableElements, tableHeader);
+        }
         jTable.setVisible(true);
         jTable.setPreferredSize(new Dimension(screenWidth * 4 / 5, screenHeight));
         jTable.setFont(Constants.subFont);
@@ -339,7 +364,7 @@ public class MainScreen {
 
                 currentBundle = Constants.getBundleFromLanguageName(languages.getSelectedItem().toString());
                 mainFrame.getContentPane().removeAll();
-                startMain();
+                startMain(true);
 
             }
         });
@@ -347,7 +372,7 @@ public class MainScreen {
         languages.setPreferredSize(new Dimension(screenWidth / 5, screenHeight / 20));
 
     }
-    public void startMain() {
+    public void startMain(boolean isNeedsToInitTableValue) {
         initElements();
         //-------------------------
         setSettingsForMainFrame();
@@ -358,17 +383,19 @@ public class MainScreen {
         //--------------------------
         setSettingForCommandPanel();
         //--------------------------
-        setSettingForArgumentPanel("", true);
+        setSettingForArgumentPanel("", false);
         //--------------------------
         setListenerForSubmitButton();
         //--------------------------
         setListenerForVisualStyleButton();
         //--------------------------
-        setListenerForFileChoose();
+        setListenerForFileChooser();
 
         setSettingForLanguagesList();
 
+        setSettingsForSortPanel();
 
+        setSettingsForFilterPanel();
         southPanel.setPreferredSize(new Dimension(screenWidth, screenHeight * 2 / 7));
         mainFrame.add(northPanel);
         mainFrame.add(centerPanel);
@@ -381,7 +408,7 @@ public class MainScreen {
             }
         };*/
 
-        setSettingsForTable();
+        setSettingsForTable(isNeedsToInitTableValue);
         southPanel.setLayout(new GridLayout());
         textResult = new JTextArea();
         textResult.setPreferredSize(new Dimension(screenWidth, screenHeight));
@@ -392,5 +419,6 @@ public class MainScreen {
         southPanel.add(scrollText);
         mainFrame.setVisible(true);
     }
+
 
 }

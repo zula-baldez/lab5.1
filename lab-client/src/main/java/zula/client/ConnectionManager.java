@@ -1,6 +1,7 @@
 package zula.client;
 
 import zula.common.commands.Command;
+import zula.common.commands.GetUserId;
 import zula.common.data.ResponseCode;
 import zula.common.data.ServerMessage;
 import zula.common.exceptions.GetServerMessageException;
@@ -40,6 +41,7 @@ public class ConnectionManager {
     private final int maxAttemps = 10;
     private final int maxIterationsOnTheWaitingLoop = 30; //ждем ответа не более 30 секунд
     private final int intByteSize = 4;
+    private int userId;
     private String login;
     private String password;
     public ConnectionManager(String ip, int port, IoManager ioManager) {
@@ -47,7 +49,6 @@ public class ConnectionManager {
         serverPort = port;
         this.ioManager = ioManager;
     }
-
     private void connect() throws IOException {
 
         client = SocketChannel.open();
@@ -77,8 +78,12 @@ public class ConnectionManager {
         connect();
         objectSerializer = new ObjectOutputStream(objectSerializationBuffer);
         writerToObjectDeserializationBuffer = new PipedInputStream(objectDeserializationBuffer, buffSize * buffSize);
-    }
 
+
+    }
+    public int getUserId() {
+        return userId;
+    }
     public void sendToServer(Command command, Serializable[] args) throws SendException {
         try {
             ServerMessage serverMessage = new ServerMessage(command, args, ResponseCode.OK);
@@ -130,6 +135,7 @@ public class ConnectionManager {
             }
             return deserialize(storageOfInputBytes.toByteArray());
         } catch (IOException e) {
+            e.printStackTrace();
             throw new GetServerMessageException();
         }
     }
@@ -167,6 +173,9 @@ public class ConnectionManager {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+    public void setUserId(int id) {
+        this.userId = id;
     }
 }
 

@@ -4,6 +4,8 @@ import zula.app.AppForExecuteScript;
 import zula.client.ConnectionManager;
 import zula.common.commands.*;
 import zula.common.data.Dragon;
+import zula.common.data.ResponseCode;
+import zula.common.data.ServerMessage;
 import zula.common.exceptions.GetServerMessageException;
 import zula.common.exceptions.PrintException;
 import zula.common.exceptions.SendException;
@@ -16,70 +18,40 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
-public class MainScreenLogics {
-    ConnectionManager connectionManager;
-    JFrame mainFrame;
-    private final int idIndex = 0;
-    private final int nameIndex = 1;
-    private final int xIndex = 2;
-    private final int yIndex = 3;
-    private final int creationDateIndex = 4;
-    private final int ageIndex = 5;
-    private final int wingspanIndex = 6;
-    private final int colorIndex = 7;
-    private final int typeIndex = 8;
-    private final int depthIndex = 9;
-    private final int numOfTresIndex = 10;
-    private final int ownerIdIndex = 11;
-    public MainScreenLogics(ConnectionManager connectionManager, JFrame mainFrame) {
+public class CommandExecutor {
+    private ConnectionManager connectionManager;
+    private JFrame mainFrame;
+    public ConnectionManager getConnectionManager() {
+        return connectionManager;
+    }
+    public JFrame getMainFrame() {
+        return mainFrame;
+    }
+    public CommandExecutor(ConnectionManager connectionManager, JFrame mainFrame) {
         this.connectionManager = connectionManager;
         this.mainFrame = mainFrame;
     }
 
-    private String sendCommandReturningString(Command command, Serializable[] args) {
+    private synchronized String sendCommandReturningString(Command command, Serializable[] args) {
         try {
-            connectionManager.sendToServer(command, new Serializable[]{""});
+            connectionManager.sendToServer(command, args);
             return connectionManager.getMessage().getArguments()[0].toString();
         } catch (SendException | GetServerMessageException e) {
             e.printStackTrace();
             return null;
         }
     }
-
-
-    private String[][] parseTableFromDragons(Serializable[] result) {
-        String[][] table = new String[result.length][12];
-        for(int i = 0; i < result.length; i++) {
-            Dragon dragon = (Dragon) result[i];
-
-            table[i][idIndex] = Integer.toString(dragon.getId());
-            table[i][nameIndex] = dragon.getName();
-            table[i][xIndex] = Double.toString(dragon.getCoordinates().getX());
-            table[i][yIndex] = Integer.toString(dragon.getCoordinates().getY());
-            table[i][creationDateIndex] = dragon.getCreationDate().toString();
-            table[i][ageIndex] = Long.toString(dragon.getAge());
-            table[i][wingspanIndex] = Float.toString(dragon.getWingspan());
-            if(dragon.getColor() != null) {
-                table[i][colorIndex] = dragon.getColor().toString();
-            } else {
-                table[i][colorIndex] = "null";
-            }
-            table[i][typeIndex] = dragon.getType().toString();
-            if(dragon.getCave().getDepth() != null) {
-                table[i][depthIndex] = dragon.getCave().getDepth().toString();
-            } else {
-                table[i][depthIndex] = "null";
-            }
-            if(dragon.getCave().getNumberOfTreasures() != null) {
-                table[i][numOfTresIndex] = dragon.getCave().getNumberOfTreasures().toString();
-            } else {
-                table[i][numOfTresIndex] = "null";
-            }
-            table[i][ownerIdIndex] = Integer.toString(dragon.getOwnerId());
-
+    private synchronized ServerMessage sendCommandReturningServerMessage(Command command, Serializable[] args) {
+        try {
+            connectionManager.sendToServer(command, args);
+            return connectionManager.getMessage();
+        } catch (SendException | GetServerMessageException e) {
+            e.printStackTrace();
+            return null;
         }
-        return table;
     }
 
 
@@ -87,13 +59,35 @@ public class MainScreenLogics {
         Show show = new Show();
         try {
             connectionManager.sendToServer(show, new Serializable[]{""});
-            Serializable[] result = connectionManager.getMessage().getArguments();
-            return parseTableFromDragons(result);
+            List<Dragon> result = new ArrayList<>();
+            ServerMessage serverMessage = connectionManager.getMessage();
+
+            for(int i = 0; i < serverMessage.getArguments().length; i++) {
+                result.add((Dragon) serverMessage.getArguments()[i]);
+            }
+            Parcers parcers = new Parcers();
+            return parcers.parseTableFromDragons(result);
         } catch (SendException | GetServerMessageException e) {
             e.printStackTrace();
             return null;
         }
 
+    }
+    public List<Dragon> showWithoutParsingToMassive() {
+        Show show = new Show();
+        try {
+            connectionManager.sendToServer(show, new Serializable[]{""});
+            List<Dragon> result = new ArrayList<>();
+            ServerMessage serverMessage = connectionManager.getMessage();
+
+            for(int i = 0; i < serverMessage.getArguments().length; i++) {
+                result.add((Dragon) serverMessage.getArguments()[i]);
+            }
+            return result;
+        } catch (SendException | GetServerMessageException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
     public String helpCommand() {
         Help help = new Help();
@@ -123,8 +117,8 @@ public class MainScreenLogics {
         return sendCommandReturningString(removeLast, new Serializable[]{""});
     }
     public String removeByIdCommand(int id) {
-        RemoveLast removeLast = new RemoveLast();
-        return sendCommandReturningString(removeLast, new Serializable[]{""});
+        RemoveById removeById = new RemoveById();
+        return sendCommandReturningString(removeById, new Serializable[]{id});
     }
     public String exitCommand() {
         Exit exit = new Exit();
@@ -158,5 +152,8 @@ public class MainScreenLogics {
     }
     public String reorder() {
         return sendCommandReturningString(new Reorder(), new Serializable[]{""});
+    }
+    public ResponseCode getDragonById(int id) {
+        return sendCommandReturningServerMessage(new DragonByIdCommand(), new Serializable[]{id}).getResponseStatus();
     }
 }

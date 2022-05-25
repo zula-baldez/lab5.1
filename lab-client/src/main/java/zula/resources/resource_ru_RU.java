@@ -19,7 +19,8 @@ public class resource_ru_RU extends ListResourceBundle {
             {"REGISTER", "Вы новый пользователь? Зарегистрироваться"},
             {"ARGUMENT", "Аргумент"},
             {"COMMAND", "Команда"},
-            {"Visual style", "Визуализация"}
+            {"Visual style", "Визуализация"},
+            {"Back to normal", "Вернуться"}
     };
 
     @Override

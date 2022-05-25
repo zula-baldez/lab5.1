@@ -45,11 +45,7 @@ public class AppForExecuteScript {
 
     public void startApp() throws PrintException {
 
-       /* try {
-            authenticate();
-        } catch (WrongArgumentException e) {
-            return;
-        }*/
+
         try {
             connectionManager.sendToServer(new GetListOfCommands(),  new Serializable[]{""});
             ServerMessage serverMessage = connectionManager.getMessage();

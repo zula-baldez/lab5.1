@@ -42,7 +42,7 @@ public class AddPanel {
     private final ArrayList<JComponent> elementsList = new ArrayList<>();
 
 
-    ArgumentParser argumentParser = new ArgumentParser();
+    private final ArgumentParser argumentParser = new ArgumentParser();
 
 
     private final JLabel fieldText =BasicGUIElementsFabric.createBasicLabel("FIELD");
@@ -66,8 +66,8 @@ public class AddPanel {
     private final JLabel typeReq = BasicGUIElementsFabric.createBasicLabel("NOT NULL");
     private final JLabel depthReq = BasicGUIElementsFabric.createBasicLabel("Float, may be null");
     private final JLabel numberOfTreasuresReq = BasicGUIElementsFabric.createBasicLabel("Double, may be null");
-    private final String[] colors = new String[]{"BLACK", "ABOBA"};
-    private final String[] types = new String[]{"AIR", "ABOBA"};
+    private final String[] colors = Constants.colors;
+    private final String[] types = Constants.types;
     private final JTextField nameField = BasicGUIElementsFabric.createBasicJTextField();
     private final JTextField xField = BasicGUIElementsFabric.createBasicJTextField();
     private final JTextField yField = BasicGUIElementsFabric.createBasicJTextField();
@@ -77,37 +77,10 @@ public class AddPanel {
     private final JComboBox<String> typeField = BasicGUIElementsFabric.createBasicComboBox(types);
     private final JTextField depthField = BasicGUIElementsFabric.createBasicJTextField();
     private final JTextField numberOfTreasuresField = BasicGUIElementsFabric.createBasicJTextField();
-    private ResourceBundle currentBundle;
+    private final JComboBox<String> languages = new JComboBox<>(Constants.languages);
+    private final ResourceBundle currentBundle;
 
-
-    public AddPanel(JFrame mainFrame, ConnectionManager connectionManager, ResourceBundle resourceBundle) {
-        this.currentBundle = resourceBundle;
-        this.connectionManager = connectionManager;
-        mainFrame.setExtendedState(Frame.MAXIMIZED_BOTH);
-        mainFrame.setVisible(false);
-        mainFrame.setTitle("Add window");
-        this.mainFrame = mainFrame;
-        northPanel.setPreferredSize(new Dimension(Constants.screenWidth, Constants.screenHeight/10));
-        centralPanel.setPreferredSize(new Dimension(Constants.screenWidth, Constants.screenHeight*6/10));
-        southPanel.setPreferredSize(new Dimension(Constants.screenWidth, Constants.screenHeight*3/20));
-        errorPanel.setPreferredSize(new Dimension(Constants.screenWidth, Constants.screenHeight*3/20));
-        errorPanel.setBackground(Color.RED);
-        /*ridBagLayout gridBagLayout = new GridBagLayout();
-        int ints[] = new int[]{Constants.screenWidth/5, Constants.screenWidth*3/5, Constants.screenWidth/5};
-        gridBagLayout.columnWidths(ints)*/
-        northPanel.setLayout(new FlowLayout());
-        centralPanel.setLayout(new GridLayout(10, 3));
-        southPanel.setLayout(new GridBagLayout());
-        errorPanel.setLayout(new GridBagLayout());
-
-/*
-        leftOfCentralPanel.setLayout(new BoxLayout(leftOfCentralPanel, BoxLayout.Y_AXIS));
-        centreOfCentralPanel.setLayout(new BoxLayout(centreOfCentralPanel, BoxLayout.Y_AXIS));
-        rightOfCentralPanel.setLayout(new BoxLayout(rightOfCentralPanel, BoxLayout.Y_AXIS));
-
-        leftOfCentralPanel.setPreferredSize(new Dimension(Constants.screenWidth/5, Constants.screenHeight));
-        centreOfCentralPanel.setPreferredSize(new Dimension(Constants.screenWidth*3/5, Constants.screenHeight));
-        rightOfCentralPanel.setPreferredSize(new Dimension(Constants.screenWidth/5, Constants.screenHeight));*/
+    private void setBorders() {
 
         fieldText.setBorder(BorderFactory.createLineBorder(Color.black, 1));
         valueText.setBorder(BorderFactory.createLineBorder(Color.black, 1));
@@ -140,30 +113,69 @@ public class AddPanel {
         numberOfTreasuresField.setBorder(BorderFactory.createLineBorder(Color.black, 1));
         numberOfTreasuresReq.setBorder(BorderFactory.createLineBorder(Color.black, 1));
 
+    }
+    public AddPanel(ConnectionManager connectionManager, ResourceBundle resourceBundle) {
+        mainFrame  = new JFrame();
+        mainFrame.setSize(new Dimension(Constants.screenWidth, Constants.screenHeight));
+        this.currentBundle = resourceBundle;
+        this.connectionManager = connectionManager;
+        mainFrame.setExtendedState(Frame.MAXIMIZED_BOTH);
+        mainFrame.setVisible(false);
+        mainFrame.setTitle("Add window");
+        this.mainFrame = mainFrame;
+        northPanel.setPreferredSize(new Dimension(Constants.screenWidth, Constants.screenHeight/10));
+        centralPanel.setPreferredSize(new Dimension(Constants.screenWidth, Constants.screenHeight*6/10));
+        southPanel.setPreferredSize(new Dimension(Constants.screenWidth, Constants.screenHeight*3/20));
+        errorPanel.setPreferredSize(new Dimension(Constants.screenWidth, Constants.screenHeight*3/20));
 
+        northPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        centralPanel.setLayout(new GridLayout(10, 3));
+        southPanel.setLayout(new GridBagLayout());
+        errorPanel.setLayout(new GridBagLayout());
+
+        setBorders();
 
         submitButton.setFont(Constants.mainFont);
 
         submitButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         submitButton.setAlignmentY(Component.CENTER_ALIGNMENT);
+        setListenerForSubmitButton();
+        languages.setFont(Constants.mainFont);
+        languages.setAlignmentX(Component.CENTER_ALIGNMENT);
+        northPanel.add(languages);
+    }
+
+    protected Dragon parseDragonFromData() throws WrongArgumentException {
+        DragonValidator dragonValidator = new DragonValidator();
+        String name = argumentParser.parseArgFromString(nameField.getText(), dragonValidator::nameValidator, (String s) -> s);
+        Double x = argumentParser.parseArgFromString(xField.getText(), dragonValidator::xValidator, Double::parseDouble);
+        Integer y = argumentParser.parseArgFromString(yField.getText(), dragonValidator::yValidator, Integer::parseInt);
+        Coordinates coordinates = new Coordinates(x, y);
+        Long age = argumentParser.parseArgFromString(ageField.getText(), dragonValidator::ageValidator, Long::parseLong);
+        Float wingspan = argumentParser.parseArgFromString(wingspanField.getText(), dragonValidator::wingspanValidator, Float::parseFloat);
+        zula.common.data.Color color = argumentParser.parseArgFromString(colorField.getSelectedItem().toString(), dragonValidator::colorValidator, zula.common.data.Color::valueOf);
+        DragonType type = argumentParser.parseArgFromString( typeField.getSelectedItem().toString(), dragonValidator::typeValidator, DragonType::valueOf);
+        Float depth = argumentParser.parseArgFromString(depthField.getText(), dragonValidator::depthValidator, Float::parseFloat);
+        Double numberOfTreasures = argumentParser.parseArgFromString(numberOfTreasuresField.getText(), dragonValidator::numberOfTreasuresValidator, Double::parseDouble);
+        DragonCave dragonCave = new DragonCave(depth, numberOfTreasures);
+        return new Dragon(name, coordinates, age, wingspan, color, type, dragonCave);
+
+    }
+    protected void errorHandler(String message) {
+        errorPanel.removeAll();
+        JLabel errorLabel = new JLabel("CHECK THE CURRENCY OF THE DATA");
+        errorLabel.setFont(Constants.mainFont);
+        errorPanel.add(errorLabel);
+        mainFrame.revalidate();
+        mainFrame.repaint();
+    }
+    protected void setListenerForSubmitButton() {
         submitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    DragonValidator dragonValidator = new DragonValidator();
-                    String name = argumentParser.parseArgFromString(nameField.getText(), dragonValidator::nameValidator, (String s) -> s);
-                    Double x = argumentParser.parseArgFromString(xField.getText(), dragonValidator::xValidator, Double::parseDouble);
-                    Integer y = argumentParser.parseArgFromString(yField.getText(), dragonValidator::yValidator, Integer::parseInt);
-                    Coordinates coordinates = new Coordinates(x, y);
-                    Long age = argumentParser.parseArgFromString(ageField.getText(), dragonValidator::ageValidator, Long::parseLong);
-                    Float wingspan = argumentParser.parseArgFromString(wingspanField.getText(), dragonValidator::wingspanValidator, Float::parseFloat);
-                    zula.common.data.Color color = argumentParser.parseArgFromString(colorField.getSelectedItem().toString(), dragonValidator::colorValidator, zula.common.data.Color::valueOf);
-                    DragonType type = argumentParser.parseArgFromString( typeField.getSelectedItem().toString(), dragonValidator::typeValidator, DragonType::valueOf);
-                    Float depth = argumentParser.parseArgFromString(depthField.getText(), dragonValidator::depthValidator, Float::parseFloat);
-                    Double numberOfTreasures = argumentParser.parseArgFromString(numberOfTreasuresField.getText(), dragonValidator::numberOfTreasuresValidator, Double::parseDouble);
-                    DragonCave dragonCave = new DragonCave(depth, numberOfTreasures);
-                    Dragon dragon = new Dragon(name, coordinates, age, wingspan, color, type, dragonCave);
-                    try {
+                     Dragon dragon = parseDragonFromData();
+                     try {
                         connectionManager.sendToServer(new Add(), new Serializable[]{dragon});
                         connectionManager.getMessage();
                     } catch (SendException ex) {
@@ -171,22 +183,15 @@ public class AddPanel {
                     } catch (GetServerMessageException getServerMessageException) {
                         getServerMessageException.printStackTrace();
                     }
-                    MainScreen mainScreen = new MainScreen(connectionManager, mainFrame, currentBundle);
-                    mainScreen.startMain();
+                    mainFrame.dispose();
 
                 } catch (WrongArgumentException wrongArgumentException) {
-                    System.out.println("CHE");
-                    JLabel errorLabel = new JLabel("CHECK THE CURRENCY OF THE DATA");
-                    errorLabel.setFont(Constants.mainFont);
-                    errorPanel.add(errorLabel);
-                    mainFrame.revalidate();
-                    mainFrame.repaint();
+                   errorHandler("CHECK THE CURRENCY OF THE DATA");
                 }
             }
         });
     }
-
-    public void drawAddPanel() {
+    public void drawPanel() {
         JPanel mainPanel = new JPanel();
         mainPanel.setPreferredSize(new Dimension(Constants.screenWidth, Constants.screenHeight));
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
@@ -226,12 +231,31 @@ public class AddPanel {
         centralPanel.add(numberOfTreasuresReq);
         mainFrame.setContentPane(mainPanel);
         southPanel.add(submitButton);
-
-
-
-
-
-
         mainFrame.setVisible(true);
+    }
+    public JButton getSubmitButton() {
+        return submitButton;
+    }
+    public ConnectionManager getConnectionManager() {
+        return connectionManager;
+    }
+
+    public JFrame getMainFrame() {
+        return mainFrame;
+    }
+
+    public ResourceBundle getCurrentBundle() {
+        return currentBundle;
+    }
+    public void initTextFields(Dragon dragon) {
+        nameField.setText(dragon.getName());
+        xField.setText(Double.toString(dragon.getCoordinates().getX()));
+        yField.setText(Integer.toString(dragon.getCoordinates().getY()));
+        ageField.setText(Long.toString(dragon.getAge()));
+        wingspanField.setText(Float.toString(dragon.getWingspan()));
+        colorField.setSelectedItem(dragon.getColor().toString()); //TODO null
+        typeField.setSelectedItem(dragon.getType().toString());
+        depthField.setText(Float.toString(dragon.getCave().getDepth()));
+        numberOfTreasuresField.setText(Double.toString(dragon.getCave().getNumberOfTreasures()));
     }
 }

@@ -111,8 +111,8 @@ public class ListManager implements CollectionManager {
             }).collect(Collectors.toList());
 
             Serializable[] arg = new Serializable[dragons.size()];
-            for (int i = 0; i < dragons.size(); i++) {
-                arg[i] = dragons.get(i);
+            for (int i = 0; i < toSort.size(); i++) {
+                arg[i] = toSort.get(i);
             }
             return arg;
         } finally {

@@ -5,9 +5,10 @@ import java.io.Serializable;
 public enum Color implements Serializable {
     BLACK,
     BLUE,
-    YELLOW,
+    BROWN,
     WHITE,
-    BROWN;
+    YELLOW,
+
 
 
 }

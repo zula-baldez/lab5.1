@@ -56,6 +56,11 @@
 			<artifactId>lab-common</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.jdatepicker</groupId>
+			<artifactId>jdatepicker</artifactId>
+			<version>1.3.4</version>
+		</dependency>
 	</dependencies>
 
 </project>

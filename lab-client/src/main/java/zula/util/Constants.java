@@ -1,8 +1,11 @@
 package zula.util;
 
-import zula.resources.resource;
+import zula.common.data.DragonType;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Toolkit;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -19,6 +22,10 @@ public class Constants {
     public static final ResourceBundle mkdBundle = ResourceBundle.getBundle("zula.resources.resource", new Locale("mkd"));
     public static final ResourceBundle espBundle = ResourceBundle.getBundle("zula.resources.resource", new Locale("esp"));
     public static final HashMap<String, ResourceBundle> languagesAndBundles = new HashMap<>();
+    public static final String[] types = Arrays.stream(DragonType.values()).map(Enum::toString).toArray(String[]::new);
+    public static final String[] colors = Arrays.stream(zula.common.data.Color.values()).map(Enum::toString).toArray(String[]::new);
+
+
     static {
         languagesAndBundles.put("Русский", ruBundle);
         languagesAndBundles.put("Latviski", lvaBundle);
@@ -39,21 +46,6 @@ public class Constants {
         return null;
     }
 
-/*    public static String translate(String toTranslate, Languages language) {
-        if(language == Languages.RUSSIAN) {
-            return resource_ru.getTranslation(toTranslate);
-        }
-        if(language == Languages.SPANISH) {
 
-            return resource_esp.getTranslation(toTranslate);
-        }
-        if(language == Languages.MAKEDONSKI) {
-            return resource_mkd.getTranslation(toTranslate);
-        }
-        if(language == Languages.LATVISKI) {
-        return resource_lva.getTranslation(toTranslate);
-        }
-        return null;
-    }*/
 
 }

@@ -1,6 +1,7 @@
 package zula.gui;
 
 import zula.client.ConnectionManager;
+import zula.common.commands.GetUserId;
 import zula.common.commands.LoginCommand;
 import zula.common.commands.RegisterCommand;
 import zula.common.data.ResponseCode;
@@ -24,7 +25,6 @@ public class ConnectionLogics {
     private static final Logger CLIENTLOGGER = Logger.getLogger("ClientLogger");
     private static final IoManager IO_MANAGER = new IoManager(new InputManager(new InputStreamReader(System.in)), new OutputManager(new OutputStreamWriter(System.out)));
     private static  ConnectionManager connectionManager;
-
     public String connect(String address, String serverPort) {
         try {
             ip = address;
@@ -39,18 +39,12 @@ public class ConnectionLogics {
                 CLIENTLOGGER.info("Подключение установлено");
                 return  null;
             } catch (IOException e) {
+                e.printStackTrace();
                 IO_MANAGER.getOutputManager().write("Не удалось подключиться к серверу");
                 CLIENTLOGGER.severe("Ошибка при соединении");
                 return "ERROR IN CONNECTION";
             }
 
-         /*   App app = new App(IO_MANAGER, connectionManager);
-            try {
-                app.startApp();
-            } catch (ClassNotFoundException e) {
-                IO_MANAGER.getOutputManager().write("Ответ сервера не соответствует протоколу");
-            }
-            return null;*/
         } catch (PrintException e) {
             return null;
         }
@@ -66,6 +60,9 @@ public class ConnectionLogics {
             LoginCommand loginCommand = new LoginCommand();
             connectionManager.sendToServer(loginCommand, new Serializable[]{login, password});
             serverMessage = connectionManager.getMessage();
+            GetUserId getUserId = new GetUserId();
+            connectionManager.sendToServer(getUserId, new Serializable[]{""});
+            connectionManager.setUserId(Integer.parseInt(connectionManager.getMessage().getArguments()[0].toString()));
         } catch (GetServerMessageException | SendException e) {
             e.printStackTrace();
         }
@@ -95,7 +92,8 @@ public class ConnectionLogics {
 
     }
 
-    public   ConnectionManager getConnectionManager() {
+    public ConnectionManager getConnectionManager() {
         return connectionManager;
     }
+
 }

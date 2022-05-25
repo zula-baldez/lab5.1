@@ -64,6 +64,7 @@ public class SQLCollectionManager implements SQLManager {
                 return ResponseCode.ERROR;
             }
         } catch (SQLException e) {
+            e.printStackTrace();
             logger.severe(e.getMessage());
             return ResponseCode.ERROR;
         }
@@ -77,6 +78,8 @@ public class SQLCollectionManager implements SQLManager {
             statement.execute();
             return ResponseCode.OK;
         } catch (SQLException e) {
+            e.printStackTrace();
+
             logger.severe(e.getMessage());
             return ResponseCode.ERROR;
         }
@@ -108,6 +111,8 @@ public class SQLCollectionManager implements SQLManager {
                 return ResponseCode.OK;
             }
         } catch (SQLException e) {
+            e.printStackTrace();
+
             logger.severe(e.getMessage());
             return ResponseCode.ERROR;
         }
@@ -156,6 +161,7 @@ public class SQLCollectionManager implements SQLManager {
             preparedStatement.execute();
             return ResponseCode.OK;
         } catch (SQLException e) {
+            e.printStackTrace();
             logger.severe(e.getMessage());
             return ResponseCode.ERROR;
         }
@@ -170,6 +176,8 @@ public class SQLCollectionManager implements SQLManager {
 
             return resultSet.getInt("id");
         } catch (SQLException e) {
+            e.printStackTrace();
+
             logger.severe(e.getMessage());
             return -1;
         }
@@ -247,6 +255,8 @@ public class SQLCollectionManager implements SQLManager {
             dragon.addAttributes(creationDate, id, userId);
             return dragon;
         } catch (SQLException e) {
+            e.printStackTrace();
+
             logger.severe(e.getMessage());
             return null;
         }
@@ -265,6 +275,8 @@ public class SQLCollectionManager implements SQLManager {
             login(login, password, abstractClient);
             return ResponseCode.OK;
         } catch (SQLException e) {
+            e.printStackTrace();
+
             return ResponseCode.ERROR;
         }
     }
@@ -281,6 +293,9 @@ public class SQLCollectionManager implements SQLManager {
             client.setUserId(userId);
             return ResponseCode.OK;
         } catch (SQLException e) {
+            e.printStackTrace();
+
+
             return ResponseCode.ERROR;
 
         }

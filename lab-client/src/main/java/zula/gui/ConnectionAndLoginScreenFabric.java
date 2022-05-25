@@ -176,7 +176,7 @@ public class ConnectionAndLoginScreenFabric {
                     printError(answer, mainWindow);
                 } else {
                     MainScreen mainScreen = new MainScreen(connectionLogics.getConnectionManager(), mainWindow, currentBundle);
-                    mainScreen.startMain();
+                    mainScreen.startMain(true);
                 }
 
             }
@@ -195,7 +195,7 @@ public class ConnectionAndLoginScreenFabric {
                     printError(answer, mainWindow);
                 } else {
                     MainScreen mainScreen = new MainScreen(connectionLogics.getConnectionManager(), mainWindow, currentBundle);
-                    mainScreen.startMain();
+                    mainScreen.startMain(true);
                 }
             }
         });
