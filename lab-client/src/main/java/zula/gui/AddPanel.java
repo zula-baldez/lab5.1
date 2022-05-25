@@ -79,6 +79,7 @@ public class AddPanel {
     private final JTextField numberOfTreasuresField = BasicGUIElementsFabric.createBasicJTextField();
     private final JComboBox<String> languages = new JComboBox<>(Constants.languages);
     private final ResourceBundle currentBundle;
+    private CommandExecutor commandExecutor;
 
     private void setBorders() {
 
@@ -143,6 +144,7 @@ public class AddPanel {
         languages.setFont(Constants.mainFont);
         languages.setAlignmentX(Component.CENTER_ALIGNMENT);
         northPanel.add(languages);
+        commandExecutor = new CommandExecutor(connectionManager, mainFrame);
     }
 
     protected Dragon parseDragonFromData() throws WrongArgumentException {
@@ -177,7 +179,7 @@ public class AddPanel {
                      Dragon dragon = parseDragonFromData();
                      try {
                         connectionManager.sendToServer(new Add(), new Serializable[]{dragon});
-                        connectionManager.getMessage();
+                        connectionManager.getMessage(); //todo ADD
                     } catch (SendException ex) {
                         ex.printStackTrace();
                     } catch (GetServerMessageException getServerMessageException) {
@@ -257,5 +259,20 @@ public class AddPanel {
         typeField.setSelectedItem(dragon.getType().toString());
         depthField.setText(Float.toString(dragon.getCave().getDepth()));
         numberOfTreasuresField.setText(Double.toString(dragon.getCave().getNumberOfTreasures()));
+    }
+    public void addDeleteButton(int id) {
+        JButton deleteButton = new JButton("Delete");
+        southPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+
+        deleteButton.setFont(Constants.mainFont);
+        southPanel.add(deleteButton);
+
+        deleteButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                commandExecutor.removeByIdCommand(id);
+                mainFrame.dispose();
+            }
+        });
     }
 }

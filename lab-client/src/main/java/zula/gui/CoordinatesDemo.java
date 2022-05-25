@@ -3,13 +3,8 @@ package zula.gui;
 import zula.common.data.Dragon;
 import zula.util.Constants;
 
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.Timer;
-import javax.swing.WindowConstants;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -22,18 +17,19 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class CoordinatesDemo extends Canvas implements MouseListener, ActionListener {
+public class CoordinatesDemo extends JComponent implements MouseListener, ActionListener {
     private final CommandExecutor commandExecutor;
     private final HashMap<Integer, Color> usersAndColors = new HashMap<>();
     private final Set<Color> colors = new HashSet<>();
-    private List<Dragon> dragonsNeedsToBeShowed = new ArrayList<>();
-    private List<Dragon> dragonsNeedsToBeRemoved = new ArrayList<>();
+    private List<Dragon> dragonsNeedsToBeShowed;
+    private List<RemovingDragon> dragonsNeedsToBeRemoved = new ArrayList<>();
     private List<MovingDragon> dragonsNeedsToBeMoved = new ArrayList<>();
-    private List<Dragon> currentList = new ArrayList<>();
+    private List<Dragon> showedDragons = new ArrayList<>();
+    private List<Dragon> currentList;
     private final VisualStyleMain visualStyleMain;
     private int alpha = 0;
     private int beta = 0;
-    private final Timer timer = new Timer(50, this);
+    private final Timer timer = new Timer(5, this);
     private final Set<Integer> ids = new HashSet<>();
 
     public CoordinatesDemo(VisualStyleMain visualStyleMain) {
@@ -42,18 +38,30 @@ public class CoordinatesDemo extends Canvas implements MouseListener, ActionList
         addMouseListener(this);
         dragonsNeedsToBeShowed = commandExecutor.showWithoutParsingToMassive();
         currentList = new ArrayList<>(dragonsNeedsToBeShowed);
+        for(Dragon dragon : currentList) {
+            ids.add(dragon.getId());
+        }
         checkUpdates();
 
     }
 
 
+    private static class RemovingDragon {
+        Dragon dragon;
+        int tic = 60;
+
+        public RemovingDragon(Dragon dragon) {
+            this.dragon = dragon;
+        }
+    }
 
     private static class MovingDragon {
         int x;
         int y;
         Dragon dragon;
         int wingspan;
-        int tic = 30;
+        int tic = 60;
+
         public MovingDragon(int x, int y, int oldWingspan, Dragon dragon) {
             this.x = x;
             this.y = y;
@@ -61,10 +69,6 @@ public class CoordinatesDemo extends Canvas implements MouseListener, ActionList
             this.wingspan = oldWingspan;
         }
     }
-
-
-
-
 
 
     public void checkUpdates() {
@@ -76,28 +80,30 @@ public class CoordinatesDemo extends Canvas implements MouseListener, ActionList
                 for (Dragon oldDragon : currentList) {
                     boolean needsToRemove = true;
                     for (Dragon dragon : dragons) {
-                        if(oldDragon.getId() == dragon.getId()) {
+                        if (oldDragon.getId() == dragon.getId()) {
                             needsToRemove = false;
-                            if(oldDragon.getWingspan() == dragon.getWingspan() &&
-                            oldDragon.getCoordinates().getX() == dragon.getCoordinates().getX() &&
-                            oldDragon.getCoordinates().getY() == dragon.getCoordinates().getY()) {
+                            if (oldDragon.getWingspan() == dragon.getWingspan() &&
+                                    oldDragon.getCoordinates().getX() == dragon.getCoordinates().getX() &&
+                                    oldDragon.getCoordinates().getY() == dragon.getCoordinates().getY()) {
                                 oldDragon = dragon;
                             } else {
                                 dragonsNeedsToBeMoved.add(new MovingDragon((int) oldDragon.getCoordinates().getX(), oldDragon.getCoordinates().getY(), (int) oldDragon.getWingspan(), dragon));
-                                oldDragon = dragon;
+                                showedDragons.remove(oldDragon);
+
                             }
                         }
 
                     }
-                    if(needsToRemove) {
-                        dragonsNeedsToBeRemoved.add(oldDragon);
+                    if (needsToRemove) {
+                        dragonsNeedsToBeRemoved.add(new RemovingDragon(oldDragon));
+                        showedDragons.remove(oldDragon);
                     }
                 }
                 for (Dragon newDragon : dragons) {
-                   if(!ids.contains(newDragon.getId())) {
-                       ids.add(newDragon.getId());
-                       dragonsNeedsToBeShowed.add(newDragon);
-                   }
+                    if (!ids.contains(newDragon.getId())) {
+                        ids.add(newDragon.getId());
+                        dragonsNeedsToBeShowed.add(newDragon);
+                    }
                 }
                 currentList = new ArrayList<>(dragons);
             }
@@ -109,30 +115,31 @@ public class CoordinatesDemo extends Canvas implements MouseListener, ActionList
         timer.start();
     }
 
+    @Override
     public void paint(Graphics g) {
+
+
         Graphics2D g2 = (Graphics2D) g;
         g2.translate(Constants.screenWidth / 2, Constants.screenHeight * 4 / 10);
-        g2.setPaint(Color.BLACK);
+        g2.setStroke(new BasicStroke(4));
         g2.setStroke(new BasicStroke(4));
         g2.drawLine(0, -10000, 0, 100000);
         g2.drawLine(-950, 0, 950, 0);
+        moveDragon(g2);
+        removeDragons(g2);
+        showDragons(g2);
+        showShowed(g2);
 
     }
 
-    public void update(Graphics g) {
-
-        Graphics2D g2 = (Graphics2D) g;
-        g2.translate(Constants.screenWidth / 2, Constants.screenHeight * 4 / 10);
-        g2.setStroke(new BasicStroke(4));
-        for(MovingDragon movingDragon : dragonsNeedsToBeMoved) {
-            moveDragon(g2, movingDragon);
+    private void showShowed(Graphics2D g2) {
+        for (Dragon showedDragon : showedDragons) {
+            drawDragon(g2, (int) showedDragon.getCoordinates().getX(), showedDragon.getCoordinates().getY(), (int) showedDragon.getWingspan(), usersAndColors.get(showedDragon.getOwnerId()), 255);
         }
-        showDragons(g2);
-        removeDragons(g2);
-
     }
     private void showDragons(Graphics2D g2) {
         if (dragonsNeedsToBeShowed.size() > 0) {
+
             Color color;
             Dragon dragon = dragonsNeedsToBeShowed.get(0);
             if (usersAndColors.containsKey(dragon.getOwnerId())) {
@@ -147,54 +154,57 @@ public class CoordinatesDemo extends Canvas implements MouseListener, ActionList
                     }
                 }
             }
-            alpha+=5;
-            if(alpha > 255) {
-                dragonsNeedsToBeShowed.remove(0);
+            alpha += 5;
+            if (alpha > 255) {
+                Dragon showed = dragonsNeedsToBeShowed.remove(0);
+                showedDragons.add(showed);
                 alpha = 0;
             }
-            if(dragonsNeedsToBeShowed.size() == 0) {
-                //
+            if (dragonsNeedsToBeShowed.size() == 0) {
+                drawDragon(g2, (int) dragon.getCoordinates().getX(), dragon.getCoordinates().getY(), (int) dragon.getWingspan(), color, 255);
+
             } else {
                 dragon = dragonsNeedsToBeShowed.get(0);
                 drawDragon(g2, (int) dragon.getCoordinates().getX(), dragon.getCoordinates().getY(), (int) dragon.getWingspan(), color, alpha);
             }
         }
     }
+
     private void removeDragons(Graphics2D g2) {
-        if (dragonsNeedsToBeRemoved.size() > 0) {
+        for (RemovingDragon removingDragon : dragonsNeedsToBeRemoved) {
+            System.out.println("REMOVE");
             Color color;
-            Dragon dragon = dragonsNeedsToBeRemoved.get(0);
-            color = usersAndColors.get(dragon.getOwnerId());
+            removingDragon.tic--;
+            if (removingDragon.tic == 0) {
+                dragonsNeedsToBeRemoved.remove(removingDragon);
+                return;
+            }
 
-            beta+=5;
-            if(beta > 255) {
-                dragonsNeedsToBeRemoved.remove(0);
-                beta = 0;
+            color = usersAndColors.get(removingDragon.dragon.getOwnerId());
+            int teta = 255 - 255 * (60 - removingDragon.tic) / 60;
+
+            drawDragon(g2, (int) removingDragon.dragon.getCoordinates().getX(), removingDragon.dragon.getCoordinates().getY(), (int) removingDragon.dragon.getWingspan(), color, teta);
+
+        }
+    }
+    private void moveDragon(Graphics2D g2) {
+        for (MovingDragon movingDragon : dragonsNeedsToBeMoved) {
+            if (movingDragon.tic < 0) {
+                dragonsNeedsToBeMoved.remove(movingDragon);
+                showedDragons.add(movingDragon.dragon);
+                return;
             }
-            if(dragonsNeedsToBeRemoved.size() == 0) {
-                //
-            } else {
-                dragon = dragonsNeedsToBeRemoved.get(0);
-                drawDragon(g2, (int) dragon.getCoordinates().getX(), dragon.getCoordinates().getY(), (int) dragon.getWingspan(), color, beta);
-            }
+            int deltaX = (int) (movingDragon.dragon.getCoordinates().getX() - movingDragon.x) / 60;
+            int deltaY = (int) (movingDragon.dragon.getCoordinates().getY() - movingDragon.y) / 60;
+            int deltaWingspan = (int) ((movingDragon.dragon.getWingspan() - movingDragon.wingspan) / 60);
+            movingDragon.tic--;
+            movingDragon.x += deltaX;
+            movingDragon.y += deltaY;
+            movingDragon.wingspan += deltaWingspan;
+            drawDragon(g2, movingDragon.x, movingDragon.y, (int) movingDragon.wingspan, usersAndColors.get(movingDragon.dragon.getOwnerId()), 255);
         }
     }
 
-    private void moveDragon(Graphics2D g2, MovingDragon movingDragon) {
-        if(movingDragon.tic == 0) {
-            dragonsNeedsToBeMoved.remove(movingDragon);
-            return;
-        }
-        int deltaX = (int) (movingDragon.dragon.getCoordinates().getX() - movingDragon.x)/30;
-        int deltaY = (int) (movingDragon.dragon.getCoordinates().getY() - movingDragon.y)/30;
-        int deltaWingspan = (int) ((movingDragon.dragon.getWingspan() - movingDragon.wingspan)/30);
-        movingDragon.tic--;
-        movingDragon.x += deltaX;
-        movingDragon.y += deltaY;
-        movingDragon.wingspan += deltaWingspan;
-        drawDragon(g2, movingDragon.x, movingDragon.y, (int) movingDragon.dragon.getWingspan(), usersAndColors.get(movingDragon.dragon.getOwnerId()), alpha);
-
-    }
     private void drawDragon(Graphics2D g2, int x, int y, int wingspan, Color ownerColor, int alpha) {
 
 

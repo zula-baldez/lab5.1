@@ -1,14 +1,12 @@
 package zula.gui;
 
 import zula.client.ConnectionManager;
-import zula.common.commands.Add;
 import zula.common.commands.UpdateId;
 import zula.common.data.Dragon;
 import zula.common.exceptions.GetServerMessageException;
 import zula.common.exceptions.SendException;
 import zula.common.exceptions.WrongArgumentException;
 
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
@@ -20,9 +18,10 @@ public class ChangeFieldsOfDragonPanel extends AddPanel {
     VisualStyleMain visualStyleMain;
     public ChangeFieldsOfDragonPanel(ConnectionManager connectionManager, ResourceBundle resourceBundle, Dragon dragon, VisualStyleMain visualStyleMain) {
         super(connectionManager, resourceBundle);
-        this.dragonId = dragonId;
+        this.dragonId = dragon.getId();
         this.visualStyleMain = visualStyleMain;
         initTextFields(dragon);
+        addDeleteButton(dragonId);
     }
 
     protected void setListenerForSubmitButton() {
