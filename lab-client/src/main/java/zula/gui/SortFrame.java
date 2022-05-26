@@ -2,25 +2,27 @@ package zula.gui;
 import zula.client.ConnectionManager;
 import zula.common.data.Dragon;
 import zula.util.Constants;
+import zula.util.TableSorter;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 
-import java.awt.*;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.ResourceBundle;
 
 public class SortFrame {
-    private JFrame mainFrame;
-    private ConnectionManager connectionManager;
-    private ResourceBundle currentBundle;
+    private final JFrame mainFrame;
+    private final ConnectionManager connectionManager;
+    private final ResourceBundle currentBundle;
     public SortFrame(JFrame mainFrame, ConnectionManager connectionManager, ResourceBundle currentBundle) {
-
         this.connectionManager = connectionManager;
         this.mainFrame = mainFrame;
         this.currentBundle = currentBundle;
-
     }
     JFrame subFrame = new JFrame();
 
@@ -34,7 +36,7 @@ public class SortFrame {
         sortButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String typeOfSorting = (String) typesOfSorting.getSelectedItem(); //TODO null point
+                String typeOfSorting = (String) typesOfSorting.getSelectedItem();
                 String columnToSort = (String) columns.getSelectedItem();
                 CommandExecutor commandExecutor = new CommandExecutor(connectionManager, mainFrame);
                 List<Dragon> dragons = commandExecutor.showWithoutParsingToMassive();

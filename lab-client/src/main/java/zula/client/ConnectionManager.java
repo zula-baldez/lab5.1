@@ -1,7 +1,6 @@
 package zula.client;
 
 import zula.common.commands.Command;
-import zula.common.commands.GetUserId;
 import zula.common.data.ResponseCode;
 import zula.common.data.ServerMessage;
 import zula.common.exceptions.GetServerMessageException;
@@ -115,7 +114,6 @@ public class ConnectionManager {
                 }
                 counter--;
                 try {
-
                     Thread.sleep(waitingTime);
                 } catch (InterruptedException e) {
                     throw new GetServerMessageException();

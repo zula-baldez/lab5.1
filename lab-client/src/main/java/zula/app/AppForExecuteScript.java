@@ -100,7 +100,7 @@ public class AppForExecuteScript {
         try {
             ioManager.getOutputManager().write("Введите команду!");
             String readLine = ioManager.getInputManager().read(ioManager);
-            if(readLine == null) {
+            if (readLine == null) {
                 ioManager.exitProcess();
                 return;
             }

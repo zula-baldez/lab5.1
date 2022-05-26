@@ -1,8 +1,5 @@
 package zula.gui;
 
-
-import zula.util.Constants;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.util.ResourceBundle;

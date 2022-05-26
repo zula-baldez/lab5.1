@@ -9,7 +9,7 @@ import java.util.function.Predicate;
 public class ArgumentParser {
     public <T> T parseArgFromString(String readLine, Predicate<T> predicate, StringConverter<T> stringConverter) throws WrongArgumentException {
             T t;
-            if ("".equals(readLine)) {
+            if ("".equals(readLine) || "NULL".equals(readLine)) {
                 t = null;
             } else {
                 try {

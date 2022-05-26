@@ -12,14 +12,14 @@ import java.awt.event.ActionListener;
 import java.util.ResourceBundle;
 
 public class VisualStyleMain {
-    private JFrame mainFrame;
+    private final JFrame mainFrame;
     private final JButton backButton = new JButton("Back to normal");
     private final JPanel northPanel = new JPanel();
     private final JPanel centralPanel = new JPanel();
     private final JPanel southPanel = new JPanel();
     private final ConnectionManager connectionManager;
-    CoordinatesDemo coordinatesDemo;
-    private ResourceBundle currentBundle;
+    private CoordinatesDemo coordinatesDemo;
+    private final ResourceBundle currentBundle;
     public VisualStyleMain(JFrame mainFrame, ConnectionManager connectionManager, ResourceBundle currentBundle) {
         this.currentBundle = currentBundle;
         this.mainFrame = mainFrame;
@@ -42,19 +42,27 @@ public class VisualStyleMain {
 
     public void printGraphics() {
         mainFrame.setVisible(true);
+
         JPanel mainPanel = new JPanel();
         centralPanel.removeAll();
+        centralPanel.add(coordinatesDemo);
+
+        southPanel.add(backButton);
+        backButton.setFont(Constants.mainFont);
+
         mainPanel.add(northPanel);
         mainPanel.add(centralPanel);
         mainPanel.add(southPanel);
-        southPanel.add(backButton);
-        backButton.setFont(Constants.mainFont);
+
         setSettingsForPanels();
-        centralPanel.add(coordinatesDemo);
+
+
         coordinatesDemo.startTimer();
+
         mainFrame.setContentPane(mainPanel);
         mainFrame.revalidate();
         mainFrame.repaint();
+
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -68,22 +76,6 @@ public class VisualStyleMain {
 
     public JFrame getMainFrame() {
         return mainFrame;
-    }
-
-    public JButton getBackButton() {
-        return backButton;
-    }
-
-    public JPanel getNorthPanel() {
-        return northPanel;
-    }
-
-    public JPanel getCentralPanel() {
-        return centralPanel;
-    }
-
-    public JPanel getSouthPanel() {
-        return southPanel;
     }
 
     public ConnectionManager getConnectionManager() {

@@ -1,8 +1,7 @@
-package zula.gui;
+package zula.util;
 
 import zula.common.data.Dragon;
 
-import java.io.Serializable;
 import java.util.List;
 
 public class Parcers {

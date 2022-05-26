@@ -1,4 +1,4 @@
-package zula.gui;
+package zula.util;
 
 import zula.common.data.Color;
 import zula.common.data.Dragon;
@@ -13,8 +13,6 @@ import java.util.stream.Collectors;
 public class TableFilterer {
 
 
-    String[] types = new String[]{"More than", "Less than", "Equals"};
-    private final String[] columnsNames = {"id", "name", "x", "y", "creationDate", "age", "wingspan", "color", "type", "depth", "Number ot Treasures", "owner_id"};
     private final static int EQUALS = 0;
     private final static int MORE = 1;
     private final static int LESS = 2;
@@ -107,31 +105,31 @@ public class TableFilterer {
 
     private static List<Dragon> filterByX(List<Dragon> dragons, Double xCoord, int typeOfFilter) {
         if (typeOfFilter == LESS) {
-            return dragons.stream().filter(x -> x.getCoordinates().getX() < xCoord).collect(Collectors.toList()); //todo
+            return dragons.stream().filter(x -> x.getCoordinates().getX() < xCoord).collect(Collectors.toList());
         }
         if (typeOfFilter == MORE) {
-            return dragons.stream().filter(x -> x.getCoordinates().getX() > xCoord).collect(Collectors.toList()); //todo
+            return dragons.stream().filter(x -> x.getCoordinates().getX() > xCoord).collect(Collectors.toList());
         }
-        return dragons.stream().filter(x -> x.getCoordinates().getX() == xCoord).collect(Collectors.toList()); //todo
+        return dragons.stream().filter(x -> x.getCoordinates().getX() == xCoord).collect(Collectors.toList());
 
     }
 
     private static List<Dragon> filterByY(List<Dragon> dragons, int yCoord, int typeOfFilter) {
         if (typeOfFilter == LESS) {
-            return dragons.stream().filter(x -> x.getCoordinates().getY() < yCoord).collect(Collectors.toList()); //todo
+            return dragons.stream().filter(x -> x.getCoordinates().getY() < yCoord).collect(Collectors.toList());
 
         }
         if (typeOfFilter == MORE) {
-            return dragons.stream().filter(x -> x.getCoordinates().getY() > yCoord).collect(Collectors.toList()); //todo
+            return dragons.stream().filter(x -> x.getCoordinates().getY() > yCoord).collect(Collectors.toList());
 
         }
-        return dragons.stream().filter(x -> x.getCoordinates().getY() == yCoord).collect(Collectors.toList()); //todo
+        return dragons.stream().filter(x -> x.getCoordinates().getY() == yCoord).collect(Collectors.toList());
 
     }
 
     private static List<Dragon> filterByDate(List<Dragon> dragons, Date date, int typeOfFilter) {
         if (typeOfFilter == LESS) {
-            return dragons.stream().filter(x -> x.getCreationDate().compareTo(date) < 0).collect(Collectors.toList()); //todo
+            return dragons.stream().filter(x -> x.getCreationDate().compareTo(date) < 0).collect(Collectors.toList());
 
         }
         if (typeOfFilter == MORE) {

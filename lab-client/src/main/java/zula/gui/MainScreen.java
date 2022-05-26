@@ -4,7 +4,18 @@ import zula.client.ConnectionManager;
 import zula.common.data.ResponseCode;
 import zula.util.Constants;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -18,12 +29,10 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ResourceBundle;
 
-//отрисовщик??
 public class MainScreen {
     private final int screenHeight = Toolkit.getDefaultToolkit().getScreenSize().height;
     private final int screenWidth = Toolkit.getDefaultToolkit().getScreenSize().width;
     private final CommandExecutor commandExecutor;
-    private final ConnectionAndLoginScreenFabric connectionAndLoginScreenFabric = new ConnectionAndLoginScreenFabric(Constants.ruBundle);
     private JFrame mainFrame;
     private JPanel northPanel;
     private JButton visualStyleButton;
@@ -49,24 +58,22 @@ public class MainScreen {
     private JPanel centerOfArgumentPanel;
     private JPanel southOfArgumentPanel;
     private ResourceBundle currentBundle;
-    private JFileChooser executeScriptFileChooser = new JFileChooser();
+    private final JFileChooser executeScriptFileChooser = new JFileChooser();
     private final String[] tableHeader = {"id", "name", "x", "y", "creationDate", "age", "wingspan", "color", "type", "depth", "Number ot Treasures", "owner_id"};
     private final String[] commandNames = {"help", "info", "show", "update_id", "remove_by_id", "clear", "execute_script", "exit", "remove_last",
             "remove_lower", "reorder", "average_of_wingspan", "print_ascending", "print_field_ascending_wingspan", "add"};
     private JComboBox<String> commands;
-    private String[] mainSortPanel = {"Column to sort", "Type of sorting", "Sort"};
-    private String[] typesOfSorting = {"From a to z", "From z to a"};
     private final JButton sortBy = new JButton("Sort!");
     private final JButton filterButton = new JButton("Filter!");
     private String[][] tableElements = {{}};
-    public void setTableValue(String[][] tableValue) {
-        tableElements = tableValue;
-    }
     public MainScreen(ConnectionManager connectionManager, JFrame mainFrame, ResourceBundle resourceBundle) {
         this.currentBundle = resourceBundle;
         this.commandExecutor = new CommandExecutor(connectionManager, mainFrame);
         mainFrame.getContentPane().removeAll();
         this.mainFrame = mainFrame;
+    }
+    public void setTableValue(String[][] tableValue) {
+        tableElements = tableValue;
     }
 
     public void initElements() {
@@ -143,24 +150,23 @@ public class MainScreen {
             }
         });
     }
-    private void setListenerForCommandsList(JComboBox<String> commands) {
+    private void setListenerForCommandsList() {
         commands.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String command = commands.getSelectedItem().toString();
-                if (command.equals("help") || command.equals("info") || command.equals("show") || command.equals("clear") || command.equals("exit") || command.equals("remove_last") ||
-                        command.equals("reorder") || command.equals("average_of_wingspan") || command.equals("print_ascending") || command.equals("print_field_ascending_wingspan") || command.equals("add")) {
+                if ("help".equals(command) || "info".equals(command) || "show".equals(command) || "clear".equals(command) || "exit".equals(command) || "remove_last".equals(command)
+                        || "reorder".equals(command) || "average_of_wingspan".equals(command) || "print_ascending".equals(command) || "print_field_ascending_wingspan".equals(command) || "add".equals(command)) {
                     setSettingForArgumentPanel("No arg needed", false);
                     mainFrame.revalidate();
                     mainFrame.repaint();
                 }
-                if (command.equals("update_id") || command.equals("remove_by_id") || command.equals("remove_lower")) {
+                if ("update_id".equals(command) || "remove_by_id".equals(command) || "remove_lower".equals(command)) {
                     setSettingForArgumentPanel("ID(int) needed", true);
                     mainFrame.revalidate();
                     mainFrame.repaint();
                 }
-                if (command.equals("execute_script")) {
-
+                if ("execute_script".equals(command)) {
                     executeScriptFileChooser.setPreferredSize(new Dimension(screenWidth / 7, screenHeight / 20));
                     reprintArgumentPanel(executeScriptFileChooser);
                 }
@@ -171,9 +177,6 @@ public class MainScreen {
 
     private void setSettingsForMainFrame() {
         mainFrame.setSize(screenWidth, screenHeight);
-/*
-        mainFrame.setResizable(false);
-*/ 
         mainFrame.setLayout(new BoxLayout(mainFrame.getContentPane(), BoxLayout.Y_AXIS));
     }
 
@@ -219,7 +222,7 @@ public class MainScreen {
         commandText.setAlignmentY(Component.CENTER_ALIGNMENT);
         commandText.setFont(Constants.mainFont);
         commands.setFont(Constants.subFont);
-        setListenerForCommandsList(commands);
+        setListenerForCommandsList();
 
 
         northOfCommandPanel.setLayout(new GridBagLayout());

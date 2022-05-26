@@ -16,10 +16,12 @@ import java.io.Serializable;
 import java.util.ResourceBundle;
 
 public class UpdateIdPanel extends AddPanel {
-    private int dragonId;
+    private final int dragonId;
+    private final CommandExecutor commandExecutor;
     public UpdateIdPanel(ConnectionManager connectionManager, ResourceBundle resourceBundle, int dragonId) {
         super(connectionManager, resourceBundle);
         this.dragonId = dragonId;
+        commandExecutor = new CommandExecutor(connectionManager, getMainFrame());
     }
     protected void setListenerForSubmitButton() {
         getSubmitButton().addActionListener(new ActionListener() {
@@ -28,14 +30,7 @@ public class UpdateIdPanel extends AddPanel {
                 try {
                     Dragon dragon = parseDragonFromData();
                     dragon.setId(dragonId);
-                    try {
-                        getConnectionManager().sendToServer(new UpdateId(), new Serializable[]{dragon});
-                        errorHandler(getConnectionManager().getMessage().getArguments()[0].toString());
-                    } catch (SendException ex) {
-                        ex.printStackTrace();
-                    } catch (GetServerMessageException getServerMessageException) {
-                        getServerMessageException.printStackTrace();
-                    }
+                    commandExecutor.updateId(dragon);
                     getMainFrame().dispose();
 
                 } catch (WrongArgumentException wrongArgumentException) {

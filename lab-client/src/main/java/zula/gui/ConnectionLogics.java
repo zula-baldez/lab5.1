@@ -20,17 +20,14 @@ import java.io.Serializable;
 import java.util.logging.Logger;
 
 public class ConnectionLogics {
-    private static int port;
-    private static String ip;
     private static final Logger CLIENTLOGGER = Logger.getLogger("ClientLogger");
     private static final IoManager IO_MANAGER = new IoManager(new InputManager(new InputStreamReader(System.in)), new OutputManager(new OutputStreamWriter(System.out)));
     private static  ConnectionManager connectionManager;
     public String connect(String address, String serverPort) {
         try {
-            ip = address;
             try {
-                port = Integer.parseInt(serverPort);
-                connectionManager = new ConnectionManager(ip, port, IO_MANAGER);
+                int port = Integer.parseInt(serverPort);
+                connectionManager = new ConnectionManager(address, port, IO_MANAGER);
             } catch (IllegalArgumentException e) {
                 return "PORT MUST BE A NUMBER";
             }

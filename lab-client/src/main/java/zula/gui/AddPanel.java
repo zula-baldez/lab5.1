@@ -1,10 +1,11 @@
 package zula.gui;
 
 import zula.client.ConnectionManager;
-import zula.common.commands.Add;
-import zula.common.data.*;
-import zula.common.exceptions.GetServerMessageException;
-import zula.common.exceptions.SendException;
+import zula.common.data.Coordinates;
+import zula.common.data.Dragon;
+import zula.common.data.DragonCave;
+import zula.common.data.DragonType;
+import zula.common.data.DragonValidator;
 import zula.common.exceptions.WrongArgumentException;
 import zula.common.util.ArgumentParser;
 import zula.util.Constants;
@@ -13,7 +14,6 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -27,30 +27,32 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 public class AddPanel {
-    private JFrame mainFrame;
-    private ConnectionManager connectionManager;
+    private static final int AMOUNT_OF_PARTS = 10;
+    private static final int PARTS_TO_CENTER = 6;
+    private static final int PARTS_OF_SOUTH = 3;
+    private static final int AMOUNT_OF_COLS = 3;
+    private static final int AMOUNT_OF_ROWS = 10;
+    private final JFrame mainFrame;
+    private final ConnectionManager connectionManager;
     private final JPanel northPanel = new JPanel();
     private final JPanel centralPanel = new JPanel();
     private final JPanel southPanel = new JPanel();
     private final JPanel errorPanel = new JPanel();
-    private final JButton submitButton = new JButton("SUBMIT");
-    private final ArrayList<JComponent> elementsList = new ArrayList<>();
+    private final JButton submitButton = BasicGUIElementsFabric.createBasicButton("SUBMIT");
 
 
     private final ArgumentParser argumentParser = new ArgumentParser();
 
 
-    private final JLabel fieldText =BasicGUIElementsFabric.createBasicLabel("FIELD");
+    private final JLabel fieldText = BasicGUIElementsFabric.createBasicLabel("FIELD");
     private final JLabel nameText = BasicGUIElementsFabric.createBasicLabel("name");
-    private final JLabel xText  = BasicGUIElementsFabric.createBasicLabel("x");
+    private final JLabel xText = BasicGUIElementsFabric.createBasicLabel("x");
     private final JLabel yText = BasicGUIElementsFabric.createBasicLabel("y");
     private final JLabel ageText = BasicGUIElementsFabric.createBasicLabel("age");
-    private final JLabel wingspanText  = BasicGUIElementsFabric.createBasicLabel("wingspan");
+    private final JLabel wingspanText = BasicGUIElementsFabric.createBasicLabel("wingspan");
     private final JLabel colorText = BasicGUIElementsFabric.createBasicLabel("color");
     private final JLabel typeText = BasicGUIElementsFabric.createBasicLabel("type");
     private final JLabel depthText = BasicGUIElementsFabric.createBasicLabel("depth");
@@ -60,7 +62,7 @@ public class AddPanel {
     private final JLabel nameReq = BasicGUIElementsFabric.createBasicLabel("NOT NULL");
     private final JLabel xReq = BasicGUIElementsFabric.createBasicLabel(">=-23, double");
     private final JLabel yReq = BasicGUIElementsFabric.createBasicLabel("<=160, integer");
-    private final JLabel ageReq =BasicGUIElementsFabric.createBasicLabel("long, >=0");
+    private final JLabel ageReq = BasicGUIElementsFabric.createBasicLabel("long, >=0");
     private final JLabel wingspanReq = BasicGUIElementsFabric.createBasicLabel("float, >=0");
     private final JLabel colorReq = BasicGUIElementsFabric.createBasicLabel("may be null");
     private final JLabel typeReq = BasicGUIElementsFabric.createBasicLabel("NOT NULL");
@@ -79,7 +81,17 @@ public class AddPanel {
     private final JTextField numberOfTreasuresField = BasicGUIElementsFabric.createBasicJTextField();
     private final JComboBox<String> languages = new JComboBox<>(Constants.languages);
     private final ResourceBundle currentBundle;
-    private CommandExecutor commandExecutor;
+    private final CommandExecutor commandExecutor;
+
+
+    public AddPanel(ConnectionManager connectionManager, ResourceBundle resourceBundle) {
+        mainFrame = new JFrame();
+        this.currentBundle = resourceBundle;
+        this.connectionManager = connectionManager;
+        commandExecutor = new CommandExecutor(connectionManager, mainFrame);
+
+
+    }
 
     private void setBorders() {
 
@@ -115,38 +127,35 @@ public class AddPanel {
         numberOfTreasuresReq.setBorder(BorderFactory.createLineBorder(Color.black, 1));
 
     }
-    public AddPanel(ConnectionManager connectionManager, ResourceBundle resourceBundle) {
-        mainFrame  = new JFrame();
+    private void initElemets() {
         mainFrame.setSize(new Dimension(Constants.screenWidth, Constants.screenHeight));
-        this.currentBundle = resourceBundle;
-        this.connectionManager = connectionManager;
         mainFrame.setExtendedState(Frame.MAXIMIZED_BOTH);
         mainFrame.setVisible(false);
         mainFrame.setTitle("Add window");
-        this.mainFrame = mainFrame;
-        northPanel.setPreferredSize(new Dimension(Constants.screenWidth, Constants.screenHeight/10));
-        centralPanel.setPreferredSize(new Dimension(Constants.screenWidth, Constants.screenHeight*6/10));
-        southPanel.setPreferredSize(new Dimension(Constants.screenWidth, Constants.screenHeight*3/20));
-        errorPanel.setPreferredSize(new Dimension(Constants.screenWidth, Constants.screenHeight*3/20));
 
+        northPanel.setPreferredSize(new Dimension(Constants.screenWidth, Constants.screenHeight / AMOUNT_OF_PARTS));
         northPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
-        centralPanel.setLayout(new GridLayout(10, 3));
+        northPanel.add(languages);
+
+        centralPanel.setPreferredSize(new Dimension(Constants.screenWidth, Constants.screenHeight * PARTS_TO_CENTER / AMOUNT_OF_PARTS));
+        centralPanel.setLayout(new GridLayout(AMOUNT_OF_ROWS, AMOUNT_OF_COLS));
+
+        southPanel.setPreferredSize(new Dimension(Constants.screenWidth, Constants.screenHeight * PARTS_OF_SOUTH / AMOUNT_OF_PARTS * 2));
         southPanel.setLayout(new GridBagLayout());
+
+        errorPanel.setPreferredSize(new Dimension(Constants.screenWidth, Constants.screenHeight * PARTS_OF_SOUTH / AMOUNT_OF_PARTS * 2));
         errorPanel.setLayout(new GridBagLayout());
 
         setBorders();
 
-        submitButton.setFont(Constants.mainFont);
-
         submitButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         submitButton.setAlignmentY(Component.CENTER_ALIGNMENT);
+
         setListenerForSubmitButton();
+
         languages.setFont(Constants.mainFont);
         languages.setAlignmentX(Component.CENTER_ALIGNMENT);
-        northPanel.add(languages);
-        commandExecutor = new CommandExecutor(connectionManager, mainFrame);
     }
-
     protected Dragon parseDragonFromData() throws WrongArgumentException {
         DragonValidator dragonValidator = new DragonValidator();
         String name = argumentParser.parseArgFromString(nameField.getText(), dragonValidator::nameValidator, (String s) -> s);
@@ -156,13 +165,14 @@ public class AddPanel {
         Long age = argumentParser.parseArgFromString(ageField.getText(), dragonValidator::ageValidator, Long::parseLong);
         Float wingspan = argumentParser.parseArgFromString(wingspanField.getText(), dragonValidator::wingspanValidator, Float::parseFloat);
         zula.common.data.Color color = argumentParser.parseArgFromString(colorField.getSelectedItem().toString(), dragonValidator::colorValidator, zula.common.data.Color::valueOf);
-        DragonType type = argumentParser.parseArgFromString( typeField.getSelectedItem().toString(), dragonValidator::typeValidator, DragonType::valueOf);
+        DragonType type = argumentParser.parseArgFromString(typeField.getSelectedItem().toString(), dragonValidator::typeValidator, DragonType::valueOf);
         Float depth = argumentParser.parseArgFromString(depthField.getText(), dragonValidator::depthValidator, Float::parseFloat);
         Double numberOfTreasures = argumentParser.parseArgFromString(numberOfTreasuresField.getText(), dragonValidator::numberOfTreasuresValidator, Double::parseDouble);
         DragonCave dragonCave = new DragonCave(depth, numberOfTreasures);
         return new Dragon(name, coordinates, age, wingspan, color, type, dragonCave);
 
     }
+
     protected void errorHandler(String message) {
         errorPanel.removeAll();
         JLabel errorLabel = new JLabel("CHECK THE CURRENCY OF THE DATA");
@@ -171,32 +181,23 @@ public class AddPanel {
         mainFrame.revalidate();
         mainFrame.repaint();
     }
+
     protected void setListenerForSubmitButton() {
         submitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                     Dragon dragon = parseDragonFromData();
-                     try {
-                        connectionManager.sendToServer(new Add(), new Serializable[]{dragon});
-                        connectionManager.getMessage(); //todo ADD
-                    } catch (SendException ex) {
-                        ex.printStackTrace();
-                    } catch (GetServerMessageException getServerMessageException) {
-                        getServerMessageException.printStackTrace();
-                    }
+                    Dragon dragon = parseDragonFromData();
+                    commandExecutor.addCommand(dragon);
                     mainFrame.dispose();
 
                 } catch (WrongArgumentException wrongArgumentException) {
-                   errorHandler("CHECK THE CURRENCY OF THE DATA");
+                    errorHandler("CHECK THE CURRENCY OF THE DATA");
                 }
             }
         });
     }
-    public void drawPanel() {
-        JPanel mainPanel = new JPanel();
-        mainPanel.setPreferredSize(new Dimension(Constants.screenWidth, Constants.screenHeight));
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+    private void setElements(JPanel mainPanel) {
         mainPanel.add(northPanel);
         mainPanel.add(centralPanel);
         mainPanel.add(southPanel);
@@ -231,13 +232,22 @@ public class AddPanel {
         centralPanel.add(numberOfTreasuresText);
         centralPanel.add(numberOfTreasuresField);
         centralPanel.add(numberOfTreasuresReq);
+    }
+    public void drawPanel() {
+        initElemets();
+        JPanel mainPanel = new JPanel();
+        mainPanel.setPreferredSize(new Dimension(Constants.screenWidth, Constants.screenHeight));
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        setElements(mainPanel);
         mainFrame.setContentPane(mainPanel);
         southPanel.add(submitButton);
         mainFrame.setVisible(true);
     }
+
     public JButton getSubmitButton() {
         return submitButton;
     }
+
     public ConnectionManager getConnectionManager() {
         return connectionManager;
     }
@@ -249,22 +259,22 @@ public class AddPanel {
     public ResourceBundle getCurrentBundle() {
         return currentBundle;
     }
+
     public void initTextFields(Dragon dragon) {
         nameField.setText(dragon.getName());
         xField.setText(Double.toString(dragon.getCoordinates().getX()));
         yField.setText(Integer.toString(dragon.getCoordinates().getY()));
         ageField.setText(Long.toString(dragon.getAge()));
         wingspanField.setText(Float.toString(dragon.getWingspan()));
-        colorField.setSelectedItem(dragon.getColor().toString()); //TODO null
+        colorField.setSelectedItem(dragon.getColor().toString());
         typeField.setSelectedItem(dragon.getType().toString());
         depthField.setText(Float.toString(dragon.getCave().getDepth()));
         numberOfTreasuresField.setText(Double.toString(dragon.getCave().getNumberOfTreasures()));
     }
-    public void addDeleteButton(int id) {
-        JButton deleteButton = new JButton("Delete");
-        southPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
 
-        deleteButton.setFont(Constants.mainFont);
+    public void addDeleteButton(int id) {
+        JButton deleteButton =  BasicGUIElementsFabric.createBasicButton("Delete");
+        southPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
         southPanel.add(deleteButton);
 
         deleteButton.addActionListener(new ActionListener() {

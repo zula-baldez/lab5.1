@@ -14,8 +14,8 @@ public class Constants {
     public static final Color mainColor = new Color(280671);
     public static final int screenHeight = Toolkit.getDefaultToolkit().getScreenSize().height;
     public static final int screenWidth = Toolkit.getDefaultToolkit().getScreenSize().width;
-    public static final Font mainFont = new Font("Verdana", Font.PLAIN, screenHeight/27); //при 1080 будет 40 шрифт
-    public static final Font subFont = new Font("Verdana", Font.PLAIN, screenHeight/54); //в 2 раза поменьше
+    public static final Font mainFont = new Font("Verdana", Font.PLAIN, screenHeight / 27); //при 1080 будет 40 шрифт
+    public static final Font subFont = new Font("Verdana", Font.PLAIN, screenHeight / 54); //в 2 раза поменьше
     public static final String[] languages = {"Русский", "Македонски", "Latviski", "letón"};
     public static final ResourceBundle ruBundle = ResourceBundle.getBundle("zula.resources.resource", new Locale("ru"));
     public static final ResourceBundle lvaBundle = ResourceBundle.getBundle("zula.resources.resource", new Locale("lva"));
@@ -23,7 +23,7 @@ public class Constants {
     public static final ResourceBundle espBundle = ResourceBundle.getBundle("zula.resources.resource", new Locale("esp"));
     public static final HashMap<String, ResourceBundle> languagesAndBundles = new HashMap<>();
     public static final String[] types = Arrays.stream(DragonType.values()).map(Enum::toString).toArray(String[]::new);
-    public static final String[] colors = Arrays.stream(zula.common.data.Color.values()).map(Enum::toString).toArray(String[]::new);
+    public static final String[] colors = {"BLACK", "BLUE", "BROWN", "WHITE", "YELLOW", "NULL"};
 
 
     static {
@@ -37,15 +37,15 @@ public class Constants {
     public static ResourceBundle getBundleFromLanguageName(String s) {
         return languagesAndBundles.get(s);
     }
+
     public static String getNameByBundle(ResourceBundle resourceBundle) {
-        for(String key : languagesAndBundles.keySet()) {
-            if(languagesAndBundles.get(key) == resourceBundle) {
+        for (String key : languagesAndBundles.keySet()) {
+            if (languagesAndBundles.get(key) == resourceBundle) {
                 return key;
             }
         }
         return null;
     }
-
 
 
 }

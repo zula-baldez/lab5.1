@@ -3,34 +3,64 @@ package zula.gui;
 import zula.common.data.Dragon;
 import zula.util.Constants;
 
-import javax.swing.*;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.Timer;
-import java.awt.*;
+import javax.swing.WindowConstants;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Ellipse2D;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class CoordinatesDemo extends JComponent implements MouseListener, ActionListener {
+    private static final int MAX_ALPHA = 255;
+    private static final int DELTA_ALPHA_PER_TIC = 5;
+    private static final int COUNTER_MAX = 60;
+    private static final int PERIOD_OF_UPDATING_DATA = 10;
+    private static final int AMOUNT_OF_PARTS = 10; //делим panel на 10 частей
+    private static final int HEIGHT_OF_LEG_TO_WINGSPAN = 10; //размер лапы 1/10 wingspan
+    private static final int WIDTH_OF_LEG_TO_WINGSPAN = 5;
+    private static final int AMOUNT_OD_POINTS = 5;
+    private static final int DELTA_X_TO_WINGSPAN = 4;
+    private static final int HEAD_HEIGHT_TO_WINGSPAN_DENOMINATOR = 4;
+    private static final int HEAD_HEIGHT_TO_WINGSPAN_NUMERATOR = 5;
+    private static final int MAX_COLOR_VALUE = 0xFFFFFF;
+    private static final int BASIC_STROKE = 4;
+    private static final int AMOUNT_OF_PART_TO_CENTER_HALF = 4;
+    private static final int Y_FIRST_POINT_NUMERATOR = 3;
+    private static final int HITBOX_LOW_POINT_NUMERATOR = 6;
+    private static final int HITBOX_LOW_POINT_DENOMINATOR = 5;
     private final CommandExecutor commandExecutor;
     private final HashMap<Integer, Color> usersAndColors = new HashMap<>();
     private final Set<Color> colors = new HashSet<>();
-    private List<Dragon> dragonsNeedsToBeShowed;
-    private List<RemovingDragon> dragonsNeedsToBeRemoved = new ArrayList<>();
-    private List<MovingDragon> dragonsNeedsToBeMoved = new ArrayList<>();
-    private List<Dragon> showedDragons = new ArrayList<>();
+    private final List<Dragon> dragonsNeedsToBeShowed;
+    private final List<RemovingDragon> dragonsNeedsToBeRemoved = new ArrayList<>();
+    private final List<MovingDragon> dragonsNeedsToBeMoved = new ArrayList<>();
+    private final List<Dragon> showedDragons = new ArrayList<>();
     private List<Dragon> currentList;
     private final VisualStyleMain visualStyleMain;
     private int alpha = 0;
-    private int beta = 0;
     private final Timer timer = new Timer(5, this);
     private final Set<Integer> ids = new HashSet<>();
+
 
     public CoordinatesDemo(VisualStyleMain visualStyleMain) {
         this.visualStyleMain = visualStyleMain;
@@ -38,38 +68,12 @@ public class CoordinatesDemo extends JComponent implements MouseListener, Action
         addMouseListener(this);
         dragonsNeedsToBeShowed = commandExecutor.showWithoutParsingToMassive();
         currentList = new ArrayList<>(dragonsNeedsToBeShowed);
-        for(Dragon dragon : currentList) {
+        for (Dragon dragon : currentList) {
             ids.add(dragon.getId());
         }
         checkUpdates();
 
     }
-
-
-    private static class RemovingDragon {
-        Dragon dragon;
-        int tic = 60;
-
-        public RemovingDragon(Dragon dragon) {
-            this.dragon = dragon;
-        }
-    }
-
-    private static class MovingDragon {
-        int x;
-        int y;
-        Dragon dragon;
-        int wingspan;
-        int tic = 60;
-
-        public MovingDragon(int x, int y, int oldWingspan, Dragon dragon) {
-            this.x = x;
-            this.y = y;
-            this.dragon = dragon;
-            this.wingspan = oldWingspan;
-        }
-    }
-
 
     public void checkUpdates() {
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
@@ -82,9 +86,9 @@ public class CoordinatesDemo extends JComponent implements MouseListener, Action
                     for (Dragon dragon : dragons) {
                         if (oldDragon.getId() == dragon.getId()) {
                             needsToRemove = false;
-                            if (oldDragon.getWingspan() == dragon.getWingspan() &&
-                                    oldDragon.getCoordinates().getX() == dragon.getCoordinates().getX() &&
-                                    oldDragon.getCoordinates().getY() == dragon.getCoordinates().getY()) {
+                            if (oldDragon.getWingspan() == dragon.getWingspan()
+                                    && oldDragon.getCoordinates().getX() == dragon.getCoordinates().getX()
+                                    && oldDragon.getCoordinates().getY() == dragon.getCoordinates().getY()) {
                                 oldDragon = dragon;
                             } else {
                                 dragonsNeedsToBeMoved.add(new MovingDragon((int) oldDragon.getCoordinates().getX(), oldDragon.getCoordinates().getY(), (int) oldDragon.getWingspan(), dragon));
@@ -107,7 +111,7 @@ public class CoordinatesDemo extends JComponent implements MouseListener, Action
                 }
                 currentList = new ArrayList<>(dragons);
             }
-        }, 0, 10, TimeUnit.SECONDS);
+        }, 0, PERIOD_OF_UPDATING_DATA, TimeUnit.SECONDS);
 
     }
 
@@ -120,11 +124,11 @@ public class CoordinatesDemo extends JComponent implements MouseListener, Action
 
 
         Graphics2D g2 = (Graphics2D) g;
-        g2.translate(Constants.screenWidth / 2, Constants.screenHeight * 4 / 10);
-        g2.setStroke(new BasicStroke(4));
-        g2.setStroke(new BasicStroke(4));
-        g2.drawLine(0, -10000, 0, 100000);
-        g2.drawLine(-950, 0, 950, 0);
+        g2.translate(Constants.screenWidth / 2, Constants.screenHeight * AMOUNT_OF_PART_TO_CENTER_HALF / AMOUNT_OF_PARTS);
+        g2.setStroke(new BasicStroke(BASIC_STROKE));
+        g2.setStroke(new BasicStroke(BASIC_STROKE));
+        g2.drawLine(0, -Constants.screenHeight, 0, Constants.screenHeight);
+        g2.drawLine(-Constants.screenWidth, 0, Constants.screenWidth, 0);
         moveDragon(g2);
         removeDragons(g2);
         showDragons(g2);
@@ -132,9 +136,12 @@ public class CoordinatesDemo extends JComponent implements MouseListener, Action
 
     }
 
+
+
     private void showShowed(Graphics2D g2) {
         for (Dragon showedDragon : showedDragons) {
-            drawDragon(g2, (int) showedDragon.getCoordinates().getX(), showedDragon.getCoordinates().getY(), (int) showedDragon.getWingspan(), usersAndColors.get(showedDragon.getOwnerId()), 255);
+            drawDragon(g2, (int) showedDragon.getCoordinates().getX(), showedDragon.getCoordinates().getY(), (int) showedDragon.getWingspan(), usersAndColors.get(showedDragon.getOwnerId()), MAX_ALPHA
+            );
         }
     }
     private void showDragons(Graphics2D g2) {
@@ -147,21 +154,21 @@ public class CoordinatesDemo extends JComponent implements MouseListener, Action
 
             } else {
                 while (true) {
-                    color = new Color((int) (Math.random() * 0xFFFFFF));
+                    color = new Color((int) (Math.random() * MAX_COLOR_VALUE));
                     if (!colors.contains(color)) {
                         usersAndColors.put(dragon.getOwnerId(), color);
                         break;
                     }
                 }
             }
-            alpha += 5;
-            if (alpha > 255) {
+            alpha += DELTA_ALPHA_PER_TIC;
+            if (alpha > MAX_ALPHA) {
                 Dragon showed = dragonsNeedsToBeShowed.remove(0);
                 showedDragons.add(showed);
                 alpha = 0;
             }
             if (dragonsNeedsToBeShowed.size() == 0) {
-                drawDragon(g2, (int) dragon.getCoordinates().getX(), dragon.getCoordinates().getY(), (int) dragon.getWingspan(), color, 255);
+                drawDragon(g2, (int) dragon.getCoordinates().getX(), dragon.getCoordinates().getY(), (int) dragon.getWingspan(), color, MAX_ALPHA);
 
             } else {
                 dragon = dragonsNeedsToBeShowed.get(0);
@@ -172,7 +179,6 @@ public class CoordinatesDemo extends JComponent implements MouseListener, Action
 
     private void removeDragons(Graphics2D g2) {
         for (RemovingDragon removingDragon : dragonsNeedsToBeRemoved) {
-            System.out.println("REMOVE");
             Color color;
             removingDragon.tic--;
             if (removingDragon.tic == 0) {
@@ -181,7 +187,7 @@ public class CoordinatesDemo extends JComponent implements MouseListener, Action
             }
 
             color = usersAndColors.get(removingDragon.dragon.getOwnerId());
-            int teta = 255 - 255 * (60 - removingDragon.tic) / 60;
+            int teta = MAX_ALPHA - MAX_ALPHA * (COUNTER_MAX - removingDragon.tic) / COUNTER_MAX;
 
             drawDragon(g2, (int) removingDragon.dragon.getCoordinates().getX(), removingDragon.dragon.getCoordinates().getY(), (int) removingDragon.dragon.getWingspan(), color, teta);
 
@@ -194,31 +200,31 @@ public class CoordinatesDemo extends JComponent implements MouseListener, Action
                 showedDragons.add(movingDragon.dragon);
                 return;
             }
-            int deltaX = (int) (movingDragon.dragon.getCoordinates().getX() - movingDragon.x) / 60;
-            int deltaY = (int) (movingDragon.dragon.getCoordinates().getY() - movingDragon.y) / 60;
-            int deltaWingspan = (int) ((movingDragon.dragon.getWingspan() - movingDragon.wingspan) / 60);
+            int deltaX = (int) (movingDragon.dragon.getCoordinates().getX() - movingDragon.x) / COUNTER_MAX;
+            int deltaY = (movingDragon.dragon.getCoordinates().getY() - movingDragon.y) / COUNTER_MAX;
+            int deltaWingspan = (int) ((movingDragon.dragon.getWingspan() - movingDragon.wingspan) / COUNTER_MAX);
             movingDragon.tic--;
             movingDragon.x += deltaX;
             movingDragon.y += deltaY;
             movingDragon.wingspan += deltaWingspan;
-            drawDragon(g2, movingDragon.x, movingDragon.y, (int) movingDragon.wingspan, usersAndColors.get(movingDragon.dragon.getOwnerId()), 255);
+            drawDragon(g2, movingDragon.x, movingDragon.y, movingDragon.wingspan, usersAndColors.get(movingDragon.dragon.getOwnerId()), MAX_ALPHA);
         }
     }
 
-    private void drawDragon(Graphics2D g2, int x, int y, int wingspan, Color ownerColor, int alpha) {
+    private void drawDragon(Graphics2D g2, int x, int y, int wingspan, Color ownerColor, int alph) {
 
 
-        Color color = new Color(ownerColor.getRed(), ownerColor.getGreen(), ownerColor.getBlue(), alpha);
+        Color color = new Color(ownerColor.getRed(), ownerColor.getGreen(), ownerColor.getBlue(), alph);
         g2.setPaint(color);
         Ellipse2D body = new Ellipse2D.Double(xCoordinatesFunc(x, wingspan), yCoordinatesFunc(y, wingspan * 2), wingspan, wingspan * 2);
         g2.draw(body);
         Ellipse2D head = new Ellipse2D.Double(xCoordinatesFunc(x, wingspan), yCoordinatesFunc(y, wingspan * 2), wingspan, wingspan * 2);
         g2.draw(head);
-        g2.drawPolyline(new int[]{x + wingspan / 4, x + wingspan / 2, x + wingspan, x + wingspan, x + wingspan / 4}, new int[]{(int) -(Math.sqrt(3) * wingspan / 2) - y, -wingspan - y, -wingspan / 2 - y, 0 - y, (int) (Math.sqrt(3) * wingspan / 2 - y)}, 5);
-        g2.drawPolyline(new int[]{x - wingspan / 4, x - wingspan / 2, x - wingspan, x - wingspan, x - wingspan / 4}, new int[]{(int) -(Math.sqrt(3) * wingspan / 2) - y, -wingspan - y, -wingspan / 2 - y, 0 - y, (int) (Math.sqrt(3) * wingspan / 2 - y)}, 5);
-        g2.drawOval(xCoordinatesFunc(x, wingspan / 2), yCoordinatesFunc(y + wingspan * 5 / 4, wingspan / 2), wingspan / 2, wingspan / 2);
-        g2.drawOval(xCoordinatesFunc(x + wingspan / 4, wingspan / 2), yCoordinatesFunc(y - wingspan - wingspan / 10, wingspan / 5), wingspan / 2, wingspan / 5);
-        g2.drawOval(xCoordinatesFunc(x - wingspan / 4, wingspan / 2), yCoordinatesFunc(y - wingspan - wingspan / 10, wingspan / 5), wingspan / 2, wingspan / 5);
+        g2.drawPolyline(new int[]{x + wingspan / DELTA_X_TO_WINGSPAN, x + wingspan / 2, x + wingspan, x + wingspan, x + wingspan / DELTA_X_TO_WINGSPAN}, new int[]{(int) -(Math.sqrt(Y_FIRST_POINT_NUMERATOR) * wingspan / 2) - y, -wingspan - y, -wingspan / 2 - y, 0 - y, (int) (Math.sqrt(Y_FIRST_POINT_NUMERATOR) * wingspan / 2 - y)}, AMOUNT_OD_POINTS);
+        g2.drawPolyline(new int[]{x - wingspan / DELTA_X_TO_WINGSPAN, x - wingspan / 2, x - wingspan, x - wingspan, x - wingspan / DELTA_X_TO_WINGSPAN}, new int[]{(int) -(Math.sqrt(Y_FIRST_POINT_NUMERATOR) * wingspan / 2) - y, -wingspan - y, -wingspan / 2 - y, 0 - y, (int) (Math.sqrt(Y_FIRST_POINT_NUMERATOR) * wingspan / 2 - y)}, AMOUNT_OD_POINTS);
+        g2.drawOval(xCoordinatesFunc(x, wingspan / 2), yCoordinatesFunc(y + wingspan * HEAD_HEIGHT_TO_WINGSPAN_NUMERATOR / HEAD_HEIGHT_TO_WINGSPAN_DENOMINATOR, wingspan / 2), wingspan / 2, wingspan / 2);
+        g2.drawOval(xCoordinatesFunc(x + wingspan / DELTA_X_TO_WINGSPAN, wingspan / 2), yCoordinatesFunc(y - wingspan - wingspan / HEIGHT_OF_LEG_TO_WINGSPAN, wingspan / WIDTH_OF_LEG_TO_WINGSPAN), wingspan / 2, wingspan / WIDTH_OF_LEG_TO_WINGSPAN);
+        g2.drawOval(xCoordinatesFunc(x - wingspan / DELTA_X_TO_WINGSPAN, wingspan / 2), yCoordinatesFunc(y - wingspan - wingspan / HEIGHT_OF_LEG_TO_WINGSPAN, wingspan / WIDTH_OF_LEG_TO_WINGSPAN), wingspan / 2, wingspan / WIDTH_OF_LEG_TO_WINGSPAN);
 
 
     }
@@ -233,18 +239,17 @@ public class CoordinatesDemo extends JComponent implements MouseListener, Action
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        System.out.println("CLICK");
 
 
         for (int i = currentList.size() - 1; i >= 0; i--) {
             int x = e.getX() - Constants.screenWidth / 2;
-            int y = -e.getY() + Constants.screenHeight * 4 / 10;
+            int y = -e.getY() + Constants.screenHeight * AMOUNT_OF_PART_TO_CENTER_HALF / AMOUNT_OF_PARTS;
             Dragon dragon = currentList.get(i);
             if (x <= dragon.getCoordinates().getX() + dragon.getWingspan() && x >= dragon.getCoordinates().getX() - dragon.getWingspan()
-                    && y >= dragon.getCoordinates().getY() - dragon.getWingspan() * 6 / 5 && y <= dragon.getCoordinates().getY() + dragon.getWingspan() * 3 / 2) {
+                    && y >= dragon.getCoordinates().getY() - dragon.getWingspan() * HITBOX_LOW_POINT_NUMERATOR / HITBOX_LOW_POINT_DENOMINATOR && y <= dragon.getCoordinates().getY() + dragon.getWingspan() * Y_FIRST_POINT_NUMERATOR / 2) {
 
                 if (commandExecutor.getConnectionManager().getUserId() == dragon.getOwnerId()) {
-                    ChangeFieldsOfDragonPanel changeFieldsOfDragonPanel = new ChangeFieldsOfDragonPanel(visualStyleMain.getConnectionManager(), visualStyleMain.getCurrentBundle(), dragon, visualStyleMain);
+                    ChangeFieldsOfDragonPanel changeFieldsOfDragonPanel = new ChangeFieldsOfDragonPanel(visualStyleMain.getConnectionManager(), visualStyleMain.getCurrentBundle(), dragon);
                     changeFieldsOfDragonPanel.drawPanel();
                 } else {
                     JFrame subFrame = new JFrame();
@@ -253,8 +258,7 @@ public class CoordinatesDemo extends JComponent implements MouseListener, Action
                     subFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
                     mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
                     mainPanel.add(jLabel);
-                    JButton exitButton = new JButton("OK");
-                    exitButton.setFont(Constants.mainFont);
+                    JButton exitButton = BasicGUIElementsFabric.createBasicButton("OK");
                     exitButton.setAlignmentX(CENTER_ALIGNMENT);
                     JPanel subPanel = new JPanel();
                     subPanel.setLayout(new GridBagLayout());
@@ -264,7 +268,6 @@ public class CoordinatesDemo extends JComponent implements MouseListener, Action
                     subFrame.setContentPane(mainPanel);
                     subFrame.revalidate();
                     subFrame.pack();
-                    subFrame.repaint();
                     subFrame.setLocationRelativeTo(null);
                     subFrame.setVisible(true);
                 }
@@ -297,4 +300,28 @@ public class CoordinatesDemo extends JComponent implements MouseListener, Action
     public void actionPerformed(ActionEvent e) {
         repaint();
     }
+
+    private static class RemovingDragon {
+        private Dragon dragon;
+        private int tic = COUNTER_MAX;
+        RemovingDragon(Dragon dragon) {
+            this.dragon = dragon;
+        }
+    }
+
+    private static class MovingDragon {
+        private int x;
+        private int y;
+        private Dragon dragon;
+        private int wingspan;
+        private int tic = COUNTER_MAX;
+
+        MovingDragon(int x, int y, int oldWingspan, Dragon dragon) {
+            this.x = x;
+            this.y = y;
+            this.dragon = dragon;
+            this.wingspan = oldWingspan;
+        }
+    }
+
 }

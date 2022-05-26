@@ -1,4 +1,4 @@
-package zula.gui;
+package zula.util;
 
 import zula.common.data.Dragon;
 
@@ -9,9 +9,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class TableSorter {
-
-    private final String[] types = new String[]{"From a to z", "From z to a"};
-    private final String[] columnsNames = {"id", "name", "x", "y", "creationDate", "age", "wingspan", "color", "type", "depth", "Number ot Treasures", "owner_id"};
 
 
     public static String[][] sortList(List<Dragon> dragons, String field, String typeOfSorting) {
