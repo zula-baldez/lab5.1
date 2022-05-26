@@ -3,7 +3,7 @@ package zula.gui.controllers;
 import zula.common.data.Dragon;
 import zula.util.CommandExecutor;
 
-import javax.swing.*;
+import javax.swing.JFrame;
 import java.util.ResourceBundle;
 
 public class AddPanelController {

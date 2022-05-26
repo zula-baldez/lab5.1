@@ -64,7 +64,7 @@ public final class Server {
                 clientThread.setDaemon(true); //to make exit works
                 clientThread.start();
                 } catch (IOException e) {
-                    System.out.print(""); //todo printstacktrace;
+                    System.out.print("");
                 }
             }
         } catch (SQLException e) {

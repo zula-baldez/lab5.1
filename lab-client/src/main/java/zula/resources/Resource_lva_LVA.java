@@ -87,7 +87,7 @@ public class Resource_lva_LVA extends ListResourceBundle {
             {"Impossible to change data base", "Nevar mainīt datu bāzi"},
             {"There is no element with such id or you are not its creator", "Nav neviena elementa ar šādu ID, vai arī jūs neesat tā radītājs"},
             {"Good buy!", "Labs pirkums!"},
-            {"Successful authorization", "Veiksmīga autorizācija",},
+            {"Successful authorization", "Veiksmīga autorizācija"},
             {"Failed to login, please check the correctness of the entered data", "Neizdevās pieteikties, lūdzu, pārbaudiet ievadīto datu pareizību"},
             {"Successful registration", "Veiksmīga reģistrācija"},
             {"Error registering, please try another username", "Reģistrējoties radās kļūda, lūdzu, mēģiniet citu lietotājvārdu"},

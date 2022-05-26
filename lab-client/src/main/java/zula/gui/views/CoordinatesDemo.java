@@ -1,12 +1,18 @@
 package zula.gui.views;
 
-import zula.client.ConnectionManager;
 import zula.common.data.Dragon;
 import zula.util.BasicGUIElementsFabric;
 import zula.util.CommandExecutor;
 import zula.util.Constants;
 
-import javax.swing.*;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.Timer;
+import javax.swing.WindowConstants;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -22,9 +28,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+
 
 public class CoordinatesDemo extends JComponent implements MouseListener, ActionListener {
     private static final int MAX_ALPHA = 255;
@@ -121,7 +125,7 @@ public class CoordinatesDemo extends JComponent implements MouseListener, Action
         g2.drawLine(0, -Constants.SCREEN_HEIGHT, 0, Constants.SCREEN_HEIGHT);
         g2.drawLine(-Constants.SCREEN_WIDTH, 0, Constants.SCREEN_WIDTH, 0);
         frequencyOfUpdate--;
-        if(frequencyOfUpdate == 0) {
+        if (frequencyOfUpdate == 0) {
             checkUpdates();
             frequencyOfUpdate = frequencyOfUpdateConst;
         }
