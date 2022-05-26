@@ -4,7 +4,10 @@ import zula.client.ConnectionManager;
 import zula.gui.controllers.ConnectionAndLoginScreenController;
 import zula.util.Constants;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagLayout;
