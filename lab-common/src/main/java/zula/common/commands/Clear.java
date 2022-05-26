@@ -14,9 +14,9 @@ public class Clear extends Command {
     public ServerMessage doInstructions(IoManager ioManager, AbstractClient client, Serializable[] arguments) throws PrintException {
         if (client.getSqlManager().removeUsersDragons(client.getUserId()) == ResponseCode.OK) {
             client.getCollectionManager().clearDragons(client.getUserId());
-            return new ServerMessage("Команда выполнена!", ResponseCode.OK);
+            return new ServerMessage("Successful execution!", ResponseCode.OK);
         } else {
-           return new ServerMessage("Не удалось изменить состояние базы данных", ResponseCode.ERROR);
+           return new ServerMessage("Impossible to change data base", ResponseCode.ERROR);
         }
     }
 }

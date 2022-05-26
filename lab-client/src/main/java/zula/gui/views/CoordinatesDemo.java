@@ -1,16 +1,12 @@
-package zula.gui;
+package zula.gui.views;
 
+import zula.client.ConnectionManager;
 import zula.common.data.Dragon;
+import zula.util.BasicGUIElementsFabric;
+import zula.util.CommandExecutor;
 import zula.util.Constants;
 
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.Timer;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -33,8 +29,8 @@ import java.util.concurrent.TimeUnit;
 public class CoordinatesDemo extends JComponent implements MouseListener, ActionListener {
     private static final int MAX_ALPHA = 255;
     private static final int DELTA_ALPHA_PER_TIC = 5;
-    private static final int COUNTER_MAX = 60;
-    private static final int PERIOD_OF_UPDATING_DATA = 10;
+    private static final int COUNTER_MAX = 30;
+    private static final int PERIOD_OF_UPDATING_DATA = 5;
     private static final int AMOUNT_OF_PARTS = 10; //делим panel на 10 частей
     private static final int HEIGHT_OF_LEG_TO_WINGSPAN = 10; //размер лапы 1/10 wingspan
     private static final int WIDTH_OF_LEG_TO_WINGSPAN = 5;
@@ -58,9 +54,10 @@ public class CoordinatesDemo extends JComponent implements MouseListener, Action
     private List<Dragon> currentList;
     private final VisualStyleMain visualStyleMain;
     private int alpha = 0;
-    private final Timer timer = new Timer(5, this);
+    private final int frequencyOfUpdateConst = 300;
+    private int frequencyOfUpdate = frequencyOfUpdateConst; //Можно создать новый поток, но тогда придется создавать новый ConnectionManager
+    private final Timer timer = new Timer(15, this);
     private final Set<Integer> ids = new HashSet<>();
-
 
     public CoordinatesDemo(VisualStyleMain visualStyleMain) {
         this.visualStyleMain = visualStyleMain;
@@ -71,49 +68,45 @@ public class CoordinatesDemo extends JComponent implements MouseListener, Action
         for (Dragon dragon : currentList) {
             ids.add(dragon.getId());
         }
-        checkUpdates();
 
     }
+
+
 
     public void checkUpdates() {
-        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-        scheduler.scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
-                List<Dragon> dragons = commandExecutor.showWithoutParsingToMassive();
-                for (Dragon oldDragon : currentList) {
-                    boolean needsToRemove = true;
-                    for (Dragon dragon : dragons) {
-                        if (oldDragon.getId() == dragon.getId()) {
-                            needsToRemove = false;
-                            if (oldDragon.getWingspan() == dragon.getWingspan()
-                                    && oldDragon.getCoordinates().getX() == dragon.getCoordinates().getX()
-                                    && oldDragon.getCoordinates().getY() == dragon.getCoordinates().getY()) {
-                                oldDragon = dragon;
-                            } else {
-                                dragonsNeedsToBeMoved.add(new MovingDragon((int) oldDragon.getCoordinates().getX(), oldDragon.getCoordinates().getY(), (int) oldDragon.getWingspan(), dragon));
-                                showedDragons.remove(oldDragon);
 
-                            }
-                        }
-
-                    }
-                    if (needsToRemove) {
-                        dragonsNeedsToBeRemoved.add(new RemovingDragon(oldDragon));
+        List<Dragon> dragons = commandExecutor.showWithoutParsingToMassive();
+        for (Dragon oldDragon : currentList) {
+            boolean needsToRemove = true;
+            for (Dragon dragon : dragons) {
+                if (oldDragon.getId() == dragon.getId()) {
+                    needsToRemove = false;
+                    if (oldDragon.getWingspan() == dragon.getWingspan()
+                            && oldDragon.getCoordinates().getX() == dragon.getCoordinates().getX()
+                            && oldDragon.getCoordinates().getY() == dragon.getCoordinates().getY()) {
+                        oldDragon = dragon;
+                    } else {
+                        dragonsNeedsToBeMoved.add(new MovingDragon((int) oldDragon.getCoordinates().getX(), oldDragon.getCoordinates().getY(), (int) oldDragon.getWingspan(), dragon));
                         showedDragons.remove(oldDragon);
-                    }
-                }
-                for (Dragon newDragon : dragons) {
-                    if (!ids.contains(newDragon.getId())) {
-                        ids.add(newDragon.getId());
-                        dragonsNeedsToBeShowed.add(newDragon);
-                    }
-                }
-                currentList = new ArrayList<>(dragons);
-            }
-        }, 0, PERIOD_OF_UPDATING_DATA, TimeUnit.SECONDS);
 
+                    }
+                }
+
+            }
+            if (needsToRemove) {
+                dragonsNeedsToBeRemoved.add(new RemovingDragon(oldDragon));
+                showedDragons.remove(oldDragon);
+            }
+        }
+        for (Dragon newDragon : dragons) {
+            if (!ids.contains(newDragon.getId())) {
+                ids.add(newDragon.getId());
+                dragonsNeedsToBeShowed.add(newDragon);
+            }
+        }
+        currentList = new ArrayList<>(dragons);
     }
+
 
     public void startTimer() {
         timer.start();
@@ -121,14 +114,17 @@ public class CoordinatesDemo extends JComponent implements MouseListener, Action
 
     @Override
     public void paint(Graphics g) {
-
-
         Graphics2D g2 = (Graphics2D) g;
-        g2.translate(Constants.screenWidth / 2, Constants.screenHeight * AMOUNT_OF_PART_TO_CENTER_HALF / AMOUNT_OF_PARTS);
+        g2.translate(Constants.SCREEN_WIDTH / 2, Constants.SCREEN_HEIGHT * AMOUNT_OF_PART_TO_CENTER_HALF / AMOUNT_OF_PARTS);
         g2.setStroke(new BasicStroke(BASIC_STROKE));
         g2.setStroke(new BasicStroke(BASIC_STROKE));
-        g2.drawLine(0, -Constants.screenHeight, 0, Constants.screenHeight);
-        g2.drawLine(-Constants.screenWidth, 0, Constants.screenWidth, 0);
+        g2.drawLine(0, -Constants.SCREEN_HEIGHT, 0, Constants.SCREEN_HEIGHT);
+        g2.drawLine(-Constants.SCREEN_WIDTH, 0, Constants.SCREEN_WIDTH, 0);
+        frequencyOfUpdate--;
+        if(frequencyOfUpdate == 0) {
+            checkUpdates();
+            frequencyOfUpdate = frequencyOfUpdateConst;
+        }
         moveDragon(g2);
         removeDragons(g2);
         showDragons(g2);
@@ -137,13 +133,12 @@ public class CoordinatesDemo extends JComponent implements MouseListener, Action
     }
 
 
-
-    private void showShowed(Graphics2D g2) {
+    private synchronized void showShowed(Graphics2D g2) {
         for (Dragon showedDragon : showedDragons) {
-            drawDragon(g2, (int) showedDragon.getCoordinates().getX(), showedDragon.getCoordinates().getY(), (int) showedDragon.getWingspan(), usersAndColors.get(showedDragon.getOwnerId()), MAX_ALPHA
-            );
+            drawDragon(g2, (int) showedDragon.getCoordinates().getX(), showedDragon.getCoordinates().getY(), (int) showedDragon.getWingspan(), usersAndColors.get(showedDragon.getOwnerId()), MAX_ALPHA);
         }
     }
+
     private void showDragons(Graphics2D g2) {
         if (dragonsNeedsToBeShowed.size() > 0) {
 
@@ -151,7 +146,6 @@ public class CoordinatesDemo extends JComponent implements MouseListener, Action
             Dragon dragon = dragonsNeedsToBeShowed.get(0);
             if (usersAndColors.containsKey(dragon.getOwnerId())) {
                 color = usersAndColors.get(dragon.getOwnerId());
-
             } else {
                 while (true) {
                     color = new Color((int) (Math.random() * MAX_COLOR_VALUE));
@@ -193,6 +187,7 @@ public class CoordinatesDemo extends JComponent implements MouseListener, Action
 
         }
     }
+
     private void moveDragon(Graphics2D g2) {
         for (MovingDragon movingDragon : dragonsNeedsToBeMoved) {
             if (movingDragon.tic < 0) {
@@ -200,14 +195,11 @@ public class CoordinatesDemo extends JComponent implements MouseListener, Action
                 showedDragons.add(movingDragon.dragon);
                 return;
             }
-            int deltaX = (int) (movingDragon.dragon.getCoordinates().getX() - movingDragon.x) / COUNTER_MAX;
-            int deltaY = (movingDragon.dragon.getCoordinates().getY() - movingDragon.y) / COUNTER_MAX;
-            int deltaWingspan = (int) ((movingDragon.dragon.getWingspan() - movingDragon.wingspan) / COUNTER_MAX);
             movingDragon.tic--;
-            movingDragon.x += deltaX;
-            movingDragon.y += deltaY;
-            movingDragon.wingspan += deltaWingspan;
-            drawDragon(g2, movingDragon.x, movingDragon.y, movingDragon.wingspan, usersAndColors.get(movingDragon.dragon.getOwnerId()), MAX_ALPHA);
+            movingDragon.x += movingDragon.deltaX;
+            movingDragon.y += movingDragon.deltaY;
+            movingDragon.wingspan += movingDragon.deltaWingspan;
+            drawDragon(g2, (int) movingDragon.x, (int) movingDragon.y, (int) movingDragon.wingspan, usersAndColors.get(movingDragon.dragon.getOwnerId()), MAX_ALPHA);
         }
     }
 
@@ -242,8 +234,8 @@ public class CoordinatesDemo extends JComponent implements MouseListener, Action
 
 
         for (int i = currentList.size() - 1; i >= 0; i--) {
-            int x = e.getX() - Constants.screenWidth / 2;
-            int y = -e.getY() + Constants.screenHeight * AMOUNT_OF_PART_TO_CENTER_HALF / AMOUNT_OF_PARTS;
+            int x = e.getX() - Constants.SCREEN_WIDTH / 2;
+            int y = -e.getY() + Constants.SCREEN_HEIGHT * AMOUNT_OF_PART_TO_CENTER_HALF / AMOUNT_OF_PARTS;
             Dragon dragon = currentList.get(i);
             if (x <= dragon.getCoordinates().getX() + dragon.getWingspan() && x >= dragon.getCoordinates().getX() - dragon.getWingspan()
                     && y >= dragon.getCoordinates().getY() - dragon.getWingspan() * HITBOX_LOW_POINT_NUMERATOR / HITBOX_LOW_POINT_DENOMINATOR && y <= dragon.getCoordinates().getY() + dragon.getWingspan() * Y_FIRST_POINT_NUMERATOR / 2) {
@@ -254,11 +246,11 @@ public class CoordinatesDemo extends JComponent implements MouseListener, Action
                 } else {
                     JFrame subFrame = new JFrame();
                     JPanel mainPanel = new JPanel();
-                    JLabel jLabel = BasicGUIElementsFabric.createBasicLabel("Это не ваш дракон(");
+                    JLabel jLabel = BasicGUIElementsFabric.createBasicLabel(visualStyleMain.getCurrentBundle().getString("It is not your dragon"));
                     subFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
                     mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
                     mainPanel.add(jLabel);
-                    JButton exitButton = BasicGUIElementsFabric.createBasicButton("OK");
+                    JButton exitButton = BasicGUIElementsFabric.createBasicButton(visualStyleMain.getCurrentBundle().getString("OK"));
                     exitButton.setAlignmentX(CENTER_ALIGNMENT);
                     JPanel subPanel = new JPanel();
                     subPanel.setLayout(new GridBagLayout());
@@ -304,23 +296,30 @@ public class CoordinatesDemo extends JComponent implements MouseListener, Action
     private static class RemovingDragon {
         private Dragon dragon;
         private int tic = COUNTER_MAX;
+
         RemovingDragon(Dragon dragon) {
             this.dragon = dragon;
         }
     }
 
     private static class MovingDragon {
-        private int x;
-        private int y;
-        private Dragon dragon;
-        private int wingspan;
+        private double x;
+        private double y;
+        private final Dragon dragon;
+        private double wingspan;
         private int tic = COUNTER_MAX;
+        private final double deltaX;
+        private final double deltaY;
+        private final double deltaWingspan;
 
         MovingDragon(int x, int y, int oldWingspan, Dragon dragon) {
             this.x = x;
             this.y = y;
             this.dragon = dragon;
             this.wingspan = oldWingspan;
+            this.deltaX = ((dragon.getCoordinates().getX() - x) / COUNTER_MAX);
+            this.deltaY = (dragon.getCoordinates().getY() - y) * 1.0 / COUNTER_MAX;
+            this.deltaWingspan = ((dragon.getWingspan() - wingspan) / COUNTER_MAX);
         }
     }
 

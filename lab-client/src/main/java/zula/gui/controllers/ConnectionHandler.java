@@ -1,4 +1,4 @@
-package zula.gui;
+package zula.gui.controllers;
 
 import zula.client.ConnectionManager;
 import zula.common.commands.GetUserId;
@@ -19,10 +19,10 @@ import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.util.logging.Logger;
 
-public class ConnectionLogics {
+public class ConnectionHandler {
     private static final Logger CLIENTLOGGER = Logger.getLogger("ClientLogger");
     private static final IoManager IO_MANAGER = new IoManager(new InputManager(new InputStreamReader(System.in)), new OutputManager(new OutputStreamWriter(System.out)));
-    private static  ConnectionManager connectionManager;
+    private static ConnectionManager connectionManager;
     public String connect(String address, String serverPort) {
         try {
             try {
@@ -50,6 +50,7 @@ public class ConnectionLogics {
 
 
     public String login(String login, String password) {
+
         connectionManager.setLogin(login);
         connectionManager.setPassword(password);
         ServerMessage serverMessage = null;

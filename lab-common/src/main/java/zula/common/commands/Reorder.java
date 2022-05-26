@@ -13,6 +13,6 @@ public class Reorder extends Command {
     @Override
     public ServerMessage doInstructions(IoManager ioManager, AbstractClient client, Serializable[] arguments) throws PrintException {
         client.getCollectionManager().reverseList();
-        return new ServerMessage("Коллекция перемешана", ResponseCode.OK);
+        return new ServerMessage("Collection Shuffled", ResponseCode.OK);
     }
 }

@@ -18,6 +18,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.Date;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 public class SQLCollectionManager implements SQLManager {
@@ -256,7 +257,6 @@ public class SQLCollectionManager implements SQLManager {
             return dragon;
         } catch (SQLException e) {
             e.printStackTrace();
-
             logger.severe(e.getMessage());
             return null;
         }

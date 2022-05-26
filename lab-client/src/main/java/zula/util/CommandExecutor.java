@@ -1,4 +1,4 @@
-package zula.gui;
+package zula.util;
 
 import zula.app.AppForExecuteScript;
 import zula.client.ConnectionManager;
@@ -26,8 +26,7 @@ import zula.common.exceptions.PrintException;
 import zula.common.exceptions.SendException;
 import zula.common.util.InputManager;
 import zula.common.util.IoManager;
-import zula.util.GraphicOutputManager;
-import zula.util.Parcers;
+
 
 import javax.swing.JFrame;
 import javax.swing.JTextArea;
@@ -37,10 +36,12 @@ import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 public class CommandExecutor {
-    private ConnectionManager connectionManager;
-    private JFrame mainFrame;
+    private final ConnectionManager connectionManager;
+    private final JFrame mainFrame;
     public CommandExecutor(ConnectionManager connectionManager, JFrame mainFrame) {
         this.connectionManager = connectionManager;
         this.mainFrame = mainFrame;
@@ -49,16 +50,25 @@ public class CommandExecutor {
         return connectionManager;
     }
 
-    private synchronized String sendCommandReturningString(Command command, Serializable[] args) {
+    private synchronized String sendCommandReturningString(Command command, Serializable[] args, ResourceBundle resourceBundle) {
         try {
             connectionManager.sendToServer(command, args);
-            return connectionManager.getMessage().getArguments()[0].toString();
+            return resourceBundle.getString(connectionManager.getMessage().getArguments()[0].toString());
         } catch (SendException | GetServerMessageException e) {
             e.printStackTrace();
             return null;
         }
     }
-    private synchronized ServerMessage sendCommandReturningServerMessage(Command command, Serializable[] args) {
+    private synchronized String sendCommandReturningStringWithoutTranslate(Command command, Serializable[] args, ResourceBundle resourceBundle) {
+        try {
+            connectionManager.sendToServer(command, args);
+            return (connectionManager.getMessage().getArguments()[0].toString());
+        } catch (SendException | GetServerMessageException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    private synchronized ServerMessage sendCommandReturningServerMessage(Command command, Serializable[] args, ResourceBundle resourceBundle) {
         try {
             connectionManager.sendToServer(command, args);
             return connectionManager.getMessage();
@@ -69,22 +79,10 @@ public class CommandExecutor {
     }
 
 
-    public String[][] showCommand() {
-        Show show = new Show();
-        try {
-            connectionManager.sendToServer(show, new Serializable[]{""});
-            List<Dragon> result = new ArrayList<>();
-            ServerMessage serverMessage = connectionManager.getMessage();
-
-            for (int i = 0; i < serverMessage.getArguments().length; i++) {
-                result.add((Dragon) serverMessage.getArguments()[i]);
-            }
-            Parcers parcers = new Parcers();
-            return parcers.parseTableFromDragons(result);
-        } catch (SendException | GetServerMessageException e) {
-            e.printStackTrace();
-            return null;
-        }
+    public String[][] showCommand(Locale locale) {
+        List<Dragon> result = showWithoutParsingToMassive();
+        Parcers parcers = new Parcers();
+        return parcers.parseTableFromDragons(result, locale);
 
     }
     public List<Dragon> showWithoutParsingToMassive() {
@@ -103,43 +101,43 @@ public class CommandExecutor {
             return null;
         }
     }
-    public String helpCommand() {
+    public String helpCommand(ResourceBundle resourceBundle) {
         Help help = new Help();
-        return sendCommandReturningString(help, new Serializable[]{""});
+        return sendCommandReturningStringWithoutTranslate(help, new Serializable[]{""}, resourceBundle);
 
     }
-    public String infoCommand() {
+    public String infoCommand(ResourceBundle resourceBundle) {
         Info info = new Info();
-        return sendCommandReturningString(info, new Serializable[]{""});
+        return sendCommandReturningStringWithoutTranslate(info, new Serializable[]{""}, resourceBundle);
     }
 
 
-    public String printAscendingCommand() {
+    public String printAscendingCommand(ResourceBundle resourceBundle) {
         PrintAscending printAscending = new PrintAscending();
-        return sendCommandReturningString(printAscending, new Serializable[]{""});
+        return sendCommandReturningStringWithoutTranslate(printAscending, new Serializable[]{""}, resourceBundle);
     }
-    public String printFieldAscendingWingspanCommand() {
+    public String printFieldAscendingWingspanCommand(ResourceBundle resourceBundle) {
         PrintFieldAscendingWingspan printFieldAscendingWingspan = new PrintFieldAscendingWingspan();
-        return sendCommandReturningString(printFieldAscendingWingspan, new Serializable[]{""});
+        return sendCommandReturningStringWithoutTranslate(printFieldAscendingWingspan, new Serializable[]{""}, resourceBundle);
     }
-    public String averageOfWingspan() {
+    public String averageOfWingspan(ResourceBundle resourceBundle) {
         AverageOfWingspan averageOfWingspan = new AverageOfWingspan();
-        return sendCommandReturningString(averageOfWingspan, new Serializable[]{""});
+        return sendCommandReturningStringWithoutTranslate(averageOfWingspan, new Serializable[]{""}, resourceBundle);
     }
-    public String removeLastCommand() {
+    public String removeLastCommand(ResourceBundle resourceBundle) {
         RemoveLast removeLast = new RemoveLast();
-        return sendCommandReturningString(removeLast, new Serializable[]{""});
+        return sendCommandReturningString(removeLast, new Serializable[]{""}, resourceBundle);
     }
-    public String removeByIdCommand(int id) {
+    public String removeByIdCommand(int id, ResourceBundle resourceBundle) {
         RemoveById removeById = new RemoveById();
-        return sendCommandReturningString(removeById, new Serializable[]{id});
+        return sendCommandReturningString(removeById, new Serializable[]{id}, resourceBundle);
     }
-    public String exitCommand() {
+    public String exitCommand(ResourceBundle resourceBundle) {
         Exit exit = new Exit();
         mainFrame.dispose();
-        return sendCommandReturningString(exit, new Serializable[]{""});
+        return sendCommandReturningString(exit, new Serializable[]{""}, resourceBundle);
     }
-    public void executeScript(JTextArea jTextArea, File file) {
+    public void executeScript(JTextArea jTextArea, File file, ResourceBundle resourceBundle) {
         InputManager inputManager = new InputManager(new InputStreamReader(System.in));
         GraphicOutputManager outputManager = new GraphicOutputManager();
         IoManager ioManager = new IoManager(inputManager, outputManager);
@@ -150,30 +148,30 @@ public class CommandExecutor {
             return;
         }
         outputManager.setJTextField(jTextArea);
-        AppForExecuteScript appForExecuteScript = new AppForExecuteScript(ioManager, connectionManager);
+        AppForExecuteScript appForExecuteScript = new AppForExecuteScript(ioManager, connectionManager, resourceBundle);
         try {
             appForExecuteScript.startApp();
         } catch (PrintException ex) {
             jTextArea.setText("Не удалось закончить работу");
         }
     }
-    public String removeLowerCommand(int id) {
+    public String removeLowerCommand(int id, ResourceBundle resourceBundle) {
         RemoveLower removeLower = new RemoveLower();
-        return sendCommandReturningString(removeLower, new Serializable[]{id});
+        return sendCommandReturningString(removeLower, new Serializable[]{id}, resourceBundle);
     }
-    public String clearCommand() {
-        return sendCommandReturningString(new Clear(), new Serializable[]{""});
+    public String clearCommand(ResourceBundle resourceBundle) {
+        return sendCommandReturningString(new Clear(), new Serializable[]{""}, resourceBundle);
     }
-    public String reorder() {
-        return sendCommandReturningString(new Reorder(), new Serializable[]{""});
+    public String reorder(ResourceBundle resourceBundle) {
+        return sendCommandReturningString(new Reorder(), new Serializable[]{""}, resourceBundle);
     }
-    public ResponseCode getDragonById(int id) {
-        return sendCommandReturningServerMessage(new DragonByIdCommand(), new Serializable[]{id}).getResponseStatus();
+    public ResponseCode getDragonById(int id, ResourceBundle resourceBundle) {
+        return sendCommandReturningServerMessage(new DragonByIdCommand(), new Serializable[]{id}, resourceBundle).getResponseStatus();
     }
-    public void addCommand(Dragon dragon) {
-        sendCommandReturningString(new Add(), new Serializable[]{dragon});
+    public void addCommand(Dragon dragon, ResourceBundle resourceBundle) {
+        sendCommandReturningString(new Add(), new Serializable[]{dragon}, resourceBundle);
     }
-    public void updateId(Dragon dragon) {
-        sendCommandReturningString(new UpdateId(), new Serializable[]{dragon});
+    public void updateId(Dragon dragon, ResourceBundle resourceBundle) {
+        sendCommandReturningStringWithoutTranslate(new UpdateId(), new Serializable[]{dragon}, resourceBundle);
     }
 }

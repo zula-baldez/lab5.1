@@ -1,4 +1,4 @@
-package zula.gui;
+package zula.gui.views;
 
 import zula.client.ConnectionManager;
 import zula.common.data.Coordinates;
@@ -8,6 +8,9 @@ import zula.common.data.DragonType;
 import zula.common.data.DragonValidator;
 import zula.common.exceptions.WrongArgumentException;
 import zula.common.util.ArgumentParser;
+import zula.gui.controllers.AddPanelController;
+import zula.util.BasicGUIElementsFabric;
+import zula.util.CommandExecutor;
 import zula.util.Constants;
 
 import javax.swing.BorderFactory;
@@ -41,35 +44,35 @@ public class AddPanel {
     private final JPanel centralPanel = new JPanel();
     private final JPanel southPanel = new JPanel();
     private final JPanel errorPanel = new JPanel();
-    private final JButton submitButton = BasicGUIElementsFabric.createBasicButton("SUBMIT");
+    private JButton submitButton;
 
 
     private final ArgumentParser argumentParser = new ArgumentParser();
 
 
-    private final JLabel fieldText = BasicGUIElementsFabric.createBasicLabel("FIELD");
-    private final JLabel nameText = BasicGUIElementsFabric.createBasicLabel("name");
-    private final JLabel xText = BasicGUIElementsFabric.createBasicLabel("x");
-    private final JLabel yText = BasicGUIElementsFabric.createBasicLabel("y");
-    private final JLabel ageText = BasicGUIElementsFabric.createBasicLabel("age");
-    private final JLabel wingspanText = BasicGUIElementsFabric.createBasicLabel("wingspan");
-    private final JLabel colorText = BasicGUIElementsFabric.createBasicLabel("color");
-    private final JLabel typeText = BasicGUIElementsFabric.createBasicLabel("type");
-    private final JLabel depthText = BasicGUIElementsFabric.createBasicLabel("depth");
-    private final JLabel numberOfTreasuresText = BasicGUIElementsFabric.createBasicLabel("num. of tres.");
-    private final JLabel valueText = BasicGUIElementsFabric.createBasicLabel("value");
-    private final JLabel requirementText = BasicGUIElementsFabric.createBasicLabel("REQUIREMENT");
-    private final JLabel nameReq = BasicGUIElementsFabric.createBasicLabel("NOT NULL");
-    private final JLabel xReq = BasicGUIElementsFabric.createBasicLabel(">=-23, double");
-    private final JLabel yReq = BasicGUIElementsFabric.createBasicLabel("<=160, integer");
-    private final JLabel ageReq = BasicGUIElementsFabric.createBasicLabel("long, >=0");
-    private final JLabel wingspanReq = BasicGUIElementsFabric.createBasicLabel("float, >=0");
-    private final JLabel colorReq = BasicGUIElementsFabric.createBasicLabel("may be null");
-    private final JLabel typeReq = BasicGUIElementsFabric.createBasicLabel("NOT NULL");
-    private final JLabel depthReq = BasicGUIElementsFabric.createBasicLabel("Float, may be null");
-    private final JLabel numberOfTreasuresReq = BasicGUIElementsFabric.createBasicLabel("Double, may be null");
-    private final String[] colors = Constants.colors;
-    private final String[] types = Constants.types;
+    private JLabel fieldText;
+    private JLabel nameText;
+    private JLabel xText;
+    private JLabel yText;
+    private JLabel ageText;
+    private JLabel wingspanText;
+    private JLabel colorText;
+    private JLabel typeText;
+    private JLabel depthText;
+    private JLabel numberOfTreasuresText;
+    private JLabel valueText;
+    private JLabel requirementText;
+    private JLabel nameReq;
+    private JLabel xReq;
+    private JLabel yReq;
+    private JLabel ageReq;
+    private JLabel wingspanReq;
+    private JLabel colorReq;
+    private JLabel typeReq;
+    private JLabel depthReq;
+    private JLabel numberOfTreasuresReq;
+    private final String[] colors = Constants.COLORS;
+    private final String[] types = Constants.TYPES;
     private final JTextField nameField = BasicGUIElementsFabric.createBasicJTextField();
     private final JTextField xField = BasicGUIElementsFabric.createBasicJTextField();
     private final JTextField yField = BasicGUIElementsFabric.createBasicJTextField();
@@ -79,10 +82,10 @@ public class AddPanel {
     private final JComboBox<String> typeField = BasicGUIElementsFabric.createBasicComboBox(types);
     private final JTextField depthField = BasicGUIElementsFabric.createBasicJTextField();
     private final JTextField numberOfTreasuresField = BasicGUIElementsFabric.createBasicJTextField();
-    private final JComboBox<String> languages = new JComboBox<>(Constants.languages);
+    private final JComboBox<String> languages = new JComboBox<>(Constants.LANGUAGES);
     private final ResourceBundle currentBundle;
     private final CommandExecutor commandExecutor;
-
+    private final AddPanelController addPanelController = new AddPanelController();
 
     public AddPanel(ConnectionManager connectionManager, ResourceBundle resourceBundle) {
         mainFrame = new JFrame();
@@ -90,9 +93,31 @@ public class AddPanel {
         this.connectionManager = connectionManager;
         commandExecutor = new CommandExecutor(connectionManager, mainFrame);
 
-
     }
-
+    private void initElements() {
+        fieldText = BasicGUIElementsFabric.createBasicLabel(currentBundle.getString("FIELD"));
+        nameText = BasicGUIElementsFabric.createBasicLabel(currentBundle.getString("name"));
+        xText = BasicGUIElementsFabric.createBasicLabel(currentBundle.getString("x"));
+        yText = BasicGUIElementsFabric.createBasicLabel(currentBundle.getString("y"));
+        ageText = BasicGUIElementsFabric.createBasicLabel(currentBundle.getString("age"));
+        wingspanText = BasicGUIElementsFabric.createBasicLabel(currentBundle.getString("wingspan"));
+        colorText = BasicGUIElementsFabric.createBasicLabel(currentBundle.getString("color"));
+        typeText = BasicGUIElementsFabric.createBasicLabel(currentBundle.getString("type"));
+        depthText = BasicGUIElementsFabric.createBasicLabel(currentBundle.getString("depth"));
+        numberOfTreasuresText = BasicGUIElementsFabric.createBasicLabel(currentBundle.getString("num. of tres."));
+        valueText = BasicGUIElementsFabric.createBasicLabel(currentBundle.getString("value"));
+        requirementText = BasicGUIElementsFabric.createBasicLabel(currentBundle.getString("REQUIREMENT"));
+        nameReq = BasicGUIElementsFabric.createBasicLabel(currentBundle.getString("NOT NULL"));
+        xReq = BasicGUIElementsFabric.createBasicLabel(currentBundle.getString(">=-23, double"));
+        yReq = BasicGUIElementsFabric.createBasicLabel(currentBundle.getString("<=160, integer"));
+        ageReq = BasicGUIElementsFabric.createBasicLabel(currentBundle.getString("long, >0"));
+        wingspanReq = BasicGUIElementsFabric.createBasicLabel(currentBundle.getString("float, >0"));
+        colorReq = BasicGUIElementsFabric.createBasicLabel(currentBundle.getString("may be null"));
+        typeReq = BasicGUIElementsFabric.createBasicLabel(currentBundle.getString("NOT NULL"));
+        depthReq = BasicGUIElementsFabric.createBasicLabel(currentBundle.getString("Float, may be null"));
+        numberOfTreasuresReq = BasicGUIElementsFabric.createBasicLabel(currentBundle.getString("Double, may be null"));
+        submitButton = BasicGUIElementsFabric.createBasicButton(currentBundle.getString("SUBMIT"));
+    }
     private void setBorders() {
 
         fieldText.setBorder(BorderFactory.createLineBorder(Color.black, 1));
@@ -127,23 +152,23 @@ public class AddPanel {
         numberOfTreasuresReq.setBorder(BorderFactory.createLineBorder(Color.black, 1));
 
     }
-    private void initElemets() {
-        mainFrame.setSize(new Dimension(Constants.screenWidth, Constants.screenHeight));
+    private void setSettingsForElements() {
+        mainFrame.setSize(new Dimension(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT));
         mainFrame.setExtendedState(Frame.MAXIMIZED_BOTH);
         mainFrame.setVisible(false);
         mainFrame.setTitle("Add window");
 
-        northPanel.setPreferredSize(new Dimension(Constants.screenWidth, Constants.screenHeight / AMOUNT_OF_PARTS));
+        northPanel.setPreferredSize(new Dimension(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT / AMOUNT_OF_PARTS));
         northPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
         northPanel.add(languages);
 
-        centralPanel.setPreferredSize(new Dimension(Constants.screenWidth, Constants.screenHeight * PARTS_TO_CENTER / AMOUNT_OF_PARTS));
+        centralPanel.setPreferredSize(new Dimension(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT * PARTS_TO_CENTER / AMOUNT_OF_PARTS));
         centralPanel.setLayout(new GridLayout(AMOUNT_OF_ROWS, AMOUNT_OF_COLS));
 
-        southPanel.setPreferredSize(new Dimension(Constants.screenWidth, Constants.screenHeight * PARTS_OF_SOUTH / AMOUNT_OF_PARTS * 2));
+        southPanel.setPreferredSize(new Dimension(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT * PARTS_OF_SOUTH / AMOUNT_OF_PARTS * 2));
         southPanel.setLayout(new GridBagLayout());
 
-        errorPanel.setPreferredSize(new Dimension(Constants.screenWidth, Constants.screenHeight * PARTS_OF_SOUTH / AMOUNT_OF_PARTS * 2));
+        errorPanel.setPreferredSize(new Dimension(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT * PARTS_OF_SOUTH / AMOUNT_OF_PARTS * 2));
         errorPanel.setLayout(new GridBagLayout());
 
         setBorders();
@@ -153,7 +178,7 @@ public class AddPanel {
 
         setListenerForSubmitButton();
 
-        languages.setFont(Constants.mainFont);
+        languages.setFont(Constants.MAIN_FONT);
         languages.setAlignmentX(Component.CENTER_ALIGNMENT);
     }
     protected Dragon parseDragonFromData() throws WrongArgumentException {
@@ -173,10 +198,10 @@ public class AddPanel {
 
     }
 
-    protected void errorHandler(String message) {
+    protected void errorHandler() {
         errorPanel.removeAll();
-        JLabel errorLabel = new JLabel("CHECK THE CURRENCY OF THE DATA");
-        errorLabel.setFont(Constants.mainFont);
+        JLabel errorLabel = new JLabel(currentBundle.getString("CHECK THE CURRENCY OF THE DATA"));
+        errorLabel.setFont(Constants.MAIN_FONT);
         errorPanel.add(errorLabel);
         mainFrame.revalidate();
         mainFrame.repaint();
@@ -188,11 +213,9 @@ public class AddPanel {
             public void actionPerformed(ActionEvent e) {
                 try {
                     Dragon dragon = parseDragonFromData();
-                    commandExecutor.addCommand(dragon);
-                    mainFrame.dispose();
-
+                    addPanelController.addAndClose(commandExecutor, currentBundle, mainFrame, dragon);
                 } catch (WrongArgumentException wrongArgumentException) {
-                    errorHandler("CHECK THE CURRENCY OF THE DATA");
+                    errorHandler();
                 }
             }
         });
@@ -234,9 +257,10 @@ public class AddPanel {
         centralPanel.add(numberOfTreasuresReq);
     }
     public void drawPanel() {
-        initElemets();
+        initElements();
+        setSettingsForElements();
         JPanel mainPanel = new JPanel();
-        mainPanel.setPreferredSize(new Dimension(Constants.screenWidth, Constants.screenHeight));
+        mainPanel.setPreferredSize(new Dimension(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT));
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         setElements(mainPanel);
         mainFrame.setContentPane(mainPanel);
@@ -266,22 +290,33 @@ public class AddPanel {
         yField.setText(Integer.toString(dragon.getCoordinates().getY()));
         ageField.setText(Long.toString(dragon.getAge()));
         wingspanField.setText(Float.toString(dragon.getWingspan()));
-        colorField.setSelectedItem(dragon.getColor().toString());
+        if (dragon.getColor() == null) {
+            colorField.setSelectedItem("NULL");
+        } else {
+            colorField.setSelectedItem(dragon.getColor().toString());
+        }
         typeField.setSelectedItem(dragon.getType().toString());
-        depthField.setText(Float.toString(dragon.getCave().getDepth()));
-        numberOfTreasuresField.setText(Double.toString(dragon.getCave().getNumberOfTreasures()));
+        if (dragon.getCave().getDepth() == null) {
+            depthField.setText("");
+        } else {
+            depthField.setText(Float.toString(dragon.getCave().getDepth()));
+        }
+        if (dragon.getCave().getNumberOfTreasures() == null) {
+            numberOfTreasuresField.setText("");
+        } else {
+            numberOfTreasuresField.setText(Double.toString(dragon.getCave().getNumberOfTreasures()));
+        }
     }
 
     public void addDeleteButton(int id) {
-        JButton deleteButton =  BasicGUIElementsFabric.createBasicButton("Delete");
+        JButton deleteButton =  BasicGUIElementsFabric.createBasicButton(currentBundle.getString("Delete"));
         southPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
         southPanel.add(deleteButton);
 
         deleteButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                commandExecutor.removeByIdCommand(id);
-                mainFrame.dispose();
+                addPanelController.deleteAndClose(commandExecutor, mainFrame, currentBundle, id);
             }
         });
     }

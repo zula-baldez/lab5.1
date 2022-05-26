@@ -1,14 +1,12 @@
 package zula.resources;
 
-import java.util.*;
+import java.util.ListResourceBundle;
 
-public class resource_ru_RU extends ListResourceBundle {
-
-
+public class Resource extends ListResourceBundle {
 
 
 
-    private static final Object[][] contents = {
+    private static final Object[][] CONTENTS = {
             {"LANGUAGE", "ЯЗЫК"},
             {"REMOTE HOST ADDRESS:", "АДРЕС СЕРВЕРА:"},
             {"REMOTE HOST PORT:", "ПОРТ:"},
@@ -19,12 +17,11 @@ public class resource_ru_RU extends ListResourceBundle {
             {"REGISTER", "Вы новый пользователь? Зарегистрироваться"},
             {"ARGUMENT", "Аргумент"},
             {"COMMAND", "Команда"},
-            {"Visual style", "Визуализация"},
-            {"Back to normal", "Вернуться"}
+            {"Visual style", "Визуализация"}
     };
 
     @Override
     protected Object[][] getContents() {
-        return contents;
+        return CONTENTS;
     }
 }

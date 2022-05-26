@@ -19,7 +19,7 @@ public class RemoveLast extends Command {
             RemoveById removeById = new RemoveById();
             return removeById.doInstructions(ioManager, client, new Serializable[]{id});
         } else {
-            return new ServerMessage("Нечего удалять", ResponseCode.ERROR);
+            return new ServerMessage("Nothing to Remove", ResponseCode.ERROR);
         }
     }
 }

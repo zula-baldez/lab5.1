@@ -12,21 +12,21 @@ import java.io.Serializable;
 public class Help extends Command {
     @Override
     public ServerMessage doInstructions(IoManager ioManager, AbstractClient client, Serializable[] arguments) throws PrintException {
-        return new ServerMessage("help : вывести справку по доступным командам\n"
-                + "info : вывести в стандартный поток вывода информацию о коллекции (тип, дата инициализации, количество элементов и т.д.)\n"
-                + "show : вывести в стандартный поток вывода все элементы коллекции в строковом представлении\n"
-                + "add {element} : добавить новый элемент в коллекцию\n"
-                + "update_id {element} : обновить значение элемента коллекции, id которого равен заданному\n"
-                + "remove_by_id id : удалить элемент из коллекции по его id\n"
-                + "clear : очистить коллекцию\n"
-                + "execute_script file_name : считать и исполнить скрипт из указанного файла. В скрипте содержатся команды в таком же виде, в котором их вводит пользователь в интерактивном режиме.\n"
-                + "exit : завершить программу (без сохранения в файл)\n"
-                + "remove_last : удалить последний элемент из коллекции\n"
-                + "remove_lower {element} : удалить из коллекции все элементы, меньшие, чем заданный\n"
-                + "reorder : отсортировать коллекцию в порядке, обратном нынешнему\n"
-                + "average_of_wingspan : вывести среднее значение поля wingspan для всех элементов коллекции\n"
-                + "print_ascending : вывести элементы коллекции в порядке возрастания\n"
-                + "print_field_ascending_wingspan : вывести значения поля wingspan всех элементов в порядке возрастания", ResponseCode.OK);
+        return new ServerMessage("help : display help on available commands\n"
+                + "info : print to standard output information about the collection (type, initialization date, number of elements, etc.)\n"
+                + "show : print to standard output all elements of the collection in string representation\n"
+                + "add {element} : add a new element to the collection\n"
+                + "update_id {element} : update the value of the collection element whose id is equal to the given\n"
+                + "remove_by_id id : remove an element from the collection by its id\n"
+                + "clear : clear collection\n"
+                + "execute_script file_name : read and execute a script from the specified file. The script contains commands in the same form as the user enters them in interactive mode.\n"
+                + "exit : exit program (without saving to file)\n"
+                + "remove_last : remove the last element from the collection\n"
+                + "remove_lower {element} : remove all elements from the collection that are smaller than the given one\n"
+                + "reorder : sort the collection in reverse order of the current one\n"
+                + "average_of_wingspan : display the average value of the wingspan field for all items in the collection\n"
+                + "print_ascending : print collection items in ascending order\n"
+                + "print_field_ascending_wingspan : Print the values of the wingspan field of all elements in ascending order", ResponseCode.OK);
     }
 
 

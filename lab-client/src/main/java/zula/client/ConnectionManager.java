@@ -175,6 +175,12 @@ public class ConnectionManager {
     public void setUserId(int id) {
         this.userId = id;
     }
+    public String getIp() {
+        return serverIp;
+    }
+    public int getServerPort() {
+        return serverPort;
+    }
 }
 
 

@@ -13,6 +13,6 @@ public class Info extends Command {
 
     @Override
     public ServerMessage doInstructions(IoManager ioManager, AbstractClient client, Serializable[] arguments) throws PrintException {
-       return new ServerMessage("размер " + client.getCollectionManager().getCopyOfList().size() + " Дата создания - " + client.getCollectionManager().getDate() + " Тип - LinkedList", ResponseCode.OK);
+       return new ServerMessage("size " + client.getCollectionManager().getCopyOfList().size() + " Date - " + client.getCollectionManager().getDate() + " Type - LinkedList", ResponseCode.OK);
     }
 }

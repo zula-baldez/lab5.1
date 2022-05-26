@@ -18,9 +18,9 @@ public class RemoveLower extends Command {
         int id = Integer.parseInt(arguments[0].toString());
         if (client.getSqlManager().removeLower(client.getUserId(), id) == ResponseCode.OK) {
             client.getCollectionManager().removeLower(id, client.getUserId());
-            return new ServerMessage("Удаление проведено успешно", ResponseCode.OK);
+            return new ServerMessage("Removal completed successfully", ResponseCode.OK);
         } else {
-            return new ServerMessage("Элемента с заданным id не существует", ResponseCode.ERROR);
+            return new ServerMessage("There is no element with the given id", ResponseCode.ERROR);
         }
 
     }

@@ -8,70 +8,76 @@ import zula.common.util.StringConverterRealisation;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
-public class TableFilterer {
+public final class TableFilterer {
 
 
-    private final static int EQUALS = 0;
-    private final static int MORE = 1;
-    private final static int LESS = 2;
-
-    public static String[][] filterList(List<Dragon> dragons, String field, String value, String typeOfFiltering) {
+    private static final int EQUALS = 0;
+    private static final int MORE = 1;
+    private static final int LESS = 2;
+/*
+    private final ResourceBundle currentBundle;
+*/
+    private TableFilterer() {
+        throw new Error();
+    }
+    public static String[][] filterList(List<Dragon> dragons, String field, String value, String typeOfFiltering, ResourceBundle currentBundle) {
         List<Dragon> resultOfFiltering = dragons;
         try {
-            if ("More than".equals(typeOfFiltering)) {
-                resultOfFiltering = filter(dragons, field, value, MORE);
+            if (currentBundle.getString("More than").equals(typeOfFiltering)) {
+                resultOfFiltering = filter(dragons, field, value, MORE, currentBundle);
             }
-            if ("Less than".equals(typeOfFiltering)) {
-                resultOfFiltering = filter(dragons, field, value, LESS);
+            if (currentBundle.getString("Less than").equals(typeOfFiltering)) {
+                resultOfFiltering = filter(dragons, field, value, LESS, currentBundle);
             }
-            if ("Equals".equals(typeOfFiltering)) {
-                resultOfFiltering = filter(dragons, field, value, EQUALS);
+            if (currentBundle.getString("Equals").equals(typeOfFiltering)) {
+                resultOfFiltering = filter(dragons, field, value, EQUALS, currentBundle);
             }
         } catch (NumberFormatException e) {
             resultOfFiltering = new ArrayList<>();
         }
         Parcers parcers = new Parcers();
-        return parcers.parseTableFromDragons(resultOfFiltering);
+        return parcers.parseTableFromDragons(resultOfFiltering, currentBundle.getLocale());
     }
 
-    private static List<Dragon> filter(List<Dragon> dragons, String field, String value, int typeOfFilter) {
+    private static List<Dragon> filter(List<Dragon> dragons, String field, String value, int typeOfFilter, ResourceBundle currentBundle) {
         List filteredList = null;
-        if ("id".equals(field)) {
+        if (currentBundle.getString("id").equals(field)) {
             filteredList = filterById(dragons, Integer.parseInt(value), typeOfFilter);
         }
-        if ("name".equals(field)) {
+        if (currentBundle.getString("name").equals(field)) {
             filteredList = filterByName(dragons, value, typeOfFilter);
         }
-        if ("x".equals(field)) {
+        if (currentBundle.getString("x").equals(field)) {
             filteredList = filterByX(dragons, Double.parseDouble(value), typeOfFilter);
         }
-        if ("y".equals(field)) {
+        if (currentBundle.getString("y").equals(field)) {
             filteredList = filterByY(dragons, Integer.parseInt(value), typeOfFilter);
         }
-        if ("creationDate".equals(field)) {
+        if (currentBundle.getString("creationDate").equals(field)) {
             filteredList = filterByDate(dragons, StringConverterRealisation.parseDate(value), typeOfFilter);
         }
-        if ("age".equals(field)) {
+        if (currentBundle.getString("age").equals(field)) {
             filteredList = filterByAge(dragons, Long.parseLong(value), typeOfFilter);
         }
-        if ("wingspan".equals(field)) {
+        if (currentBundle.getString("wingspan").equals(field)) {
             filteredList = filterByWingspan(dragons, Float.parseFloat(value), typeOfFilter);
         }
-        if ("color".equals(field)) {
+        if (currentBundle.getString("color").equals(field)) {
             filteredList = filterByColor(dragons, Color.valueOf(value), typeOfFilter);
         }
-        if ("type".equals(field)) {
+        if (currentBundle.getString("type").equals(field)) {
             filteredList = filterByType(dragons, DragonType.valueOf(value), typeOfFilter);
         }
-        if ("depth".equals(field)) {
+        if (currentBundle.getString("depth").equals(field)) {
             filteredList = filterByDepth(dragons, Float.parseFloat(value), typeOfFilter);
         }
-        if ("Number ot Treasures".equals(field)) {
+        if (currentBundle.getString("Number ot Treasures").equals(field)) {
             filteredList = filterByNumOfTres(dragons, Double.parseDouble(value), typeOfFilter);
         }
-        if ("owner_id".equals(field)) {
+        if (currentBundle.getString("owner_id").equals(field)) {
             filteredList = filterByOwner(dragons, Integer.parseInt(value), typeOfFilter);
         }
         return filteredList;
@@ -212,7 +218,7 @@ public class TableFilterer {
                 }
             }).collect(Collectors.toList());
         }
-        if(typeOfFilter == MORE) {
+        if (typeOfFilter == MORE) {
             return dragons.stream().filter(x -> {
                 if (x.getCave().getDepth() == null) {
                     return false;
@@ -231,7 +237,7 @@ public class TableFilterer {
     }
 
     private static List<Dragon> filterByNumOfTres(List<Dragon> dragons, Double numOfTres, int typeOfFilter) {
-        if(typeOfFilter == LESS) {
+        if (typeOfFilter == LESS) {
             return dragons.stream().filter(x -> {
                 if (x.getCave().getNumberOfTreasures() == null) {
                     return false;
@@ -240,7 +246,7 @@ public class TableFilterer {
                 }
             }).collect(Collectors.toList());
         }
-        if(typeOfFilter == MORE) {
+        if (typeOfFilter == MORE) {
             return dragons.stream().filter(x -> {
                 if (x.getCave().getNumberOfTreasures() == null) {
                     return false;
@@ -259,10 +265,10 @@ public class TableFilterer {
     }
 
     private static List<Dragon> filterByOwner(List<Dragon> dragons, int ownerId, int typeOfFilter) {
-        if(typeOfFilter == LESS) {
+        if (typeOfFilter == LESS) {
             return dragons.stream().filter(x -> x.getOwnerId() < ownerId).collect(Collectors.toList());
         }
-        if(typeOfFilter == MORE) {
+        if (typeOfFilter == MORE) {
             return dragons.stream().filter(x -> x.getOwnerId() > ownerId).collect(Collectors.toList());
 
         }

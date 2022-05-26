@@ -13,6 +13,6 @@ public class Exit extends Command {
     @Override
     public ServerMessage doInstructions(IoManager ioManager, AbstractClient client, Serializable[] arguments) throws  PrintException {
         ioManager.exitProcess();
-        return new ServerMessage("До свидания!", ResponseCode.OK);
+        return new ServerMessage("Good buy!", ResponseCode.OK);
     }
 }

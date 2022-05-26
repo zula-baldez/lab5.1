@@ -1,6 +1,7 @@
-package zula.gui;
+package zula.gui.views;
 import zula.client.ConnectionManager;
 import zula.common.data.Dragon;
+import zula.util.CommandExecutor;
 import zula.util.Constants;
 import zula.util.TableSorter;
 
@@ -16,22 +17,27 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 public class SortFrame {
+    private static final int SCREEN_WIDTH = Constants.SCREEN_WIDTH / 5;
+    private static final int SCREEN_HEIGHT = Constants.SCREEN_HEIGHT / 5;
     private final JFrame mainFrame;
     private final ConnectionManager connectionManager;
     private final ResourceBundle currentBundle;
+    private final JFrame subFrame = new JFrame();
+    private JPanel mainPanel;
+
+    private JComboBox<String> typesOfSorting;
+    private JComboBox<String> columns;
+    private String[] types;
+    private String[] columnsNames;
+    private JButton sortButton;
     public SortFrame(JFrame mainFrame, ConnectionManager connectionManager, ResourceBundle currentBundle) {
         this.connectionManager = connectionManager;
         this.mainFrame = mainFrame;
         this.currentBundle = currentBundle;
-    }
-    JFrame subFrame = new JFrame();
+        types = new String[]{currentBundle.getString("From a to z"), currentBundle.getString("From z to a")};
+        columnsNames = new String[]{currentBundle.getString("id"), currentBundle.getString("name"), currentBundle.getString("x"), currentBundle.getString("y"), currentBundle.getString("creationDate"), currentBundle.getString("age"), currentBundle.getString("wingspan"), currentBundle.getString("color"), currentBundle.getString("type"), currentBundle.getString("depth"), currentBundle.getString("Number ot Treasures")};
 
-    JPanel mainPanel;
-    JComboBox<String> typesOfSorting;
-    JComboBox<String> columns;
-    String[] types = new String[]{"From a to z", "From z to a", "Random"};
-    private final String[] columnsNames = {"id", "name", "x", "y", "creationDate", "age", "wingspan", "color", "type", "depth", "Number ot Treasures", "owner_id"};
-    JButton sortButton;
+    }
     private void setSortButtonListener() {
         sortButton.addActionListener(new ActionListener() {
             @Override
@@ -40,7 +46,7 @@ public class SortFrame {
                 String columnToSort = (String) columns.getSelectedItem();
                 CommandExecutor commandExecutor = new CommandExecutor(connectionManager, mainFrame);
                 List<Dragon> dragons = commandExecutor.showWithoutParsingToMassive();
-                String[][] result = TableSorter.sortList(dragons, columnToSort, typeOfSorting);
+                String[][] result = TableSorter.sortList(dragons, columnToSort, typeOfSorting, currentBundle);
                 MainScreen mainScreen = new MainScreen(connectionManager, mainFrame, currentBundle);
                 subFrame.dispose();
                 mainScreen.setTableValue(result);
@@ -50,17 +56,17 @@ public class SortFrame {
         });
     }
     public void drawSortPanel() {
-        subFrame.setSize(Constants.screenWidth / 5, Constants.screenHeight / 5);
+        subFrame.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
         subFrame.setVisible(true);
         subFrame.setLocationRelativeTo(null);
         mainPanel = new JPanel();
         mainPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
         typesOfSorting = new JComboBox<>(types);
         columns = new JComboBox<>(columnsNames);
-        sortButton = new JButton("Sort!");
-        typesOfSorting.setFont(Constants.mainFont);
-        columns.setFont(Constants.mainFont);
-        sortButton.setFont(Constants.mainFont);
+        sortButton = new JButton(currentBundle.getString("Sort!"));
+        typesOfSorting.setFont(Constants.MAIN_FONT);
+        columns.setFont(Constants.MAIN_FONT);
+        sortButton.setFont(Constants.MAIN_FONT);
         mainPanel.add(typesOfSorting);
         mainPanel.add(columns);
         mainPanel.add(sortButton);

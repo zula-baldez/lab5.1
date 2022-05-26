@@ -14,9 +14,9 @@ public class LoginCommand extends Command {
         String login = arguments[0].toString();
         String password = arguments[1].toString();
         if (client.getSqlManager().login(login, password, client) == ResponseCode.OK) {
-            return new ServerMessage("Успешная авторизация", ResponseCode.OK);
+            return new ServerMessage("Successful authorization", ResponseCode.OK);
         } else {
-            return new ServerMessage("Не удалось авторизоваться, проверьте корректность введенных данных", ResponseCode.ERROR);
+            return new ServerMessage("Failed to login, please check the correctness of the entered data", ResponseCode.ERROR);
         }
 
 

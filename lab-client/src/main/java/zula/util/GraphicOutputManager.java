@@ -12,11 +12,11 @@ public class GraphicOutputManager extends OutputManager { //нужен, чтоб
         super(new OutputStreamWriter(System.out));
     }
 
-    public void setJTextField(JTextArea jTextArea) {
-        this.jTextArea = jTextArea;
+    public void setJTextField(JTextArea textResult) {
+        this.jTextArea = textResult;
     }
     @Override
     public void write(Serializable arg) {
-        jTextArea.setText(jTextArea.getText() +'\n'+ arg.toString());
+        jTextArea.setText(jTextArea.getText() + '\n' + arg.toString());
     }
 }

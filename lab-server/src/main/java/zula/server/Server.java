@@ -10,7 +10,6 @@ import zula.server.util.ListManager;
 import zula.server.util.SQLCollectionManager;
 import zula.server.util.ServerOutputManager;
 
-import javax.sql.rowset.RowSetFactory;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
@@ -18,7 +17,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Scanner;
 import java.util.logging.Logger;
@@ -40,7 +38,6 @@ public final class Server {
 
 
     public static void main(String[] args) {
-
         ListManager listManager = new ListManager();
         if (args.length != AMOUNT_OF_ARGUMENTS || args[0] == null) {
             throw new IllegalArgumentException();
@@ -67,7 +64,7 @@ public final class Server {
                 clientThread.setDaemon(true); //to make exit works
                 clientThread.start();
                 } catch (IOException e) {
-                    System.out.print("");
+                    System.out.print(""); //todo printstacktrace;
                 }
             }
         } catch (SQLException e) {

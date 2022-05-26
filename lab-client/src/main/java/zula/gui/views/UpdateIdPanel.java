@@ -1,28 +1,26 @@
-package zula.gui;
+package zula.gui.views;
 
 
 import zula.client.ConnectionManager;
-import zula.common.commands.Add;
-import zula.common.commands.UpdateId;
 import zula.common.data.Dragon;
-import zula.common.exceptions.GetServerMessageException;
-import zula.common.exceptions.SendException;
 import zula.common.exceptions.WrongArgumentException;
+import zula.gui.controllers.AddPanelController;
+import zula.util.CommandExecutor;
 
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.Serializable;
 import java.util.ResourceBundle;
 
 public class UpdateIdPanel extends AddPanel {
     private final int dragonId;
     private final CommandExecutor commandExecutor;
+    private final AddPanelController addPanelController = new AddPanelController();
     public UpdateIdPanel(ConnectionManager connectionManager, ResourceBundle resourceBundle, int dragonId) {
         super(connectionManager, resourceBundle);
         this.dragonId = dragonId;
         commandExecutor = new CommandExecutor(connectionManager, getMainFrame());
     }
+    @Override
     protected void setListenerForSubmitButton() {
         getSubmitButton().addActionListener(new ActionListener() {
             @Override
@@ -30,11 +28,9 @@ public class UpdateIdPanel extends AddPanel {
                 try {
                     Dragon dragon = parseDragonFromData();
                     dragon.setId(dragonId);
-                    commandExecutor.updateId(dragon);
-                    getMainFrame().dispose();
-
+                    addPanelController.updateAndClose(commandExecutor, getCurrentBundle(), getMainFrame(), dragon);
                 } catch (WrongArgumentException wrongArgumentException) {
-                    errorHandler("CHECK THE CURRENCY OF THE DATA");
+                    errorHandler();
                 }
             }
         });

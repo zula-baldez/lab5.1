@@ -26,9 +26,9 @@ public class Add extends Command implements Serializable {
             dragon.setId(id);
             client.getCollectionManager().addDragonWithoutGeneratingId(dragon);
         } else {
-            return new ServerMessage("Не удалось добавить элемент в базу", ResponseCode.ERROR);
+            return new ServerMessage("Impossible to add element", ResponseCode.ERROR);
         }
-        return new ServerMessage("Команда выполнена!", ResponseCode.OK);
+        return new ServerMessage("Successful execution!", ResponseCode.OK);
     }
 
 

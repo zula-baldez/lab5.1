@@ -1,6 +1,5 @@
-package zula.gui;
+package zula.util;
 
-import zula.util.Constants;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -13,23 +12,23 @@ public final class BasicGUIElementsFabric {
     }
     public static JLabel createBasicLabel(String text) {
         JLabel basicLabel = new JLabel(text);
-        basicLabel.setFont(Constants.mainFont);
+        basicLabel.setFont(Constants.MAIN_FONT);
         return basicLabel;
     }
 
     public static JTextField createBasicJTextField() {
         JTextField jTextField = new JTextField();
-        jTextField.setFont(Constants.mainFont);
+        jTextField.setFont(Constants.MAIN_FONT);
         return jTextField;
     }
     public static JComboBox<String> createBasicComboBox(String[] elements) {
         JComboBox<String> jComboBox = new JComboBox<>(elements);
-        jComboBox.setFont(Constants.mainFont);
+        jComboBox.setFont(Constants.MAIN_FONT);
         return jComboBox;
     }
     public static JButton createBasicButton(String text) {
         JButton jButton = new JButton();
-        jButton.setFont(Constants.mainFont);
+        jButton.setFont(Constants.MAIN_FONT);
         jButton.setText(text);
         return jButton;
     }

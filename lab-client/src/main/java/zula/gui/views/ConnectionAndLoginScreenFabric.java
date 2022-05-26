@@ -1,5 +1,7 @@
-package zula.gui;
+package zula.gui.views;
 
+import zula.gui.controllers.ConnectionAndLoginScreenController;
+import zula.gui.controllers.ConnectionHandler;
 import zula.util.Constants;
 
 import javax.swing.BorderFactory;
@@ -28,12 +30,11 @@ public class ConnectionAndLoginScreenFabric {
     private static final int SEVEN_PANELS = 7;
     private static final int EIGHT_PANELS = 8;
     private static final int DEFAULT_THICKNESS = 3;
-    private final ConnectionLogics connectionLogics = new ConnectionLogics();
     private int amountOfPanels = SEVEN_PANELS; //can change
-    private final int relativeWidthDisplacementForLanguagesList = Constants.screenWidth / 50;
-    private final int relativeHeightDisplacementForLanguagesList = Constants.screenHeight / 25; //Константы, управляющие размерами объектов и зависящие от размера экрана
-    private final int relativeWidthDisplacementForTextFields = Constants.screenWidth * 8 / 10;
-    private final int relativeHeightDisplacementForTextFields = Constants.screenHeight / 20;
+    private final int relativeWidthDisplacementForLanguagesList = Constants.SCREEN_WIDTH / 50;
+    private final int relativeHeightDisplacementForLanguagesList = Constants.SCREEN_HEIGHT / 25; //Константы, управляющие размерами объектов и зависящие от размера экрана
+    private final int relativeWidthDisplacementForTextFields = Constants.SCREEN_WIDTH * 8 / 10;
+    private final int relativeHeightDisplacementForTextFields = Constants.SCREEN_HEIGHT / 20;
     private final JPanel languageListPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, relativeWidthDisplacementForLanguagesList, relativeHeightDisplacementForLanguagesList));
     private final JPanel addressTextPanel = new JPanel(new BorderLayout());
     private final JPanel addressTextFieldPanel = new JPanel(new GridBagLayout());
@@ -48,39 +49,45 @@ public class ConnectionAndLoginScreenFabric {
     private JLabel portText;
     private JTextField fieldForPort;
     private JButton secondButton;
-    private final JComboBox<String> listToChooseLanguage = new JComboBox<>(Constants.languages);
+    private final JComboBox<String> listToChooseLanguage = new JComboBox<>(Constants.LANGUAGES);
     private ResourceBundle currentBundle;
+    private ConnectionHandler connectionHandler = new ConnectionHandler();
+    private final ConnectionAndLoginScreenController connectionAndLoginScreenController = new ConnectionAndLoginScreenController();
 
     public ConnectionAndLoginScreenFabric(ResourceBundle resourceBundle) {
         this.currentBundle = resourceBundle;
     }
+    public ConnectionAndLoginScreenFabric(ResourceBundle resourceBundle, ConnectionHandler connectionHandler) {
+        this.connectionHandler = connectionHandler;
+        this.currentBundle = resourceBundle;
+    }
 
     private void setPanelsSizeDueToAmountOfPanels() {
-        languageListPanel.setPreferredSize(new Dimension(Constants.screenWidth, Constants.screenHeight / amountOfPanels));
-        addressTextPanel.setPreferredSize(new Dimension(Constants.screenWidth, Constants.screenHeight / amountOfPanels));
-        addressTextFieldPanel.setPreferredSize(new Dimension(Constants.screenWidth, Constants.screenHeight / amountOfPanels));
-        portTextPanel.setPreferredSize(new Dimension(Constants.screenWidth, Constants.screenHeight / amountOfPanels));
+        languageListPanel.setPreferredSize(new Dimension(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT / amountOfPanels));
+        addressTextPanel.setPreferredSize(new Dimension(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT / amountOfPanels));
+        addressTextFieldPanel.setPreferredSize(new Dimension(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT / amountOfPanels));
+        portTextPanel.setPreferredSize(new Dimension(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT / amountOfPanels));
 
-        portTextFieldPanel.setPreferredSize(new Dimension(Constants.screenWidth, Constants.screenHeight / amountOfPanels));
-        submitButtonPanel.setPreferredSize(new Dimension(Constants.screenWidth, Constants.screenHeight / amountOfPanels));
-        errorFieldPanel.setPreferredSize(new Dimension(Constants.screenWidth, Constants.screenHeight / amountOfPanels));
-        secondButtonPanel.setPreferredSize(new Dimension(Constants.screenWidth, Constants.screenHeight / amountOfPanels));
+        portTextFieldPanel.setPreferredSize(new Dimension(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT / amountOfPanels));
+        submitButtonPanel.setPreferredSize(new Dimension(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT / amountOfPanels));
+        errorFieldPanel.setPreferredSize(new Dimension(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT / amountOfPanels));
+        secondButtonPanel.setPreferredSize(new Dimension(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT / amountOfPanels));
     }
 
     public JTextField createCenteredJField() {
         JTextField jTextField = new JTextField(SwingConstants.CENTER);
-        jTextField.setFont(Constants.mainFont);
+        jTextField.setFont(Constants.MAIN_FONT);
         jTextField.setPreferredSize(new Dimension(relativeWidthDisplacementForTextFields, relativeHeightDisplacementForTextFields));
         jTextField.setMinimumSize(new Dimension(relativeWidthDisplacementForTextFields, relativeHeightDisplacementForTextFields));
         jTextField.setMaximumSize(new Dimension(relativeWidthDisplacementForTextFields, relativeHeightDisplacementForTextFields));
-        jTextField.setBorder(BorderFactory.createLineBorder(Constants.mainColor, DEFAULT_THICKNESS));
+        jTextField.setBorder(BorderFactory.createLineBorder(Constants.MAIN_COLOR, DEFAULT_THICKNESS));
         return jTextField;
     }
 
     private void printError(String error, JFrame mainFrame) {
         JLabel jLabel = new JLabel();
         jLabel.setText(error);
-        jLabel.setFont(Constants.mainFont);
+        jLabel.setFont(Constants.MAIN_FONT);
         jLabel.setBorder(BorderFactory.createLineBorder(Color.RED, DEFAULT_THICKNESS));
 
         errorFieldPanel.removeAll();
@@ -91,14 +98,11 @@ public class ConnectionAndLoginScreenFabric {
     }
 
 
-
-
-
     public JPanel createPanelWithSevenLayers(String nameOfTheFrame, String valueOfTheFirstJLabel, String valueOfTheSecondJLabel, String textOfTheFirstButton, JFrame mainWindow) {
         mainWindow.setTitle(nameOfTheFrame);
         setPanelsSizeDueToAmountOfPanels();
         JPanel mainPanel = new JPanel();
-        mainPanel.setPreferredSize(new Dimension(Constants.screenWidth, Constants.screenHeight));
+        mainPanel.setPreferredSize(new Dimension(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT));
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
         mainPanel.add(languageListPanel);
         mainPanel.add(addressTextPanel);
@@ -107,39 +111,38 @@ public class ConnectionAndLoginScreenFabric {
         mainPanel.add(portTextFieldPanel);
         mainPanel.add(submitButtonPanel);
         mainPanel.add(errorFieldPanel);
-        listToChooseLanguage.setFont(Constants.mainFont);
+        listToChooseLanguage.setFont(Constants.MAIN_FONT);
         listToChooseLanguage.setSelectedItem(Constants.getNameByBundle(currentBundle));
         languageListPanel.add(listToChooseLanguage);
         //Host address text
         addressText = new JLabel(currentBundle.getString(valueOfTheFirstJLabel), SwingConstants.CENTER);
-        addressText.setFont(Constants.mainFont);
+        addressText.setFont(Constants.MAIN_FONT);
         addressTextPanel.add(addressText, BorderLayout.CENTER);
         //TextField for getting address
         fieldForAddress = createCenteredJField();
         addressTextFieldPanel.add(fieldForAddress);
         //host port text
         portText = new JLabel(currentBundle.getString(valueOfTheSecondJLabel), SwingConstants.CENTER);
-        portText.setFont(Constants.mainFont);
+        portText.setFont(Constants.MAIN_FONT);
         portTextPanel.add(portText, BorderLayout.CENTER);
         //Textfield for getting port
         fieldForPort = createCenteredJField();
         portTextFieldPanel.add(fieldForPort);
         //Submit button
         submitButton = new JButton(currentBundle.getString(textOfTheFirstButton));
-        submitButton.setFont(Constants.mainFont);
+        submitButton.setFont(Constants.MAIN_FONT);
         submitButtonPanel.add(submitButton);
         return mainPanel;
     }
 
 
-
     public JPanel createFrameWithEightLayers(String nameOfTheFrame, String valueOfTheFirstJLabel, String valueOfTheSecondJLabel, String textOfTheFirstButton, String textOfTheSecondButton, JFrame mainFrame) {
         amountOfPanels = EIGHT_PANELS;
         JPanel mainPanel = createPanelWithSevenLayers(nameOfTheFrame, valueOfTheFirstJLabel, valueOfTheSecondJLabel, textOfTheFirstButton, mainFrame);
-        mainPanel.setMaximumSize(new Dimension(Constants.screenWidth, Constants.screenHeight));
+        mainPanel.setMaximumSize(new Dimension(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT));
         secondButton = new JButton(currentBundle.getString(textOfTheSecondButton));
         secondButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        secondButton.setFont(Constants.mainFont);
+        secondButton.setFont(Constants.MAIN_FONT);
         secondButtonPanel.add(secondButton);
         mainPanel.add(secondButton);
         amountOfPanels = SEVEN_PANELS;
@@ -153,13 +156,12 @@ public class ConnectionAndLoginScreenFabric {
             public void actionPerformed(ActionEvent e) {
                 String address = fieldForAddress.getText();
                 String port = fieldForPort.getText();
-                String answer = connectionLogics.connect(address, port);
+                String answer = connectionHandler.connect(address, port);
 
                 if (answer != null) {
-                    printError(answer, mainWindow);
+                    printError(currentBundle.getString(answer), mainWindow);
                 } else {
-                    LoginScreen loginScreen = new LoginScreen();
-                    loginScreen.startLogin(mainWindow, currentBundle);
+                    connectionAndLoginScreenController.moveToLogin(mainWindow, currentBundle, connectionHandler);
                 }
 
             }
@@ -173,13 +175,12 @@ public class ConnectionAndLoginScreenFabric {
             public void actionPerformed(ActionEvent e) {
                 String address = fieldForAddress.getText();
                 String port = fieldForPort.getText();
-                String answer = connectionLogics.login(address, port);
+                String answer = connectionHandler.login(address, port);
 
                 if (answer != null) {
-                    printError(answer, mainWindow);
+                    printError(currentBundle.getString(answer), mainWindow);
                 } else {
-                    MainScreen mainScreen = new MainScreen(connectionLogics.getConnectionManager(), mainWindow, currentBundle);
-                    mainScreen.startMain(true);
+                    connectionAndLoginScreenController.moveToMainScreen(connectionHandler.getConnectionManager(), mainWindow, currentBundle);
                 }
 
             }
@@ -192,13 +193,12 @@ public class ConnectionAndLoginScreenFabric {
             public void actionPerformed(ActionEvent e) {
                 String address = fieldForAddress.getText();
                 String port = fieldForPort.getText();
-                String answer = connectionLogics.register(address, port);
+                String answer = connectionHandler.register(address, port);
 
                 if (answer != null) {
                     printError(answer, mainWindow);
                 } else {
-                    MainScreen mainScreen = new MainScreen(connectionLogics.getConnectionManager(), mainWindow, currentBundle);
-                    mainScreen.startMain(true);
+                   connectionAndLoginScreenController.moveToMainScreen(connectionHandler.getConnectionManager(), mainWindow, currentBundle);
                 }
             }
         });
@@ -214,7 +214,7 @@ public class ConnectionAndLoginScreenFabric {
 
                 currentBundle = Constants.getBundleFromLanguageName(listToChooseLanguage.getSelectedItem().toString());
                 ConnectionAndLoginScreenFabric connectionAndLoginScreenFabric = new ConnectionAndLoginScreenFabric(currentBundle);
-                JPanel mainPanel =  connectionAndLoginScreenFabric.createConnectionFrame(mainFrame);
+                JPanel mainPanel = connectionAndLoginScreenFabric.createConnectionFrame(mainFrame);
                 mainFrame.getContentPane().removeAll();
                 mainFrame.setContentPane(mainPanel);
                 mainFrame.revalidate();
@@ -233,7 +233,7 @@ public class ConnectionAndLoginScreenFabric {
             public void actionPerformed(ActionEvent e) {
                 currentBundle = Constants.getBundleFromLanguageName(listToChooseLanguage.getSelectedItem().toString());
                 ConnectionAndLoginScreenFabric connectionAndLoginScreenFabric = new ConnectionAndLoginScreenFabric(currentBundle);
-                JPanel mainPanel =  connectionAndLoginScreenFabric.createLoginScreen(mainFrame);
+                JPanel mainPanel = connectionAndLoginScreenFabric.createLoginScreen(mainFrame);
                 mainFrame.getContentPane().removeAll();
                 mainFrame.setContentPane(mainPanel);
                 mainFrame.revalidate();
@@ -242,15 +242,6 @@ public class ConnectionAndLoginScreenFabric {
         });
         return mainPanel;
     }
-
-
-
-
-
-
-
-
-
 
 
 }

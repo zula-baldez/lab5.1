@@ -1,7 +1,9 @@
-package zula.gui;
+package zula.gui.views;
 
 import zula.client.ConnectionManager;
 import zula.common.data.Dragon;
+import zula.util.BasicGUIElementsFabric;
+import zula.util.CommandExecutor;
 import zula.util.Constants;
 import zula.util.TableFilterer;
 
@@ -28,28 +30,30 @@ public class FilterFrame {
     private JPanel mainPanel;
     private JComboBox<String> typeOfFilter;
     private JComboBox<String> columns;
-    private JComboBox<String> typesComboBox = new JComboBox<>(Constants.types);
-    private JComboBox<String> colorsComboBox = new JComboBox<>(Constants.colors);
-    private String[] types = new String[]{"More than", "Less than", "Equals"};
-    private final String[] columnsNames = {"id", "name", "x", "y", "creationDate", "age", "wingspan", "color", "type", "depth", "Number ot Treasures", "owner_id"};
+    private JComboBox<String> typesComboBox = new JComboBox<>(Constants.TYPES);
+    private JComboBox<String> colorsComboBox = new JComboBox<>(Constants.COLORS);
+    private String[] types;
+    private String[] columnsNames;
     private JButton filterButton;
     private JTextField fieldForValue = new JTextField(AMOUNT_OF_COLUMNS);
     public FilterFrame(JFrame mainFrame, ConnectionManager connectionManager, ResourceBundle currentBundle) {
         this.connectionManager = connectionManager;
         this.mainFrame = mainFrame;
         this.currentBundle = currentBundle;
+            types = new String[]{currentBundle.getString("More than"), currentBundle.getString("Less than"), currentBundle.getString("Equals")};
+        columnsNames = new String[]{currentBundle.getString("id"), currentBundle.getString("name"), currentBundle.getString("x"), currentBundle.getString("y"), currentBundle.getString("creationDate"), currentBundle.getString("age"), currentBundle.getString("wingspan"), currentBundle.getString("color"), currentBundle.getString("type"), currentBundle.getString("depth"), currentBundle.getString("Number ot Treasures")};
     }
 
     private void setFilterButtonListener() {
         filterButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String typeOfFiltering = (String) typeOfFilter.getSelectedItem(); //TODO null point
+                String typeOfFiltering = (String) typeOfFilter.getSelectedItem();
                 String columnToFilter = (String) columns.getSelectedItem();
                 String value;
-                if ("type".equals(columnToFilter)) {
+                if (currentBundle.getString("type").equals(columnToFilter)) {
                     value = typesComboBox.getSelectedItem().toString();
-                } else if ("type".equals(columnToFilter)) {
+                } else if (currentBundle.getString("color").equals(columnToFilter)) {
                     value = colorsComboBox.getSelectedItem().toString();
                 } else {
                     value = fieldForValue.getText();
@@ -57,7 +61,7 @@ public class FilterFrame {
 
                 CommandExecutor commandExecutor = new CommandExecutor(connectionManager, mainFrame);
                 List<Dragon> dragons = commandExecutor.showWithoutParsingToMassive();
-                String[][] result = TableFilterer.filterList(dragons, columnToFilter, value, typeOfFiltering);
+                String[][] result = TableFilterer.filterList(dragons, columnToFilter, value, typeOfFiltering, currentBundle);
                 MainScreen mainScreen = new MainScreen(connectionManager, mainFrame, currentBundle);
                 subFrame.dispose();
                 mainScreen.setTableValue(result);
@@ -72,7 +76,7 @@ public class FilterFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String field = columns.getSelectedItem().toString();
-                if ("type".equals(field)) {
+                if (currentBundle.getString("type").equals(field)) {
                     mainPanel.removeAll();
                     mainPanel.add(typeOfFilter);
                     mainPanel.add(columns);
@@ -83,7 +87,7 @@ public class FilterFrame {
                     subFrame.revalidate();
                     subFrame.repaint();
                 }
-                if ("color".equals(field)) {
+                if (currentBundle.getString("color").equals(field)) {
                     mainPanel.removeAll();
                     mainPanel.add(typeOfFilter);
                     mainPanel.add(columns);
@@ -98,19 +102,19 @@ public class FilterFrame {
         });
     }
 
-    public void drawSortPanel() {
-        subFrame.setSize(Constants.screenWidth / PART_OF_SCREEN, Constants.screenHeight / PART_OF_SCREEN);
+    public void drawFilterPanel() {
+        subFrame.setSize(Constants.SCREEN_WIDTH / PART_OF_SCREEN, Constants.SCREEN_HEIGHT / PART_OF_SCREEN);
         subFrame.setVisible(true);
         mainPanel = new JPanel();
         mainPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
         typeOfFilter = new JComboBox<>(types);
         columns = new JComboBox<>(columnsNames);
-        filterButton = BasicGUIElementsFabric.createBasicButton("Filter!");
-        typeOfFilter.setFont(Constants.mainFont);
-        columns.setFont(Constants.mainFont);
-        fieldForValue.setFont(Constants.mainFont);
-        typesComboBox.setFont(Constants.mainFont);
-        colorsComboBox.setFont(Constants.mainFont);
+        filterButton = BasicGUIElementsFabric.createBasicButton(currentBundle.getString("Filter!"));
+        typeOfFilter.setFont(Constants.MAIN_FONT);
+        columns.setFont(Constants.MAIN_FONT);
+        fieldForValue.setFont(Constants.MAIN_FONT);
+        typesComboBox.setFont(Constants.MAIN_FONT);
+        colorsComboBox.setFont(Constants.MAIN_FONT);
         subFrame.setLocationRelativeTo(null);
         mainPanel.add(typeOfFilter);
         mainPanel.add(columns);

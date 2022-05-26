@@ -14,7 +14,7 @@ public class ExecuteScript extends Command {
     @Override
     public ServerMessage doInstructions(IoManager ioManager, AbstractClient client, Serializable[] arguments) throws PrintException {
 
-        return new ServerMessage("Чтение с файла установлено успешно", ResponseCode.OK);
+        return new ServerMessage("Successful execution!", ResponseCode.OK);
 
 
 

@@ -17,9 +17,9 @@ public class RemoveById extends Command {
         int id = Integer.parseInt(arguments[0].toString());
         if (client.getSqlManager().remove(id, client.getUserId()) == ResponseCode.OK) {
             client.getCollectionManager().removeById(id);
-            return new ServerMessage("Удаление проведено успешно!", ResponseCode.OK);
+            return new ServerMessage("Removal completed successfully!", ResponseCode.OK);
         } else {
-            return new ServerMessage("Либо такогo id не существует, либо не вы его создатель:(", ResponseCode.ERROR);
+            return new ServerMessage("Either this id does not exist, or you are not its creator:(", ResponseCode.ERROR);
         }
 
 

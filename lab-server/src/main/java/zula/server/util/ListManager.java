@@ -202,9 +202,9 @@ public class ListManager implements CollectionManager {
             writeLock.lock();
             if (dragons.size() != 0) {
                 dragons.removeLast();
-                return "Удаление проведено успешно";
+                return "Successful erasing!";
             } else {
-                return "Нечего удалять";
+                return "Nothing to delete";
             }
         } finally {
             writeLock.unlock();
@@ -216,7 +216,7 @@ public class ListManager implements CollectionManager {
         try {
             writeLock.lock();
             dragons.removeIf(n -> n.getId() == id);
-            return "Удаление проведено успешно";
+            return "Successful erasing!";
         } finally {
             writeLock.unlock();
         }

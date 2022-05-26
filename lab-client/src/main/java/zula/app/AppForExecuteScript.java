@@ -27,6 +27,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 
@@ -38,8 +39,10 @@ public class AppForExecuteScript {
     private final ArgumentParser argumentParser = new ArgumentParser();
     private String login;
     private String password;
-    public AppForExecuteScript(IoManager ioManager, ConnectionManager connectionManager) {
+    private ResourceBundle currentBundle;
+    public AppForExecuteScript(IoManager ioManager, ConnectionManager connectionManager, ResourceBundle currentBundle) {
         this.ioManager = ioManager;
+        this.currentBundle = currentBundle;
         this.connectionManager = connectionManager;
     }
 
@@ -51,7 +54,7 @@ public class AppForExecuteScript {
             ServerMessage serverMessage = connectionManager.getMessage();
             commands = (HashMap<String, Command>) serverMessage.getArguments()[0];
         } catch (SendException | GetServerMessageException | ClassCastException e) {
-            ioManager.getOutputManager().write("Не удалось получить список доступных команд");
+            ioManager.getOutputManager().write(currentBundle.getString("Impossible to get commands"));
             return;
         }
         while (ioManager.isProcessStillWorks()) {
@@ -87,18 +90,18 @@ public class AppForExecuteScript {
             e.printStackTrace();
         }
     }*/
-    private Serializable[] readArgsForLoginAndRegistration() throws PrintException {
+/*    private Serializable[] readArgsForLoginAndRegistration() throws PrintException {
         ioManager.getOutputManager().write("Введите логин");
         login = ioManager.getInputManager().read(ioManager);
         ioManager.getOutputManager().write("Введите пароль");
         password = ioManager.getInputManager().read(ioManager);
         return new Serializable[]{login, password};
-    }
+    }*/
 
 
     private void readAndExecute() throws PrintException {
         try {
-            ioManager.getOutputManager().write("Введите команду!");
+            ioManager.getOutputManager().write(currentBundle.getString("Enter command!"));
             String readLine = ioManager.getInputManager().read(ioManager);
             if (readLine == null) {
                 ioManager.exitProcess();
@@ -109,7 +112,7 @@ public class AppForExecuteScript {
             try {
                 args = readArgs(command, readLine);
             } catch (WrongArgumentException e) {
-                ioManager.getOutputManager().write(e.getMessage());
+                ioManager.getOutputManager().write(currentBundle.getString(e.getMessage()));
                 return;
             }
             if ("exit".equals(command)) {
@@ -122,12 +125,12 @@ public class AppForExecuteScript {
         } catch (NoSuchElementException e) {
             ioManager.exitProcess();
         } catch (WrongCommandException e) {
-            ioManager.getOutputManager().write("Такой команды не существует");
+            ioManager.getOutputManager().write(currentBundle.getString("There is no such command"));
         } catch (SendException e) {
-            ioManager.getOutputManager().write("Ошибка при отправке на сервер");
+            ioManager.getOutputManager().write(currentBundle.getString("Error sending response"));
             ioManager.exitProcess();
         } catch (GetServerMessageException e) {
-            ioManager.getOutputManager().write("Ошибка при получении ответа");
+            ioManager.getOutputManager().write(currentBundle.getString("Error while getting response"));
             ioManager.exitProcess();
         }
     }
@@ -162,12 +165,12 @@ public class AppForExecuteScript {
         }
         if ("execute_script".equals(command)) {
             if (ioManager.getInputManager().containsFileInStack(commandArguments)) {
-                throw new WrongArgumentException("Угроза рекурсии!");
+                throw new WrongArgumentException("The Threat of Recursion!");
             }
             try {
                 ioManager.getInputManager().setFileReading(true, commandArguments);
             } catch (FileNotFoundException e) {
-                throw new WrongArgumentException("Файл не найден или отсутствуют права доступа");
+                throw new WrongArgumentException("File not found or no permissions");
             }
         }
         if ("add".equals(command) || "execute_script".equals(command) || "remove_by_id".equals(command) || "remove_lower".equals(command) || "update_id".equals(command)) {
@@ -178,14 +181,14 @@ public class AppForExecuteScript {
                 APPLOGGER.info("Получены аргументы");
                 return "";
             }
-            throw new WrongArgumentException("Неверные аргументы");
+            throw new WrongArgumentException("Wrong args");
 
         }
     }
 
     private Serializable parseAdd(String commandArguments) throws WrongArgumentException {
         if (!argumentParser.checkIfTheArgsEmpty(commandArguments)) {
-            throw new WrongArgumentException("Неверные аргументы");
+            throw new WrongArgumentException("Wrong args");
         }
         try {
             return readAddArgs();
@@ -197,7 +200,7 @@ public class AppForExecuteScript {
 
     private Serializable parseUpdate(String commandArguments) throws WrongArgumentException, PrintException, SendException, GetServerMessageException {
         if (argumentParser.checkIfTheArgsEmpty(commandArguments)) {
-            throw new WrongArgumentException("Неверные аргументы");
+            throw new WrongArgumentException("Wrong args");
         }
         ServerMessage serverMessage;
         connectionManager.sendToServer(new DragonByIdCommand(), new Serializable[]{Integer.parseInt(commandArguments)});

@@ -23,7 +23,7 @@ public class UpdateId extends Command {
         } else {
             client.getCollectionManager().removeById(dragon.getId());
             client.getCollectionManager().addDragonWithoutGeneratingId(dragon);
-            return new ServerMessage("Команда выполнена!", ResponseCode.OK);
+            return new ServerMessage("Successful execution!", ResponseCode.OK);
         }
     }
 }

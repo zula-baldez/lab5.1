@@ -16,7 +16,7 @@ public class DragonByIdCommand extends Command {
         if (responseCode == ResponseCode.OK) {
             return new ServerMessage("", ResponseCode.OK);
         } else {
-            return new ServerMessage("Элемента с заданным id не существует или не вы его создатель", ResponseCode.ERROR);
+            return new ServerMessage("There is no element with such id or you are not its creator", ResponseCode.ERROR);
         }
     }
 }

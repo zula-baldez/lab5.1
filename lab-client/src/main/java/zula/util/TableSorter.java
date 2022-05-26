@@ -2,32 +2,31 @@ package zula.util;
 
 import zula.common.data.Dragon;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
-public class TableSorter {
+public final class TableSorter {
 
-
-    public static String[][] sortList(List<Dragon> dragons, String field, String typeOfSorting) {
-        List<Dragon> sortedList = new ArrayList<>(); //todo might have not been inizialuzed
-        if ("From a to z".equals(typeOfSorting)) {
+    private TableSorter() {
+        throw new Error();
+    }
+    public static String[][] sortList(List<Dragon> dragons, String field, String typeOfSorting, ResourceBundle resourceBundle) {
+        List<Dragon> sortedList = new ArrayList<>();
+        if (resourceBundle.getString("From a to z").equals(typeOfSorting)) {
             sortedList = sortFromAToZ(field, dragons);
         }
-        if ("From z to a".equals(typeOfSorting)) {
+        if (resourceBundle.getString("From z to a").equals(typeOfSorting)) {
            sortedList = sortFromZToA(field, dragons);
         }
         Parcers parcers = new Parcers();
-        return parcers.parseTableFromDragons(sortedList);
+        return parcers.parseTableFromDragons(sortedList, resourceBundle.getLocale());
     }
-    public static List<Dragon> sortListWithoutParsing(List<Dragon> dragons, String field, String typeOfSorting) {
+    public static List<Dragon> sortListWithoutParsing(List<Dragon> dragons, String field, String typeOfSorting, ResourceBundle resourceBundle) {
         List<Dragon> sortedList = new ArrayList<>(); //todo might have not been inizialuzed
-        if ("From a to z".equals(typeOfSorting)) {
+        if (resourceBundle.getString("From a to z").equals(typeOfSorting)) {
             sortedList = sortFromAToZ(field, dragons);
         }
-        if ("From z to a".equals(typeOfSorting)) {
+        if (resourceBundle.getString("From z to a").equals(typeOfSorting)) {
             sortedList = sortFromZToA(field, dragons);
         }
         return sortedList;
@@ -119,10 +118,10 @@ public class TableSorter {
         return dragons.stream().sorted(new Comparator<Dragon>() {
             @Override
             public int compare(Dragon o1, Dragon o2) {
-                if(o1.getColor() != null && o2.getColor() != null)       {
+                if (o1.getColor() != null && o2.getColor() != null)       {
                     return o1.getColor().compareTo(o2.getColor());
                 }
-                if(o1.getColor() == null) {
+                if (o1.getColor() == null) {
                     return -1;
                 } else {
                     return 1;
@@ -143,10 +142,10 @@ public class TableSorter {
             public int compare(Dragon o1, Dragon o2) {
                 Float depthFirst = o1.getCave().getDepth();
                 Float depthSecond = o2.getCave().getDepth();
-                if(depthFirst != null && depthSecond != null)       {
+                if (depthFirst != null && depthSecond != null)       {
                     return depthFirst.compareTo(depthSecond);
                 }
-                if(depthFirst == null) {
+                if (depthFirst == null) {
                     return -1;
                 } else {
                     return 1;
@@ -162,10 +161,10 @@ public class TableSorter {
             public int compare(Dragon o1, Dragon o2) {
                 Double numOfTresFirst = o1.getCave().getNumberOfTreasures();
                 Double numOfTresSecond = o2.getCave().getNumberOfTreasures();
-                if(numOfTresFirst != null && numOfTresSecond != null)       {
+                if (numOfTresFirst != null && numOfTresSecond != null)       {
                     return numOfTresFirst.compareTo(numOfTresSecond);
                 }
-                if(numOfTresFirst == null) {
+                if (numOfTresFirst == null) {
                     return -1;
                 } else {
                     return 1;
