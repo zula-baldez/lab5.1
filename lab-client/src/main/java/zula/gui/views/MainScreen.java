@@ -2,6 +2,7 @@ package zula.gui.views;
 
 import zula.client.ConnectionManager;
 import zula.gui.controllers.MainScreenController;
+import zula.util.BasicGUIElementsFabric;
 import zula.util.CommandExecutor;
 import zula.util.Constants;
 
@@ -17,6 +18,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.border.LineBorder;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -50,7 +52,7 @@ public class MainScreen {
     private JButton visualStyleButton;
 
 
-    private JComboBox<String> languages = new JComboBox<>(Constants.LANGUAGES);
+    private JComboBox<String> languages = BasicGUIElementsFabric.createBasicComboBox(Constants.LANGUAGES);
     private JPanel centerPanel;
     private JPanel leftOfCenter;
     private JPanel rightOfCenter;
@@ -91,12 +93,10 @@ public class MainScreen {
     public void initElements() {
         commandNames = new String[]{currentBundle.getString("help"), currentBundle.getString("info"), currentBundle.getString("show"), currentBundle.getString("update_id"), currentBundle.getString("remove_by_id"), currentBundle.getString("clear"), currentBundle.getString("execute_script"), currentBundle.getString("exit"), currentBundle.getString("remove_last"), currentBundle.getString("remove_lower"), currentBundle.getString("reorder"), currentBundle.getString("average_of_wingspan"), currentBundle.getString("print_ascending"), currentBundle.getString("print_field_ascending_wingspan"), currentBundle.getString("add")};
         tableHeader = new String[]{currentBundle.getString("id"), currentBundle.getString("name"), currentBundle.getString("x"), currentBundle.getString("y"), currentBundle.getString("creationDate"), currentBundle.getString("age"), currentBundle.getString("wingspan"), currentBundle.getString("color"), currentBundle.getString("type"), currentBundle.getString("depth"), currentBundle.getString("Number ot Treasures"), currentBundle.getString("owner_id")};
-        sortBy = new JButton(currentBundle.getString("Sort!"));
-        filterButton = new JButton(currentBundle.getString("Filter!"));
+        sortBy = BasicGUIElementsFabric.createBasicButton(currentBundle.getString("Sort!"));
+        filterButton = BasicGUIElementsFabric.createBasicButton(currentBundle.getString("Filter!"));
         northPanel = new JPanel();
-        visualStyleButton = new JButton();
-        sortBy.setFont(Constants.MAIN_FONT);
-        filterButton.setFont(Constants.MAIN_FONT);
+        visualStyleButton = BasicGUIElementsFabric.createBasicButton(currentBundle.getString("Visual style"));
         centerPanel = new JPanel();
         leftOfCenter = new JPanel();
         rightOfCenter = new JPanel();
@@ -109,13 +109,13 @@ public class MainScreen {
         southOfCommandPanel = new JPanel();
         argumentPanelText = new JLabel();
         submitButton = new JButton();
-        commands = new JComboBox<>(commandNames);
+        commands = BasicGUIElementsFabric.createBasicComboBox(commandNames);
         southPanel = new JPanel();
         northOfArgumentPanel = new JPanel();
         centerOfArgumentPanel = new JPanel();
         southOfArgumentPanel = new JPanel();
-        submitButton = new JButton(currentBundle.getString("SUBMIT"));
-        languages = new JComboBox<>(Constants.LANGUAGES);
+        submitButton = BasicGUIElementsFabric.createBasicButton(currentBundle.getString("SUBMIT"));
+        languages = BasicGUIElementsFabric.createBasicComboBox(Constants.LANGUAGES);
 
     }
 
@@ -123,8 +123,7 @@ public class MainScreen {
         sortBy.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
-               mainScreenController.createSortFrame(mainFrame, commandExecutor, currentBundle);
+                mainScreenController.createSortFrame(mainFrame, commandExecutor, currentBundle);
             }
         });
     }
@@ -204,8 +203,6 @@ public class MainScreen {
         northPanel.setLayout(new FlowLayout(FlowLayout.LEFT, HGAP, VGAP));
         northPanel.setLayout(new FlowLayout(FlowLayout.LEFT, HGAP, VGAP));
         northPanel.setPreferredSize(new Dimension(SCREEN_WIDTH, NORTH_PANEL_HEIGHT));
-        visualStyleButton.setText(currentBundle.getString("Visual style"));
-        visualStyleButton.setFont(Constants.MAIN_FONT);
         visualStyleButton.setPreferredSize(new Dimension(BUTTON_WIDTH, BUTTON_HEIGHT));
         sortBy.setPreferredSize(new Dimension(BUTTON_WIDTH, BUTTON_HEIGHT));
         filterButton.setPreferredSize(new Dimension(BUTTON_WIDTH, BUTTON_HEIGHT));
@@ -238,10 +235,9 @@ public class MainScreen {
     }
 
     private void setSettingForCommandPanel() {
-        commandText = new JLabel(currentBundle.getString("COMMAND"));
+        commandText = BasicGUIElementsFabric.createBasicLabel(currentBundle.getString("COMMAND"));
         commandText.setAlignmentX(Component.CENTER_ALIGNMENT);
         commandText.setAlignmentY(Component.CENTER_ALIGNMENT);
-        commandText.setFont(Constants.MAIN_FONT);
         commands.setFont(Constants.SUB_FONT);
         setListenerForCommandsList();
 
@@ -283,6 +279,7 @@ public class MainScreen {
         argumentPanel.add(northOfArgumentPanel);
         argumentPanel.add(centerOfArgumentPanel);
         argumentPanel.add(southOfArgumentPanel);
+        argumentPanel.setBorder(new LineBorder(Color.BLACK, 1));
     }
 
     private void setListenerForSubmitButton() {

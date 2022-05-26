@@ -21,7 +21,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import java.awt.Color;
+
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -40,10 +40,10 @@ public class AddPanel {
     private static final int AMOUNT_OF_ROWS = 10;
     private final JFrame mainFrame;
     private final ConnectionManager connectionManager;
-    private final JPanel northPanel = new JPanel();
-    private final JPanel centralPanel = new JPanel();
-    private final JPanel southPanel = new JPanel();
-    private final JPanel errorPanel = new JPanel();
+    private JPanel northPanel = new JPanel();
+    private JPanel centralPanel = new JPanel();
+    private JPanel southPanel = new JPanel();
+    private JPanel errorPanel = new JPanel();
     private JButton submitButton;
 
 
@@ -82,8 +82,8 @@ public class AddPanel {
     private final JComboBox<String> typeField = BasicGUIElementsFabric.createBasicComboBox(types);
     private final JTextField depthField = BasicGUIElementsFabric.createBasicJTextField();
     private final JTextField numberOfTreasuresField = BasicGUIElementsFabric.createBasicJTextField();
-    private final JComboBox<String> languages = new JComboBox<>(Constants.LANGUAGES);
-    private final ResourceBundle currentBundle;
+    private final JComboBox<String> languages = BasicGUIElementsFabric.createBasicComboBox(Constants.LANGUAGES);
+    private ResourceBundle currentBundle;
     private final CommandExecutor commandExecutor;
     private final AddPanelController addPanelController = new AddPanelController();
 
@@ -92,9 +92,16 @@ public class AddPanel {
         this.currentBundle = resourceBundle;
         this.connectionManager = connectionManager;
         commandExecutor = new CommandExecutor(connectionManager, mainFrame);
+        mainFrame.setSize(new Dimension(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT));
 
     }
+
     private void initElements() {
+        northPanel = new JPanel();
+        centralPanel = new JPanel();
+        southPanel = new JPanel();
+        errorPanel = new JPanel();
+
         fieldText = BasicGUIElementsFabric.createBasicLabel(currentBundle.getString("FIELD"));
         nameText = BasicGUIElementsFabric.createBasicLabel(currentBundle.getString("name"));
         xText = BasicGUIElementsFabric.createBasicLabel(currentBundle.getString("x"));
@@ -118,45 +125,43 @@ public class AddPanel {
         numberOfTreasuresReq = BasicGUIElementsFabric.createBasicLabel(currentBundle.getString("Double, may be null"));
         submitButton = BasicGUIElementsFabric.createBasicButton(currentBundle.getString("SUBMIT"));
     }
+
     private void setBorders() {
 
-        fieldText.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-        valueText.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-        requirementText.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-        nameText.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-        nameField.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-        nameReq.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-        xText.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-        xField.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-        xReq.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-        yText.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-        yField.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-        yReq.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-        ageText.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-        ageField.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-        ageReq.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-        wingspanText.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-        wingspanField.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-        wingspanReq.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-        colorText.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-        colorField.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-        colorReq.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-        typeText.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-        typeField.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-        typeReq.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-        depthText.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-        depthField.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-        depthReq.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-        numberOfTreasuresText.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-        numberOfTreasuresField.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-        numberOfTreasuresReq.setBorder(BorderFactory.createLineBorder(Color.black, 1));
+        fieldText.setBorder(BorderFactory.createLineBorder(Constants.MAIN_COLOR, 1));
+        valueText.setBorder(BorderFactory.createLineBorder(Constants.MAIN_COLOR, 1));
+        requirementText.setBorder(BorderFactory.createLineBorder(Constants.MAIN_COLOR, 1));
+        nameText.setBorder(BorderFactory.createLineBorder(Constants.MAIN_COLOR, 1));
+        nameField.setBorder(BorderFactory.createLineBorder(Constants.MAIN_COLOR, 1));
+        nameReq.setBorder(BorderFactory.createLineBorder(Constants.MAIN_COLOR, 1));
+        xText.setBorder(BorderFactory.createLineBorder(Constants.MAIN_COLOR, 1));
+        xField.setBorder(BorderFactory.createLineBorder(Constants.MAIN_COLOR, 1));
+        xReq.setBorder(BorderFactory.createLineBorder(Constants.MAIN_COLOR, 1));
+        yText.setBorder(BorderFactory.createLineBorder(Constants.MAIN_COLOR, 1));
+        yField.setBorder(BorderFactory.createLineBorder(Constants.MAIN_COLOR, 1));
+        yReq.setBorder(BorderFactory.createLineBorder(Constants.MAIN_COLOR, 1));
+        ageText.setBorder(BorderFactory.createLineBorder(Constants.MAIN_COLOR, 1));
+        ageField.setBorder(BorderFactory.createLineBorder(Constants.MAIN_COLOR, 1));
+        ageReq.setBorder(BorderFactory.createLineBorder(Constants.MAIN_COLOR, 1));
+        wingspanText.setBorder(BorderFactory.createLineBorder(Constants.MAIN_COLOR, 1));
+        wingspanField.setBorder(BorderFactory.createLineBorder(Constants.MAIN_COLOR, 1));
+        wingspanReq.setBorder(BorderFactory.createLineBorder(Constants.MAIN_COLOR, 1));
+        colorText.setBorder(BorderFactory.createLineBorder(Constants.MAIN_COLOR, 1));
+        colorField.setBorder(BorderFactory.createLineBorder(Constants.MAIN_COLOR, 1));
+        colorReq.setBorder(BorderFactory.createLineBorder(Constants.MAIN_COLOR, 1));
+        typeText.setBorder(BorderFactory.createLineBorder(Constants.MAIN_COLOR, 1));
+        typeField.setBorder(BorderFactory.createLineBorder(Constants.MAIN_COLOR, 1));
+        typeReq.setBorder(BorderFactory.createLineBorder(Constants.MAIN_COLOR, 1));
+        depthText.setBorder(BorderFactory.createLineBorder(Constants.MAIN_COLOR, 1));
+        depthField.setBorder(BorderFactory.createLineBorder(Constants.MAIN_COLOR, 1));
+        depthReq.setBorder(BorderFactory.createLineBorder(Constants.MAIN_COLOR, 1));
+        numberOfTreasuresText.setBorder(BorderFactory.createLineBorder(Constants.MAIN_COLOR, 1));
+        numberOfTreasuresField.setBorder(BorderFactory.createLineBorder(Constants.MAIN_COLOR, 1));
+        numberOfTreasuresReq.setBorder(BorderFactory.createLineBorder(Constants.MAIN_COLOR, 1));
 
     }
+
     private void setSettingsForElements() {
-        mainFrame.setSize(new Dimension(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT));
-        mainFrame.setExtendedState(Frame.MAXIMIZED_BOTH);
-        mainFrame.setVisible(false);
-        mainFrame.setTitle("Add window");
 
         northPanel.setPreferredSize(new Dimension(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT / AMOUNT_OF_PARTS));
         northPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
@@ -178,9 +183,9 @@ public class AddPanel {
 
         setListenerForSubmitButton();
 
-        languages.setFont(Constants.MAIN_FONT);
-        languages.setAlignmentX(Component.CENTER_ALIGNMENT);
+        languages.setSelectedItem(Constants.getNameByBundle(currentBundle));
     }
+
     protected Dragon parseDragonFromData() throws WrongArgumentException {
         DragonValidator dragonValidator = new DragonValidator();
         String name = argumentParser.parseArgFromString(nameField.getText(), dragonValidator::nameValidator, (String s) -> s);
@@ -200,8 +205,7 @@ public class AddPanel {
 
     protected void errorHandler() {
         errorPanel.removeAll();
-        JLabel errorLabel = new JLabel(currentBundle.getString("CHECK THE CURRENCY OF THE DATA"));
-        errorLabel.setFont(Constants.MAIN_FONT);
+        JLabel errorLabel = BasicGUIElementsFabric.createBasicLabel(currentBundle.getString("CHECK THE CURRENCY OF THE DATA"));
         errorPanel.add(errorLabel);
         mainFrame.revalidate();
         mainFrame.repaint();
@@ -220,6 +224,7 @@ public class AddPanel {
             }
         });
     }
+
     private void setElements(JPanel mainPanel) {
         mainPanel.add(northPanel);
         mainPanel.add(centralPanel);
@@ -256,9 +261,24 @@ public class AddPanel {
         centralPanel.add(numberOfTreasuresField);
         centralPanel.add(numberOfTreasuresReq);
     }
+
+    private void setListenerForLanguages() {
+        languages.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (!(currentBundle == Constants.getBundleFromLanguageName(languages.getSelectedItem().toString()))) {
+
+                    currentBundle = Constants.getBundleFromLanguageName(languages.getSelectedItem().toString());
+                    drawPanel();
+                }
+            }
+        });
+    }
+
     public void drawPanel() {
         initElements();
         setSettingsForElements();
+        setListenerForLanguages();
         JPanel mainPanel = new JPanel();
         mainPanel.setPreferredSize(new Dimension(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT));
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
@@ -309,7 +329,7 @@ public class AddPanel {
     }
 
     public void addDeleteButton(int id) {
-        JButton deleteButton =  BasicGUIElementsFabric.createBasicButton(currentBundle.getString("Delete"));
+        JButton deleteButton = BasicGUIElementsFabric.createBasicButton(currentBundle.getString("Delete"));
         southPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
         southPanel.add(deleteButton);
 

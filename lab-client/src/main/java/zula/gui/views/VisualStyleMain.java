@@ -2,6 +2,7 @@ package zula.gui.views;
 
 import zula.client.ConnectionManager;
 import zula.gui.controllers.ConnectionAndLoginScreenController;
+import zula.util.BasicGUIElementsFabric;
 import zula.util.Constants;
 
 import javax.swing.JButton;
@@ -30,13 +31,13 @@ public class VisualStyleMain {
     private ResourceBundle currentBundle;
     private final ConnectionAndLoginScreenController connectionAndLoginScreenController = new ConnectionAndLoginScreenController();
     //нет смысла создавать отдельный контроллер, ConnectionAndLoginScreenController содержит необходимые методы
-    private final JComboBox<String> languages = new JComboBox<>(Constants.LANGUAGES);
+    private final JComboBox<String> languages = BasicGUIElementsFabric.createBasicComboBox(Constants.LANGUAGES);
 
     public VisualStyleMain(JFrame mainFrame, ConnectionManager connectionManager, ResourceBundle currentBundle) {
         this.currentBundle = currentBundle;
         this.mainFrame = mainFrame;
         this.connectionManager = connectionManager;
-        backButton = new JButton(currentBundle.getString("Back to normal"));
+        backButton = BasicGUIElementsFabric.createBasicButton(currentBundle.getString("Back to normal"));
 
     }
     private void setLanguages() {

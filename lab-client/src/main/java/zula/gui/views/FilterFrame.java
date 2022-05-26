@@ -1,5 +1,7 @@
 package zula.gui.views;
 
+import org.jdatepicker.JDatePicker;
+import org.jdatepicker.impl.JDatePickerImpl;
 import zula.client.ConnectionManager;
 import zula.common.data.Dragon;
 import zula.util.BasicGUIElementsFabric;
@@ -36,6 +38,11 @@ public class FilterFrame {
     private String[] columnsNames;
     private JButton filterButton;
     private JTextField fieldForValue = new JTextField(AMOUNT_OF_COLUMNS);
+
+
+
+
+
     public FilterFrame(JFrame mainFrame, ConnectionManager connectionManager, ResourceBundle currentBundle) {
         this.connectionManager = connectionManager;
         this.mainFrame = mainFrame;

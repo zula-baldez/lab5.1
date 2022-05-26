@@ -1,6 +1,7 @@
 package zula.gui.views;
 import zula.client.ConnectionManager;
 import zula.common.data.Dragon;
+import zula.util.BasicGUIElementsFabric;
 import zula.util.CommandExecutor;
 import zula.util.Constants;
 import zula.util.TableSorter;
@@ -61,9 +62,9 @@ public class SortFrame {
         subFrame.setLocationRelativeTo(null);
         mainPanel = new JPanel();
         mainPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
-        typesOfSorting = new JComboBox<>(types);
-        columns = new JComboBox<>(columnsNames);
-        sortButton = new JButton(currentBundle.getString("Sort!"));
+        typesOfSorting = BasicGUIElementsFabric.createBasicComboBox(types);
+        columns = BasicGUIElementsFabric.createBasicComboBox(columnsNames);
+        sortButton = BasicGUIElementsFabric.createBasicButton(currentBundle.getString("Sort!"));
         typesOfSorting.setFont(Constants.MAIN_FONT);
         columns.setFont(Constants.MAIN_FONT);
         sortButton.setFont(Constants.MAIN_FONT);

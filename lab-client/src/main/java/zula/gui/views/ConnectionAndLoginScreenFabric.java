@@ -2,6 +2,7 @@ package zula.gui.views;
 
 import zula.gui.controllers.ConnectionAndLoginScreenController;
 import zula.gui.controllers.ConnectionHandler;
+import zula.util.BasicGUIElementsFabric;
 import zula.util.Constants;
 
 import javax.swing.BorderFactory;
@@ -49,7 +50,7 @@ public class ConnectionAndLoginScreenFabric {
     private JLabel portText;
     private JTextField fieldForPort;
     private JButton secondButton;
-    private final JComboBox<String> listToChooseLanguage = new JComboBox<>(Constants.LANGUAGES);
+    private final JComboBox<String> listToChooseLanguage = BasicGUIElementsFabric.createBasicComboBox(Constants.LANGUAGES);
     private ResourceBundle currentBundle;
     private ConnectionHandler connectionHandler = new ConnectionHandler();
     private final ConnectionAndLoginScreenController connectionAndLoginScreenController = new ConnectionAndLoginScreenController();
@@ -129,7 +130,7 @@ public class ConnectionAndLoginScreenFabric {
         fieldForPort = createCenteredJField();
         portTextFieldPanel.add(fieldForPort);
         //Submit button
-        submitButton = new JButton(currentBundle.getString(textOfTheFirstButton));
+        submitButton = BasicGUIElementsFabric.createBasicButton(currentBundle.getString(textOfTheFirstButton));
         submitButton.setFont(Constants.MAIN_FONT);
         submitButtonPanel.add(submitButton);
         return mainPanel;
@@ -140,7 +141,7 @@ public class ConnectionAndLoginScreenFabric {
         amountOfPanels = EIGHT_PANELS;
         JPanel mainPanel = createPanelWithSevenLayers(nameOfTheFrame, valueOfTheFirstJLabel, valueOfTheSecondJLabel, textOfTheFirstButton, mainFrame);
         mainPanel.setMaximumSize(new Dimension(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT));
-        secondButton = new JButton(currentBundle.getString(textOfTheSecondButton));
+        secondButton = BasicGUIElementsFabric.createBasicButton(currentBundle.getString(textOfTheSecondButton));
         secondButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         secondButton.setFont(Constants.MAIN_FONT);
         secondButtonPanel.add(secondButton);
