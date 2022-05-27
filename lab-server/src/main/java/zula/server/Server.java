@@ -52,23 +52,15 @@ public final class Server {
             sqlCollectionManager.start(listManager);
             ServerSocket server = new ServerSocket(port);
             while (checkForConsoleCommands()) {
-                try {
                 server.setSoTimeout(TIMEOUT);
                 Socket clientSocket;
                 try {
-
                     clientSocket = server.accept();
                 } catch (IOException e) {
-                    System.out.print(""); //ничего такого ,если никто не хочет подключаться
                     continue;
                 }
-                IoManager ioManager = new IoManager(new InputManager(new InputStreamReader(clientSocket.getInputStream())), new ServerOutputManager(clientSocket.getOutputStream()));
-                Client client = new Client(clientSocket, ioManager, sqlCollectionManager, listManager);
-                ObjectInputStream objectInputStream = new ObjectInputStream(clientSocket.getInputStream());
-                client.setObjectInputStream(objectInputStream);
-                ClientThread clientThread = new ClientThread(client);
-                clientThread.setDaemon(true); //to make exit works
-                clientThread.start();
+                try {
+                startClient(clientSocket, sqlCollectionManager, listManager);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -83,7 +75,15 @@ public final class Server {
             SERVERLOGGER.severe("Отправка стала невозможной");
         }
     }
-
+    private static void startClient(Socket clientSocket, SQLCollectionManager sqlCollectionManager, ListManager listManager) throws IOException {
+        IoManager ioManager = new IoManager(new InputManager(new InputStreamReader(clientSocket.getInputStream())), new ServerOutputManager(clientSocket.getOutputStream()));
+        Client client = new Client(clientSocket, ioManager, sqlCollectionManager, listManager);
+        ObjectInputStream objectInputStream = new ObjectInputStream(clientSocket.getInputStream());
+        client.setObjectInputStream(objectInputStream);
+        ClientThread clientThread = new ClientThread(client);
+        clientThread.setDaemon(true); //to make exit works
+        clientThread.start();
+    }
 
     public static boolean checkForConsoleCommands() throws IOException, PrintException {
             if (System.in.available() > 0) {

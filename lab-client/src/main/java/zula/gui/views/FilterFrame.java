@@ -46,11 +46,11 @@ public class FilterFrame {
     private final String[] types;
     private final String[] columnsNames;
     private JButton filterButton;
-    private JTextField fieldForValue = BasicGUIElementsFabric.createBasicJTextField(AMOUNT_OF_COLUMNS);
-    private JTextField fieldForHours = BasicGUIElementsFabric.createBasicJTextField(2);
-    private JTextField fieldForMinutes = BasicGUIElementsFabric.createBasicJTextField(2);
-    private JTextField fieldForSeconds = BasicGUIElementsFabric.createBasicJTextField(2);
-    private JDateChooser jDateChooser = new JDateChooser();
+    private final JTextField fieldForValue = BasicGUIElementsFabric.createBasicJTextField(AMOUNT_OF_COLUMNS);
+    private final JTextField fieldForHours = BasicGUIElementsFabric.createBasicJTextField(2);
+    private final JTextField fieldForMinutes = BasicGUIElementsFabric.createBasicJTextField(2);
+    private final JTextField fieldForSeconds = BasicGUIElementsFabric.createBasicJTextField(2);
+    private final JDateChooser jDateChooser = new JDateChooser();
 
     public FilterFrame(JFrame mainFrame, ConnectionManager connectionManager, ResourceBundle currentBundle) {
         this.connectionManager = connectionManager;
@@ -138,7 +138,7 @@ public class FilterFrame {
         mainPanel.add(fieldForSeconds);
         mainPanel.add(filterButton);
     }
-    private void setFilterFieldListener() {
+    private void setFilterFieldListener() { //изменение окна в зависимости от выбранного типа данных
         columns.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

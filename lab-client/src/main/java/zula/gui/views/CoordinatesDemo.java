@@ -50,10 +50,10 @@ public class CoordinatesDemo extends JComponent implements MouseListener, Action
     private final CommandExecutor commandExecutor;
     private final HashMap<Integer, Color> usersAndColors = new HashMap<>();
     private final Set<Color> colors = new HashSet<>();
-    private final List<Dragon> dragonsNeedsToBeShowed;
-    private final List<RemovingDragon> dragonsNeedsToBeRemoved = new ArrayList<>();
-    private final List<MovingDragon> dragonsNeedsToBeMoved = new ArrayList<>();
-    private final List<Dragon> showedDragons = new ArrayList<>();
+    private final List<Dragon> dragonsNeedsToBeShowed; //Для анимации появления
+    private final List<RemovingDragon> dragonsNeedsToBeRemoved = new ArrayList<>(); //Для анимации удаления
+    private final List<MovingDragon> dragonsNeedsToBeMoved = new ArrayList<>(); //Для анимации перемещения
+    private final List<Dragon> showedDragons = new ArrayList<>(); //Просто чтобы отрисовывать уже появившихся драконов
     private List<Dragon> currentList;
     private final VisualStyleMain visualStyleMain;
     private int alpha = 0;
@@ -215,8 +215,8 @@ public class CoordinatesDemo extends JComponent implements MouseListener, Action
         g2.draw(body);
         Ellipse2D head = new Ellipse2D.Double(xCoordinatesFunc(x, wingspan), yCoordinatesFunc(y, wingspan * 2), wingspan, wingspan * 2);
         g2.draw(head);
-        g2.drawPolyline(new int[]{x + wingspan / DELTA_X_TO_WINGSPAN, x + wingspan / 2, x + wingspan, x + wingspan, x + wingspan / DELTA_X_TO_WINGSPAN}, new int[]{(int) -(Math.sqrt(Y_FIRST_POINT_NUMERATOR) * wingspan / 2) - y, -wingspan - y, -wingspan / 2 - y, 0 - y, (int) (Math.sqrt(Y_FIRST_POINT_NUMERATOR) * wingspan / 2 - y)}, AMOUNT_OD_POINTS);
-        g2.drawPolyline(new int[]{x - wingspan / DELTA_X_TO_WINGSPAN, x - wingspan / 2, x - wingspan, x - wingspan, x - wingspan / DELTA_X_TO_WINGSPAN}, new int[]{(int) -(Math.sqrt(Y_FIRST_POINT_NUMERATOR) * wingspan / 2) - y, -wingspan - y, -wingspan / 2 - y, 0 - y, (int) (Math.sqrt(Y_FIRST_POINT_NUMERATOR) * wingspan / 2 - y)}, AMOUNT_OD_POINTS);
+        g2.drawPolyline(new int[]{x + wingspan / DELTA_X_TO_WINGSPAN, x + wingspan / 2, x + wingspan, x + wingspan, x + wingspan / DELTA_X_TO_WINGSPAN}, new int[]{(int) -(Math.sqrt(Y_FIRST_POINT_NUMERATOR) * wingspan / 2) - y, -wingspan - y, -wingspan / 2 - y, -y, (int) (Math.sqrt(Y_FIRST_POINT_NUMERATOR) * wingspan / 2 - y)}, AMOUNT_OD_POINTS);
+        g2.drawPolyline(new int[]{x - wingspan / DELTA_X_TO_WINGSPAN, x - wingspan / 2, x - wingspan, x - wingspan, x - wingspan / DELTA_X_TO_WINGSPAN}, new int[]{(int) -(Math.sqrt(Y_FIRST_POINT_NUMERATOR) * wingspan / 2) - y, -wingspan - y, -wingspan / 2 - y, -y, (int) (Math.sqrt(Y_FIRST_POINT_NUMERATOR) * wingspan / 2 - y)}, AMOUNT_OD_POINTS);
         g2.drawOval(xCoordinatesFunc(x, wingspan / 2), yCoordinatesFunc((int) (y + wingspan * HEAD_HEIGHT_TO_WINGSPAN), wingspan / 2), wingspan / 2, wingspan / 2);
         g2.drawOval(xCoordinatesFunc(x + wingspan / DELTA_X_TO_WINGSPAN, wingspan / 2), yCoordinatesFunc(y - wingspan - wingspan / HEIGHT_OF_LEG_TO_WINGSPAN, wingspan / WIDTH_OF_LEG_TO_WINGSPAN), wingspan / 2, wingspan / WIDTH_OF_LEG_TO_WINGSPAN);
         g2.drawOval(xCoordinatesFunc(x - wingspan / DELTA_X_TO_WINGSPAN, wingspan / 2), yCoordinatesFunc(y - wingspan - wingspan / HEIGHT_OF_LEG_TO_WINGSPAN, wingspan / WIDTH_OF_LEG_TO_WINGSPAN), wingspan / 2, wingspan / WIDTH_OF_LEG_TO_WINGSPAN);

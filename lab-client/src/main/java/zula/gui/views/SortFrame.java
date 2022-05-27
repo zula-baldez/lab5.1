@@ -28,8 +28,8 @@ public class SortFrame {
 
     private JComboBox<String> typesOfSorting;
     private JComboBox<String> columns;
-    private String[] types;
-    private String[] columnsNames;
+    private final String[] types;
+    private final String[] columnsNames;
     private JButton sortButton;
     public SortFrame(JFrame mainFrame, ConnectionManager connectionManager, ResourceBundle currentBundle) {
         this.connectionManager = connectionManager;

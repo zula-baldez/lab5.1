@@ -202,7 +202,7 @@ public class AddPanel {
 
     }
 
-    protected void errorHandler() {
+    protected void errorHandler() { //protected, чтобы можно было переопределить и сделать новые окна(updatePanel)
         errorPanel.removeAll();
         JLabel errorLabel = BasicGUIElementsFabric.createBasicLabel(currentBundle.getString("CHECK THE CURRENCY OF THE DATA"));
         errorPanel.add(errorLabel);
@@ -210,7 +210,7 @@ public class AddPanel {
         mainFrame.repaint();
     }
 
-    protected void setListenerForSubmitButton() {
+    protected void setListenerForSubmitButton() { //protected, чтобы можно было переопределить и сделать новые окна(updatePanel)
         submitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -225,6 +225,7 @@ public class AddPanel {
     }
 
     private void setElements(JPanel mainPanel) {
+        //
         mainPanel.add(northPanel);
         mainPanel.add(centralPanel);
         mainPanel.add(southPanel);

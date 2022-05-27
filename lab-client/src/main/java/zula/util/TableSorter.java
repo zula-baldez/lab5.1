@@ -25,7 +25,7 @@ public final class TableSorter {
         Parcers parcers = new Parcers();
         return parcers.parseTableFromDragons(sortedList, resourceBundle.getLocale());
     }
-    public static List<Dragon> sortListWithoutParsing(List<Dragon> dragons, String field, String typeOfSorting, ResourceBundle resourceBundle) {
+/*    public static List<Dragon> sortListWithoutParsing(List<Dragon> dragons, String field, String typeOfSorting, ResourceBundle resourceBundle) {
         List<Dragon> sortedList = new ArrayList<>();
         if (resourceBundle.getString("From a to z").equals(typeOfSorting)) {
             sortedList = sortFromAToZ(field, dragons, resourceBundle);
@@ -34,7 +34,7 @@ public final class TableSorter {
             sortedList = sortFromZToA(field, dragons, resourceBundle);
         }
         return sortedList;
-    }
+    }*/
     private static List<Dragon> sortFromZToA(String field, List<Dragon> dragons, ResourceBundle resourceBundle) {
         List<Dragon> fromAToZ = sortFromAToZ(field, dragons, resourceBundle);
         Collections.reverse(fromAToZ);
@@ -42,7 +42,7 @@ public final class TableSorter {
     }
 
     private static List<Dragon> sortFromAToZ(String field, List<Dragon> dragons, ResourceBundle resourceBundle) {
-        List sortedList = null;
+        List<Dragon> sortedList = null;
         if (resourceBundle.getString("id").equals(field)) {
             sortedList = sortById(dragons);
         }
@@ -94,12 +94,12 @@ public final class TableSorter {
 
     private static List<Dragon> sortByX(List<Dragon> dragons) {
 
-        return dragons.stream().sorted((o1, o2) -> (int) (o1.getCoordinates().getX() - o2.getCoordinates().getX())).collect(Collectors.toList());
+        return dragons.stream().sorted((first, second) -> (int) (first.getCoordinates().getX() - second.getCoordinates().getX())).collect(Collectors.toList());
     }
 
     private static List<Dragon> sortByY(List<Dragon> dragons) {
 
-        return dragons.stream().sorted((o1, o2) -> (int) (o1.getCoordinates().getY() - o2.getCoordinates().getY())).collect(Collectors.toList());
+        return dragons.stream().sorted(Comparator.comparingInt(o -> o.getCoordinates().getY())).collect(Collectors.toList());
     }
 
     private static List<Dragon> sortByDate(List<Dragon> dragons) {
@@ -121,11 +121,11 @@ public final class TableSorter {
 
         return dragons.stream().sorted(new Comparator<Dragon>() {
             @Override
-            public int compare(Dragon o1, Dragon o2) {
-                if (o1.getColor() != null && o2.getColor() != null)       {
-                    return o1.getColor().compareTo(o2.getColor());
+            public int compare(Dragon first, Dragon second) {
+                if (first.getColor() != null && second.getColor() != null)       {
+                    return first.getColor().compareTo(second.getColor());
                 }
-                if (o1.getColor() == null) {
+                if (first.getColor() == null) {
                     return -1;
                 } else {
                     return 1;
@@ -143,9 +143,9 @@ public final class TableSorter {
 
         return dragons.stream().sorted(new Comparator<Dragon>() {
             @Override
-            public int compare(Dragon o1, Dragon o2) {
-                Float depthFirst = o1.getCave().getDepth();
-                Float depthSecond = o2.getCave().getDepth();
+            public int compare(Dragon first, Dragon second) {
+                Float depthFirst = first.getCave().getDepth();
+                Float depthSecond = second.getCave().getDepth();
                 if (depthFirst != null && depthSecond != null)       {
                     return depthFirst.compareTo(depthSecond);
                 }
@@ -162,9 +162,9 @@ public final class TableSorter {
 
         return dragons.stream().sorted(new Comparator<Dragon>() {
             @Override
-            public int compare(Dragon o1, Dragon o2) {
-                Double numOfTresFirst = o1.getCave().getNumberOfTreasures();
-                Double numOfTresSecond = o2.getCave().getNumberOfTreasures();
+            public int compare(Dragon first, Dragon second) {
+                Double numOfTresFirst = first.getCave().getNumberOfTreasures();
+                Double numOfTresSecond = second.getCave().getNumberOfTreasures();
                 if (numOfTresFirst != null && numOfTresSecond != null)       {
                     return numOfTresFirst.compareTo(numOfTresSecond);
                 }
