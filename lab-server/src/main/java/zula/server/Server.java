@@ -55,7 +55,13 @@ public final class Server {
                 try {
                 server.setSoTimeout(TIMEOUT);
                 Socket clientSocket;
-                clientSocket = server.accept();
+                try {
+
+                    clientSocket = server.accept();
+                } catch (IOException e) {
+                    System.out.print(""); //ничего такого ,если никто не хочет подключаться
+                    continue;
+                }
                 IoManager ioManager = new IoManager(new InputManager(new InputStreamReader(clientSocket.getInputStream())), new ServerOutputManager(clientSocket.getOutputStream()));
                 Client client = new Client(clientSocket, ioManager, sqlCollectionManager, listManager);
                 ObjectInputStream objectInputStream = new ObjectInputStream(clientSocket.getInputStream());
@@ -64,7 +70,7 @@ public final class Server {
                 clientThread.setDaemon(true); //to make exit works
                 clientThread.start();
                 } catch (IOException e) {
-                    System.out.print("");
+                    e.printStackTrace();
                 }
             }
         } catch (SQLException e) {

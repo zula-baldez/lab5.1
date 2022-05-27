@@ -58,9 +58,13 @@ public class ConnectionHandler {
             LoginCommand loginCommand = new LoginCommand();
             connectionManager.sendToServer(loginCommand, new Serializable[]{login, password});
             serverMessage = connectionManager.getMessage();
-            GetUserId getUserId = new GetUserId();
-            connectionManager.sendToServer(getUserId, new Serializable[]{""});
-            connectionManager.setUserId(Integer.parseInt(connectionManager.getMessage().getArguments()[0].toString()));
+            if(serverMessage.getResponseStatus() == ResponseCode.OK) {
+                GetUserId getUserId = new GetUserId();
+                connectionManager.sendToServer(getUserId, new Serializable[]{""});
+                connectionManager.setUserId(Integer.parseInt(connectionManager.getMessage().getArguments()[0].toString()));
+            } else {
+                return serverMessage.getArguments()[0].toString();
+            }
         } catch (GetServerMessageException | SendException e) {
             e.printStackTrace();
         }

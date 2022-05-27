@@ -7,7 +7,9 @@ import zula.gui.controllers.AddPanelController;
 import zula.util.CommandExecutor;
 
 import java.util.ResourceBundle;
-
+/*
+панель, которая вылезает при нажатии на дракона в визуальном стиле
+ */
 public class ChangeFieldsOfDragonPanel extends AddPanel {
     private final AddPanelController addPanelController = new AddPanelController();
     private final int dragonId;

@@ -25,7 +25,7 @@ import java.awt.event.ActionListener;
 import java.util.ResourceBundle;
 
 /*
-    This class has methods to create frames of one type.
+    Создание окон коннекта и логина
 */
 public class ConnectionAndLoginScreenFabric {
     private static final int SEVEN_PANELS = 7;
@@ -197,7 +197,7 @@ public class ConnectionAndLoginScreenFabric {
                 String answer = connectionHandler.register(address, port);
 
                 if (answer != null) {
-                    printError(answer, mainWindow);
+                    printError(currentBundle.getString(answer), mainWindow);
                 } else {
                    connectionAndLoginScreenController.moveToMainScreen(connectionHandler.getConnectionManager(), mainWindow, currentBundle);
                 }

@@ -29,25 +29,24 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-
+/*
+отрисовщик координатной плоскости
+ */
 public class CoordinatesDemo extends JComponent implements MouseListener, ActionListener {
     private static final int MAX_ALPHA = 255;
     private static final int DELTA_ALPHA_PER_TIC = 5;
     private static final int COUNTER_MAX = 30;
-    private static final int PERIOD_OF_UPDATING_DATA = 5;
     private static final int AMOUNT_OF_PARTS = 10; //делим panel на 10 частей
     private static final int HEIGHT_OF_LEG_TO_WINGSPAN = 10; //размер лапы 1/10 wingspan
     private static final int WIDTH_OF_LEG_TO_WINGSPAN = 5;
     private static final int AMOUNT_OD_POINTS = 5;
     private static final int DELTA_X_TO_WINGSPAN = 4;
-    private static final int HEAD_HEIGHT_TO_WINGSPAN_DENOMINATOR = 4;
-    private static final int HEAD_HEIGHT_TO_WINGSPAN_NUMERATOR = 5;
+    private static final double HEAD_HEIGHT_TO_WINGSPAN = 5 / 4.0;
     private static final int MAX_COLOR_VALUE = 0xFFFFFF;
     private static final int BASIC_STROKE = 4;
     private static final int AMOUNT_OF_PART_TO_CENTER_HALF = 4;
     private static final int Y_FIRST_POINT_NUMERATOR = 3;
-    private static final int HITBOX_LOW_POINT_NUMERATOR = 6;
-    private static final int HITBOX_LOW_POINT_DENOMINATOR = 5;
+    private static final double HITBOX_LOW_POINT = 6 / 5.0; //Я попытался структурировать константы, но большинство из них это просто значения, которые я получил из расчетов
     private final CommandExecutor commandExecutor;
     private final HashMap<Integer, Color> usersAndColors = new HashMap<>();
     private final Set<Color> colors = new HashSet<>();
@@ -59,7 +58,7 @@ public class CoordinatesDemo extends JComponent implements MouseListener, Action
     private final VisualStyleMain visualStyleMain;
     private int alpha = 0;
     private final int frequencyOfUpdateConst = 300;
-    private int frequencyOfUpdate = frequencyOfUpdateConst; //Можно создать новый поток, но тогда придется создавать новый ConnectionManager
+    private int frequencyOfUpdate = frequencyOfUpdateConst; //Можно создать новый поток, но тогда придется создавать новый ConnectionManager, так как нельзя работать с PipedStream'ами с двух потоков
     private final Timer timer = new Timer(15, this);
     private final Set<Integer> ids = new HashSet<>();
 
@@ -218,7 +217,7 @@ public class CoordinatesDemo extends JComponent implements MouseListener, Action
         g2.draw(head);
         g2.drawPolyline(new int[]{x + wingspan / DELTA_X_TO_WINGSPAN, x + wingspan / 2, x + wingspan, x + wingspan, x + wingspan / DELTA_X_TO_WINGSPAN}, new int[]{(int) -(Math.sqrt(Y_FIRST_POINT_NUMERATOR) * wingspan / 2) - y, -wingspan - y, -wingspan / 2 - y, 0 - y, (int) (Math.sqrt(Y_FIRST_POINT_NUMERATOR) * wingspan / 2 - y)}, AMOUNT_OD_POINTS);
         g2.drawPolyline(new int[]{x - wingspan / DELTA_X_TO_WINGSPAN, x - wingspan / 2, x - wingspan, x - wingspan, x - wingspan / DELTA_X_TO_WINGSPAN}, new int[]{(int) -(Math.sqrt(Y_FIRST_POINT_NUMERATOR) * wingspan / 2) - y, -wingspan - y, -wingspan / 2 - y, 0 - y, (int) (Math.sqrt(Y_FIRST_POINT_NUMERATOR) * wingspan / 2 - y)}, AMOUNT_OD_POINTS);
-        g2.drawOval(xCoordinatesFunc(x, wingspan / 2), yCoordinatesFunc(y + wingspan * HEAD_HEIGHT_TO_WINGSPAN_NUMERATOR / HEAD_HEIGHT_TO_WINGSPAN_DENOMINATOR, wingspan / 2), wingspan / 2, wingspan / 2);
+        g2.drawOval(xCoordinatesFunc(x, wingspan / 2), yCoordinatesFunc((int) (y + wingspan * HEAD_HEIGHT_TO_WINGSPAN), wingspan / 2), wingspan / 2, wingspan / 2);
         g2.drawOval(xCoordinatesFunc(x + wingspan / DELTA_X_TO_WINGSPAN, wingspan / 2), yCoordinatesFunc(y - wingspan - wingspan / HEIGHT_OF_LEG_TO_WINGSPAN, wingspan / WIDTH_OF_LEG_TO_WINGSPAN), wingspan / 2, wingspan / WIDTH_OF_LEG_TO_WINGSPAN);
         g2.drawOval(xCoordinatesFunc(x - wingspan / DELTA_X_TO_WINGSPAN, wingspan / 2), yCoordinatesFunc(y - wingspan - wingspan / HEIGHT_OF_LEG_TO_WINGSPAN, wingspan / WIDTH_OF_LEG_TO_WINGSPAN), wingspan / 2, wingspan / WIDTH_OF_LEG_TO_WINGSPAN);
 
@@ -242,7 +241,7 @@ public class CoordinatesDemo extends JComponent implements MouseListener, Action
             int y = -e.getY() + Constants.SCREEN_HEIGHT * AMOUNT_OF_PART_TO_CENTER_HALF / AMOUNT_OF_PARTS;
             Dragon dragon = currentList.get(i);
             if (x <= dragon.getCoordinates().getX() + dragon.getWingspan() && x >= dragon.getCoordinates().getX() - dragon.getWingspan()
-                    && y >= dragon.getCoordinates().getY() - dragon.getWingspan() * HITBOX_LOW_POINT_NUMERATOR / HITBOX_LOW_POINT_DENOMINATOR && y <= dragon.getCoordinates().getY() + dragon.getWingspan() * Y_FIRST_POINT_NUMERATOR / 2) {
+                    && y >= dragon.getCoordinates().getY() - dragon.getWingspan() * HITBOX_LOW_POINT && y <= dragon.getCoordinates().getY() + dragon.getWingspan() * Y_FIRST_POINT_NUMERATOR / 2) {
 
                 if (commandExecutor.getConnectionManager().getUserId() == dragon.getOwnerId()) {
                     ChangeFieldsOfDragonPanel changeFieldsOfDragonPanel = new ChangeFieldsOfDragonPanel(visualStyleMain.getConnectionManager(), visualStyleMain.getCurrentBundle(), dragon);
