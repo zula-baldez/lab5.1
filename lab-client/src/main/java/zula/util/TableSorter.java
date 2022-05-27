@@ -17,10 +17,10 @@ public final class TableSorter {
     public static String[][] sortList(List<Dragon> dragons, String field, String typeOfSorting, ResourceBundle resourceBundle) {
         List<Dragon> sortedList = new ArrayList<>();
         if (resourceBundle.getString("From a to z").equals(typeOfSorting)) {
-            sortedList = sortFromAToZ(field, dragons);
+            sortedList = sortFromAToZ(field, dragons, resourceBundle);
         }
         if (resourceBundle.getString("From z to a").equals(typeOfSorting)) {
-           sortedList = sortFromZToA(field, dragons);
+           sortedList = sortFromZToA(field, dragons, resourceBundle);
         }
         Parcers parcers = new Parcers();
         return parcers.parseTableFromDragons(sortedList, resourceBundle.getLocale());
@@ -28,55 +28,55 @@ public final class TableSorter {
     public static List<Dragon> sortListWithoutParsing(List<Dragon> dragons, String field, String typeOfSorting, ResourceBundle resourceBundle) {
         List<Dragon> sortedList = new ArrayList<>();
         if (resourceBundle.getString("From a to z").equals(typeOfSorting)) {
-            sortedList = sortFromAToZ(field, dragons);
+            sortedList = sortFromAToZ(field, dragons, resourceBundle);
         }
         if (resourceBundle.getString("From z to a").equals(typeOfSorting)) {
-            sortedList = sortFromZToA(field, dragons);
+            sortedList = sortFromZToA(field, dragons, resourceBundle);
         }
         return sortedList;
     }
-    private static List<Dragon> sortFromZToA(String field, List<Dragon> dragons) {
-        List<Dragon> fromAToZ = sortFromAToZ(field, dragons);
+    private static List<Dragon> sortFromZToA(String field, List<Dragon> dragons, ResourceBundle resourceBundle) {
+        List<Dragon> fromAToZ = sortFromAToZ(field, dragons, resourceBundle);
         Collections.reverse(fromAToZ);
         return fromAToZ;
     }
 
-    private static List<Dragon> sortFromAToZ(String field, List<Dragon> dragons) {
+    private static List<Dragon> sortFromAToZ(String field, List<Dragon> dragons, ResourceBundle resourceBundle) {
         List sortedList = null;
-        if ("id".equals(field)) {
+        if (resourceBundle.getString("id").equals(field)) {
             sortedList = sortById(dragons);
         }
-        if ("name".equals(field)) {
+        if (resourceBundle.getString("name").equals(field)) {
             sortedList = sortByName(dragons);
         }
-        if ("x".equals(field)) {
+        if (resourceBundle.getString("x").equals(field)) {
             sortedList = sortByX(dragons);
         }
-        if ("y".equals(field)) {
+        if (resourceBundle.getString("y").equals(field)) {
             sortedList = sortByY(dragons);
         }
-        if ("creationDate".equals(field)) {
+        if (resourceBundle.getString("creationDate").equals(field)) {
             sortedList = sortByDate(dragons);
         }
-        if ("age".equals(field)) {
+        if (resourceBundle.getString("age").equals(field)) {
             sortedList = sortByAge(dragons);
         }
-        if ("wingspan".equals(field)) {
+        if (resourceBundle.getString("wingspan").equals(field)) {
             sortedList = sortByWingspan(dragons);
         }
-        if ("color".equals(field)) {
+        if (resourceBundle.getString("color").equals(field)) {
             sortedList = sortByColor(dragons);
         }
-        if ("type".equals(field)) {
+        if (resourceBundle.getString("type").equals(field)) {
             sortedList = sortByType(dragons);
         }
-        if ("depth".equals(field)) {
+        if (resourceBundle.getString("depth").equals(field)) {
             sortedList = sortByDepth(dragons);
         }
-        if ("Number ot Treasures".equals(field)) {
+        if (resourceBundle.getString("Number ot Treasures").equals(field)) {
             sortedList = sortByNumOfTres(dragons);
         }
-        if ("owner_id".equals(field)) {
+        if (resourceBundle.getString("owner_id").equals(field)) {
             sortedList = sortByOwner(dragons);
         }
         return sortedList;

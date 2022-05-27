@@ -26,7 +26,6 @@ public final class StringConverterRealisation {
             throw new IllegalArgumentException();
         }
     }
-
     public static String formatDate(String dateToFormat, Locale locale) {
         Date date = parseDate(dateToFormat);
         DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT, locale);

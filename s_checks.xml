@@ -81,7 +81,7 @@
         <module name="PackageName"/>
         <module name="ParameterName"/>
         <module name="StaticVariableName"/>
-        <module name="TypeName"/>
+       <!-- <module name="TypeName"/>-->
         <module name="ClassTypeParameterName">
             <property name="format" value="^[A-Z]{1,3}$"/>
         </module>

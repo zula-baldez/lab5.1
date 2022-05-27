@@ -26,11 +26,17 @@ public final class BasicGUIElementsFabric {
         jTextField.setBorder(new LineBorder(Constants.MAIN_COLOR, 1));
         return jTextField;
     }
+    public static JTextField createBasicJTextField(int columns) {
+        JTextField jTextField = new JTextField(columns);
+        jTextField.setFont(Constants.MAIN_FONT);
+        jTextField.setBackground(Constants.SUB_COLOR);
+        jTextField.setBorder(new LineBorder(Constants.MAIN_COLOR, 1));
+        return jTextField;
+    }
     public static JComboBox<String> createBasicComboBox(String[] elements) {
         JComboBox<String> jComboBox = new JComboBox<>(elements);
         jComboBox.setFont(Constants.MAIN_FONT);
         jComboBox.setBackground(Constants.SUB_COLOR);
-        jComboBox.setBorder(new LineBorder(Constants.MAIN_COLOR, 2));
         return jComboBox;
     }
     public static JButton createBasicButton(String text) {

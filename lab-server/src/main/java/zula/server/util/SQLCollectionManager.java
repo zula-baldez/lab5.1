@@ -18,7 +18,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.Date;
-import java.util.Locale;
 import java.util.logging.Logger;
 
 public class SQLCollectionManager implements SQLManager {
