@@ -45,8 +45,8 @@ public class MainScreen {
     private static final int ARGUMENT_WIDTH = SCREEN_WIDTH / 7;
     private static final int VGAP = 30;
     private static final int HGAP = 25;
-    private int currentVgap;
-    private int currentHgap;
+    private final int currentVgap;
+    private final int currentHgap;
     private final CommandExecutor commandExecutor;
     private final JFrame mainFrame;
     private JPanel northPanel;
