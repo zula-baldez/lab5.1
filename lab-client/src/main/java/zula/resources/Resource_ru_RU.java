@@ -99,7 +99,7 @@ public class Resource_ru_RU extends ListResourceBundle {
             {"Collection Shuffled", "Коллекция перемешана"},
             {"Object with this id does not exist or you do not have permissions", "Объект с таким id не существует или у вас нет прав доступа"},
             {"ERROR IN CONNECTION", "Ошибка при присоединении" },
-            {"PORT MUST BE A NUMBER", "Порт должен быть числом"}
+            {"PORT MUST BE A NUMBER", "Порт должен быть числом"},
 
     };
 

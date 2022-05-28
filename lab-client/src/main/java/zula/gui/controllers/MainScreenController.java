@@ -19,8 +19,7 @@ import java.util.ResourceBundle;
 public class MainScreenController { //Теперь MainScreen управляет только собственным состоянием, но не управляет переходом на другие экраны
     public void createFilterFrame(JFrame mainFrame, CommandExecutor commandExecutor, ResourceBundle currentBundle) {
         FilterFrame filterFrame = new FilterFrame(mainFrame, commandExecutor.getConnectionManager(), currentBundle);
-        mainFrame.setEnabled(false);
-        filterFrame.drawFilterPanel();
+       filterFrame.drawFilterPanel();
     }
     public void createSortFrame(JFrame mainFrame, CommandExecutor commandExecutor, ResourceBundle currentBundle) {
         SortFrame sortFrame = new SortFrame(mainFrame, commandExecutor.getConnectionManager(), currentBundle);
@@ -43,7 +42,7 @@ public class MainScreenController { //Теперь MainScreen управляет
                     UpdateIdPanel changeFieldsOfDragonPanel = new UpdateIdPanel(commandExecutor.getConnectionManager(), currentBundle, id);
                     changeFieldsOfDragonPanel.drawPanel();
                 } else {
-                    textResult.setText(currentBundle.getString("Вы не его владелец("));
+                    textResult.setText(currentBundle.getString("Either this id does not exist, or you are not its creator:("));
                 }
             } catch (NumberFormatException ee) {
                 textResult.setText(currentBundle.getString("Id must be a number!"));

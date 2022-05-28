@@ -26,15 +26,14 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ResourceBundle;
 
 
 public class MainScreen {
-    private static final int SCREEN_HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height;
-    private static final int SCREEN_WIDTH = Toolkit.getDefaultToolkit().getScreenSize().width;
+    private static final int SCREEN_HEIGHT = Constants.SCREEN_HEIGHT;
+    private static final int SCREEN_WIDTH = Constants.SCREEN_WIDTH;
     private static final int BUTTON_WIDTH = SCREEN_WIDTH / 5;
     private static final int BUTTON_HEIGHT = SCREEN_HEIGHT / 20;
     private static final int NORTH_PANEL_HEIGHT = SCREEN_HEIGHT / 7;
@@ -43,9 +42,11 @@ public class MainScreen {
     private static final int LEFT_OF_CENTER_SIZE = SCREEN_WIDTH / 5;
     private static final int RIGHT_OF_CENTER_SIZE = SCREEN_WIDTH * 4 / 5;
     private static final int ROW_HEIGHT = SCREEN_HEIGHT / 21;
-    private static final int VGAP = SCREEN_HEIGHT / 30;
-    private static final int HGAP = SCREEN_WIDTH / 25;
     private static final int ARGUMENT_WIDTH = SCREEN_WIDTH / 7;
+    private static final int VGAP = 30;
+    private static final int HGAP = 25;
+    private int currentVgap;
+    private int currentHgap;
     private final CommandExecutor commandExecutor;
     private final JFrame mainFrame;
     private JPanel northPanel;
@@ -79,11 +80,14 @@ public class MainScreen {
     private JButton filterButton;
     private String[][] tableElements = {{}};
     private final MainScreenController mainScreenController = new MainScreenController();
+
     public MainScreen(ConnectionManager connectionManager, JFrame mainFrame, ResourceBundle resourceBundle) {
         this.currentBundle = resourceBundle;
         this.commandExecutor = new CommandExecutor(connectionManager, mainFrame);
         mainFrame.getContentPane().removeAll();
         this.mainFrame = mainFrame;
+        currentHgap = mainFrame.getSize().width / HGAP;
+        currentVgap = mainFrame.getSize().height / VGAP;
     }
 
     public void setTableValue(String[][] tableValue) {
@@ -194,14 +198,13 @@ public class MainScreen {
     } //не влез из-за чекстайла
 
     private void setSettingsForMainFrame() {
-        mainFrame.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 
         mainFrame.setLayout(new BoxLayout(mainFrame.getContentPane(), BoxLayout.Y_AXIS));
     }
 
     private void setSettingsForNorthPanel() {
-        northPanel.setLayout(new FlowLayout(FlowLayout.LEFT, HGAP, VGAP));
-        northPanel.setLayout(new FlowLayout(FlowLayout.LEFT, HGAP, VGAP));
+        northPanel.setLayout(new FlowLayout(FlowLayout.LEFT, currentHgap, currentVgap));
+
         northPanel.setPreferredSize(new Dimension(SCREEN_WIDTH, NORTH_PANEL_HEIGHT));
         visualStyleButton.setPreferredSize(new Dimension(BUTTON_WIDTH, BUTTON_HEIGHT));
         sortBy.setPreferredSize(new Dimension(BUTTON_WIDTH, BUTTON_HEIGHT));
@@ -347,7 +350,6 @@ public class MainScreen {
     private void setSettingsForTable(boolean isNeedsToInitTable) {
         if (isNeedsToInitTable) {
             jTable = new JTable(commandExecutor.showCommand(currentBundle.getLocale()), tableHeader);
-            jTable.setEnabled(false);
         } else {
             jTable = new JTable(tableElements, tableHeader);
         }

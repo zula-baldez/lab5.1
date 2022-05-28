@@ -19,7 +19,7 @@ import java.util.ResourceBundle;
 
 public class VisualStyleMain {
     private static final int NORTH_PANEL_HEIGHT = Constants.SCREEN_HEIGHT / 10;
-    private static final int CENTER_PANEL_HEIGHT = Constants.SCREEN_HEIGHT * 8 / 10;
+    private static final int CENTER_PANEL_HEIGHT = Constants.SCREEN_HEIGHT * 7 / 10;
     private static final int SOUTH_PANEL_HEIGHT = Constants.SCREEN_HEIGHT / 10;
     private final JFrame mainFrame;
     private final JButton backButton;

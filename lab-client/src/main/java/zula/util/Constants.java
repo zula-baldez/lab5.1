@@ -13,8 +13,8 @@ import java.util.ResourceBundle;
 public final class Constants {
     public static final Color MAIN_COLOR = new Color(0x412C84);
     public static final Color SUB_COLOR = new Color(0xFFFFFF);
-    public static final int SCREEN_HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height;
-    public static final int SCREEN_WIDTH = Toolkit.getDefaultToolkit().getScreenSize().width;
+    public static final int SCREEN_HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height * 8 / 10;
+    public static final int SCREEN_WIDTH = Toolkit.getDefaultToolkit().getScreenSize().width * 8 / 10;
     public static final Font MAIN_FONT = new Font("Tahoma", Font.PLAIN, SCREEN_HEIGHT / 27); //при 1080 будет 40 шрифт
     public static final Font SUB_FONT = new Font("Tahoma", Font.PLAIN, SCREEN_HEIGHT / 54); //в 2 раза поменьше
     public static final String[] LANGUAGES = {"Русский", "Македонски", "Latviski", "letón"};
