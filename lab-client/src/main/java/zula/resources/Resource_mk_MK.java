@@ -2,7 +2,7 @@ package zula.resources;
 
 import java.util.ListResourceBundle;
 
-public class Resource_mkd_MKD extends ListResourceBundle {
+public class Resource_mk_MK extends ListResourceBundle {
 
 
 
@@ -98,7 +98,44 @@ public class Resource_mkd_MKD extends ListResourceBundle {
             {"Collection Shuffled", "Збирка измешана"},
             {"Object with this id does not exist or you do not have permissions", "Објектот со овој ID не постои или немате дозволи"},
             {"ERROR IN CONNECTION", "ГРЕШКА ВО ПОВРЗУВАЊЕ"},
-            {"PORT MUST BE A NUMBER", "ПРИСТАНИЕТО МОРА ДА БИДЕ БРОЈ"}
+            {"PORT MUST BE A NUMBER", "ПРИСТАНИЕТО МОРА ДА БИДЕ БРОЈ"},
+            {"Removal completed successfully", "Отстранувањето е успешно завршено"},
+            {"SERVER UMER", "серверот почина"},
+            {"help : display help on available commands\n"
+                    + "info : print to standard output information about the collection (type, initialization date, number of elements, etc.)\n"
+                    + "show : print to standard output all elements of the collection in string representation\n"
+                    + "add {element} : add a new element to the collection\n"
+                    + "update_id {element} : update the value of the collection element whose id is equal to the given\n"
+                    + "remove_by_id id : remove an element from the collection by its id\n"
+                    + "clear : clear collection\n"
+                    + "execute_script file_name : read and execute a script from the specified file. The script contains commands in the same form as the user enters them in interactive mode.\n"
+                    + "exit : exit program (without saving to file)\n"
+                    + "remove_last : remove the last element from the collection\n"
+                    + "remove_lower {element} : remove all elements from the collection that are smaller than the given one\n"
+                    + "reorder : sort the collection in reverse order of the current one\n"
+                    + "average_of_wingspan : display the average value of the wingspan field for all items in the collection\n"
+                    + "print_ascending : print collection items in ascending order\n"
+                    + "print_field_ascending_wingspan : Print the values of the wingspan field of all elements in ascending order",
+                    "помош: прикажувај помош за достапните команди\n"
+                            + "информации: печатете на стандардни излезни информации за колекцијата (тип, датум на иницијализација, број на елементи итн.)\n"
+                            + "покажи : печати на стандарден излез сите елементи од колекцијата во претставата низа\n"
+                            + "add {element} : додадете нов елемент во колекцијата\n"
+                            + "update_id {element} : ажурирај ја вредноста на елементот за собирање чиј id е еднаков на дадениот\n"
+                            + "remove_by_id id : отстрани елемент од колекцијата според неговиот id\n"
+                            + "clear : clear collection\n"
+                            + "execute_script file_name : читање и извршување на скрипта од наведената датотека. Скриптата содржи команди во иста форма како што корисникот ги внесува во интерактивен режим.\n"
+                            + "излез : излез од програма (без зачувување во датотека)\n"
+                            + "remove_last : отстранете го последниот елемент од колекцијата\n"
+                            + "remove_lower {element} : отстранете ги сите елементи од колекцијата што се помали од дадената\n"
+                            + "прередување : подредете ја колекцијата по обратен редослед од сегашната\n"
+                            + "average_of_wingspan : прикажување на просечната вредност на полето за распон на крилјата за сите ставки во колекцијата\n"
+                            + "print_ascending : печати ставки од колекција во растечки редослед\n"
+                            + "print_field_ascending_wingspan : Печатете ги вредностите на полето за распон на крилата на сите елементи во растечки редослед"    },
+
+            {"size - ", "големина - "},
+            {"date of creation - ", "датум на создавање -"},
+            {"type - ", "тип - "},
+            {"Script is completing...", "Скриптата се комплетира..."}
     };
 
 

@@ -2,7 +2,7 @@ package zula.resources;
 
 import java.util.ListResourceBundle;
 
-public class Resource_esp_ESP extends ListResourceBundle {
+public class Resource_es_ES extends ListResourceBundle {
 
 
 
@@ -98,7 +98,44 @@ public class Resource_esp_ESP extends ListResourceBundle {
             {"Collection Shuffled", "Colección barajada"},
             {"Object with this id does not exist or you do not have permissions", "El objeto con esta identificación no existe o no tiene permisos"},
             {"ERROR IN CONNECTION", "ERROR EN LA CONEXIÓN" },
-            {"PORT MUST BE A NUMBER", "EL PUERTO DEBE SER UN NÚMERO"}
+            {"PORT MUST BE A NUMBER", "EL PUERTO DEBE SER UN NÚMERO"},
+            {"Removal completed successfully", "Eliminación completada con éxito"},
+            {"SERVER UMER", "el servidor murio"},
+            {"help : display help on available commands\n"
+                    + "info : print to standard output information about the collection (type, initialization date, number of elements, etc.)\n"
+                    + "show : print to standard output all elements of the collection in string representation\n"
+                    + "add {element} : add a new element to the collection\n"
+                    + "update_id {element} : update the value of the collection element whose id is equal to the given\n"
+                    + "remove_by_id id : remove an element from the collection by its id\n"
+                    + "clear : clear collection\n"
+                    + "execute_script file_name : read and execute a script from the specified file. The script contains commands in the same form as the user enters them in interactive mode.\n"
+                    + "exit : exit program (without saving to file)\n"
+                    + "remove_last : remove the last element from the collection\n"
+                    + "remove_lower {element} : remove all elements from the collection that are smaller than the given one\n"
+                    + "reorder : sort the collection in reverse order of the current one\n"
+                    + "average_of_wingspan : display the average value of the wingspan field for all items in the collection\n"
+                    + "print_ascending : print collection items in ascending order\n"
+                    + "print_field_ascending_wingspan : Print the values of the wingspan field of all elements in ascending order",
+                    "ayuda: mostrar ayuda sobre los comandos disponibles\n"
+                            + "info: imprime en salida estándar información sobre la colección (tipo, fecha de inicialización, número de elementos, etc.)\n"
+                            + "mostrar: imprime en salida estándar todos los elementos de la colección en representación de cadena\n"
+                            + "agregar {elemento}: agregar un nuevo elemento a la colección\n"
+                            + "update_id {element}: actualiza el valor del elemento de la colección cuyo id es igual al dado\n"
+                            + "remove_by_id id : elimina un elemento de la colección por su id\n"
+                            + "borrar: borrar colección\n"
+                            + "execute_script file_name: lee y ejecuta un script desde el archivo especificado. El script contiene comandos en la misma forma en que el usuario los ingresa en modo interactivo.\n"
+                            + "salir: salir del programa (sin guardar en el archivo)\n"
+                            + "remove_last : elimina el último elemento de la colección\n"
+                            + "remove_lower {element} : elimina todos los elementos de la colección que son más pequeños que el dado\n"
+                            + "reordenar: ordenar la colección en orden inverso al actual\n"
+                            + "average_of_wingspan: muestra el valor promedio del campo de envergadura para todos los elementos de la colección\n"
+                            + "print_ascending: imprime los elementos de la colección en orden ascendente\n"
+                            + "print_field_ascending_wingspan : Imprime los valores del campo de envergadura de todos los elementos en orden ascendente"
+            },
+            {"size - ", "Talla - "},
+            {"date of creation - ", "fecha de creación - "},
+            {"type - ", "escribe - "},
+            {"Script is completing...", "El guión se está completando..."}
     };
 
     @Override

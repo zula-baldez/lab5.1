@@ -69,7 +69,6 @@ public class FilterFrame {
 
     private void setFilterButtonListener() {
         filterButton.addActionListener(new ActionListener() {
-            @Override
             public void actionPerformed(ActionEvent e) {
                 String typeOfFiltering = (String) typeOfFilter.getSelectedItem();
                 String columnToFilter = (String) columns.getSelectedItem();
@@ -98,16 +97,23 @@ public class FilterFrame {
                 }
                 CommandExecutor commandExecutor = new CommandExecutor(connectionManager, mainFrame);
                 List<Dragon> dragons = commandExecutor.showWithoutParsingToMassive();
-                String[][] result = TableFilterer.filterList(dragons, columnToFilter, value, typeOfFiltering, currentBundle);
                 MainScreen mainScreen = new MainScreen(connectionManager, mainFrame, currentBundle);
-                subFrame.dispose();
-                mainScreen.setTableValue(result);
-                mainScreen.startMain(false);
-                mainFrame.setEnabled(true);
+                if (dragons == null) {
+                    mainScreen.startMain(true);
+                    subFrame.dispose();
+                } else {
+                    noException(dragons, columnToFilter, value, typeOfFiltering, mainScreen);
+                }
             }
         });
     }
-
+    private void noException(List<Dragon> dragons, String columnToFilter, String value, String typeOfFiltering, MainScreen mainScreen) {
+        String[][] result = TableFilterer.filterList(dragons, columnToFilter, value, typeOfFiltering, currentBundle);
+        subFrame.dispose();
+        mainScreen.setTableValue(result);
+        mainScreen.startMain(false);
+        mainFrame.setEnabled(true);
+    }
 
     private void typeCase() {
         mainPanel.removeAll();
@@ -116,6 +122,7 @@ public class FilterFrame {
         mainPanel.add(typesComboBox);
         mainPanel.add(filterButton);
     }
+
     private void colorCase() {
         mainPanel.removeAll();
         mainPanel.add(typeOfFilter);
@@ -123,6 +130,7 @@ public class FilterFrame {
         mainPanel.add(colorsComboBox);
         mainPanel.add(filterButton);
     }
+
     private void dateCase() {
         mainPanel.removeAll();
         mainPanel.add(typeOfFilter);
@@ -138,6 +146,7 @@ public class FilterFrame {
         mainPanel.add(fieldForSeconds);
         mainPanel.add(filterButton);
     }
+
     private void setFilterFieldListener() { //изменение окна в зависимости от выбранного типа данных
         columns.addActionListener(new ActionListener() {
             @Override

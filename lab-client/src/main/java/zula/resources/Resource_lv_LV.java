@@ -2,7 +2,7 @@ package zula.resources;
 
 import java.util.ListResourceBundle;
 
-public class Resource_lva_LVA extends ListResourceBundle {
+public class Resource_lv_LV extends ListResourceBundle {
 
 
 
@@ -98,8 +98,47 @@ public class Resource_lva_LVA extends ListResourceBundle {
             {"Collection Shuffled", "Kolekcija sajaukta"},
             {"Object with this id does not exist or you do not have permissions", "Objekts ar šo ID neeksistē vai jums nav atļauju"},
             {"ERROR IN CONNECTION", "KĻŪDA SAVIENOJUMĀ"},
-            {"PORT MUST BE A NUMBER", "OSTĀ JĀBŪT CIPARAM"}
-        };
+            {"PORT MUST BE A NUMBER", "OSTĀ JĀBŪT CIPARAM"},
+            {"Removal completed successfully", "Noņemšana ir veiksmīgi pabeigta"},
+            {"SERVER UMER", "serveris nomira"},
+            {"help : display help on available commands\n"
+                    + "info : print to standard output information about the collection (type, initialization date, number of elements, etc.)\n"
+                    + "show : print to standard output all elements of the collection in string representation\n"
+                    + "add {element} : add a new element to the collection\n"
+                    + "update_id {element} : update the value of the collection element whose id is equal to the given\n"
+                    + "remove_by_id id : remove an element from the collection by its id\n"
+                    + "clear : clear collection\n"
+                    + "execute_script file_name : read and execute a script from the specified file. The script contains commands in the same form as the user enters them in interactive mode.\n"
+                    + "exit : exit program (without saving to file)\n"
+                    + "remove_last : remove the last element from the collection\n"
+                    + "remove_lower {element} : remove all elements from the collection that are smaller than the given one\n"
+                    + "reorder : sort the collection in reverse order of the current one\n"
+                    + "average_of_wingspan : display the average value of the wingspan field for all items in the collection\n"
+                    + "print_ascending : print collection items in ascending order\n"
+                    + "print_field_ascending_wingspan : Print the values of the wingspan field of all elements in ascending order",
+                    "help : parādīt palīdzību par pieejamajām komandām\n"
+                            + "informācija : drukāt uz standarta izvades informāciju par kolekciju (tips, inicializācijas datums, elementu skaits utt.)\n"
+                            + "rādīt : drukāt uz standarta izvadi visus kolekcijas elementus virknes attēlojumā\n"
+                            + "pievienot {elementu} : pievienojiet kolekcijai jaunu elementu\n"
+                            + "update_id {element} : atjauniniet kolekcijas elementa vērtību, kura ID ir vienāds ar doto\n"
+                            + "remove_by_id id : noņemiet elementu no kolekcijas pēc tā id\n"
+                            + "notīrīt : notīrīt kolekciju\n"
+                            + "execute_script file_name : lasīt un izpildīt skriptu no norādītā faila. Skripts satur komandas tādā pašā formā, kādā lietotājs tās ievada interaktīvajā režīmā.\n"
+                            + "iziet : iziet no programmas (bez saglabāšanas failā)\n"
+                            + "remove_last : noņemt pēdējo elementu no kolekcijas\n"
+                            + "remove_lower {element} : noņemiet no kolekcijas visus elementus, kas ir mazāki par norādīto\n"
+                            + "pārkārtot : kārtot kolekciju apgrieztā secībā pašreizējai\n"
+                            + "average_of_wingspan : parāda vidējo spārnu platuma lauka vērtību visiem kolekcijas vienumiem\n"
+                            + "print_ascending : drukas kolekcijas vienumi augošā secībā\n"
+                            + "print_field_ascending_wingspan : drukājiet visu elementu spārnu platuma lauka vērtības augošā secībā"
+            },
+            {"size - ", "Izmērs -"},
+            {"date of creation - ", "izveides datums - "},
+            {"type - ", "tips - "},
+            {"Script is completing...", "Skripts tiek pabeigts..."}
+
+
+    };
 
 
     @Override

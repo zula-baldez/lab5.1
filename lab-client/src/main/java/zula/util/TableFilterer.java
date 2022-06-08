@@ -43,19 +43,8 @@ public final class TableFilterer {
     }
 
     private static List<Dragon> filter(List<Dragon> dragons, String field, String value, int typeOfFilter, ResourceBundle currentBundle) {
-        List filteredList = null;
-        if (currentBundle.getString("id").equals(field)) {
-            filteredList = filterById(dragons, Integer.parseInt(value), typeOfFilter);
-        }
-        if (currentBundle.getString("name").equals(field)) {
-            filteredList = filterByName(dragons, value, typeOfFilter);
-        }
-        if (currentBundle.getString("x").equals(field)) {
-            filteredList = filterByX(dragons, Double.parseDouble(value), typeOfFilter);
-        }
-        if (currentBundle.getString("y").equals(field)) {
-            filteredList = filterByY(dragons, Integer.parseInt(value), typeOfFilter);
-        }
+        List<Dragon> filteredList = null;
+        filteredList = checkFirstCases(currentBundle, field, dragons, value, typeOfFilter);
         if (currentBundle.getString("creationDate").equals(field)) {
             filteredList = filterByDate(dragons, StringConverterRealisation.parseDate(value), typeOfFilter);
         }
@@ -66,7 +55,11 @@ public final class TableFilterer {
             filteredList = filterByWingspan(dragons, Float.parseFloat(value), typeOfFilter);
         }
         if (currentBundle.getString("color").equals(field)) {
-            filteredList = filterByColor(dragons, Color.valueOf(value), typeOfFilter);
+            if ("NULL".equals(value)) {
+                filteredList = filterByColor(dragons, null, typeOfFilter);
+            } else {
+                filteredList = filterByColor(dragons, Color.valueOf(value), typeOfFilter);
+            }
         }
         if (currentBundle.getString("type").equals(field)) {
             filteredList = filterByType(dragons, DragonType.valueOf(value), typeOfFilter);
@@ -83,7 +76,22 @@ public final class TableFilterer {
         return filteredList;
     }
 
-
+    private static List<Dragon> checkFirstCases(ResourceBundle currentBundle, String field, List<Dragon> dragons, String value, int typeOfFilter) {
+        List<Dragon> filteredList = null;
+        if (currentBundle.getString("id").equals(field)) {
+            filteredList = filterById(dragons, Integer.parseInt(value), typeOfFilter);
+        }
+        if (currentBundle.getString("name").equals(field)) {
+            filteredList = filterByName(dragons, value, typeOfFilter);
+        }
+        if (currentBundle.getString("x").equals(field)) {
+            filteredList = filterByX(dragons, Double.parseDouble(value), typeOfFilter);
+        }
+        if (currentBundle.getString("y").equals(field)) {
+            filteredList = filterByY(dragons, Integer.parseInt(value), typeOfFilter);
+        }
+        return filteredList;
+    }
     private static List<Dragon> filterById(List<Dragon> dragons, int value, int typeOfFilter) {
         if (typeOfFilter == LESS) {
             return dragons.stream().filter(x -> x.getId() < value).collect(Collectors.toList());
@@ -142,7 +150,7 @@ public final class TableFilterer {
             return dragons.stream().filter(x -> x.getCreationDate().compareTo(date) > 0).collect(Collectors.toList());
 
         }
-        return dragons.stream().filter(x -> x.getCreationDate().compareTo(date) == 0).collect(Collectors.toList());
+        return dragons.stream().filter(x -> x.getCreationDate().getYear() == date.getYear() && x.getCreationDate().getMonth() == date.getMonth() && x.getCreationDate().getDay() == date.getDay() && x.getCreationDate().getHours() == date.getHours() && x.getCreationDate().getMinutes() == date.getMinutes() && x.getCreationDate().getSeconds() == date.getSeconds()).collect(Collectors.toList());
 
     }
 

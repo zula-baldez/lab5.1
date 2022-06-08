@@ -23,6 +23,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Ellipse2D;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -62,11 +63,14 @@ public class CoordinatesDemo extends JComponent implements MouseListener, Action
     private final Timer timer = new Timer(15, this);
     private final Set<Integer> ids = new HashSet<>();
 
-    public CoordinatesDemo(VisualStyleMain visualStyleMain) {
+    public CoordinatesDemo(VisualStyleMain visualStyleMain) throws IOException {
         this.visualStyleMain = visualStyleMain;
         commandExecutor = new CommandExecutor(visualStyleMain.getConnectionManager(), visualStyleMain.getMainFrame());
         addMouseListener(this);
         dragonsNeedsToBeShowed = commandExecutor.showWithoutParsingToMassive();
+        if (dragonsNeedsToBeShowed == null) {
+            throw new IOException();
+        }
         currentList = new ArrayList<>(dragonsNeedsToBeShowed);
         for (Dragon dragon : currentList) {
             ids.add(dragon.getId());
@@ -75,10 +79,13 @@ public class CoordinatesDemo extends JComponent implements MouseListener, Action
     }
 
 
-
-    public void checkUpdates() {
+    public void checkUpdates() throws IOException {
 
         List<Dragon> dragons = commandExecutor.showWithoutParsingToMassive();
+        if (dragons == null) {
+            visualStyleMain.errorHandler("SERVER UMER");
+            throw new IOException();
+        }
         for (Dragon oldDragon : currentList) {
             boolean needsToRemove = true;
             for (Dragon dragon : dragons) {
@@ -125,7 +132,11 @@ public class CoordinatesDemo extends JComponent implements MouseListener, Action
         g2.drawLine(-Constants.SCREEN_WIDTH, 0, Constants.SCREEN_WIDTH, 0);
         frequencyOfUpdate--;
         if (frequencyOfUpdate == 0) {
-            checkUpdates();
+            try {
+                checkUpdates();
+            } catch (IOException e) {
+                timer.stop();
+            }
             frequencyOfUpdate = frequencyOfUpdateConst;
         }
         moveDragon(g2);
@@ -244,13 +255,13 @@ public class CoordinatesDemo extends JComponent implements MouseListener, Action
                     && y >= dragon.getCoordinates().getY() - dragon.getWingspan() * HITBOX_LOW_POINT && y <= dragon.getCoordinates().getY() + dragon.getWingspan() * Y_FIRST_POINT_NUMERATOR / 2) {
 
                 if (commandExecutor.getConnectionManager().getUserId() == dragon.getOwnerId()) {
-                    ChangeFieldsOfDragonPanel changeFieldsOfDragonPanel = new ChangeFieldsOfDragonPanel(visualStyleMain.getConnectionManager(), visualStyleMain.getCurrentBundle(), dragon);
+                    ChangeFieldsOfDragonPanel changeFieldsOfDragonPanel = new ChangeFieldsOfDragonPanel(visualStyleMain.getConnectionManager(), visualStyleMain.getCurrentBundle(), dragon, null);
                     changeFieldsOfDragonPanel.drawPanel();
                 } else {
                     JFrame subFrame = new JFrame();
                     JPanel mainPanel = new JPanel();
                     JLabel jLabel = BasicGUIElementsFabric.createBasicLabel(visualStyleMain.getCurrentBundle().getString("It is not your dragon"));
-                    subFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+                    subFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
                     mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
                     mainPanel.add(jLabel);
                     JButton exitButton = BasicGUIElementsFabric.createBasicButton(visualStyleMain.getCurrentBundle().getString("OK"));

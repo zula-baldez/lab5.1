@@ -67,6 +67,7 @@ public class ConnectionHandler {
             }
         } catch (GetServerMessageException | SendException e) {
             e.printStackTrace();
+            return "SERVER UMER";
         }
         if (serverMessage.getResponseStatus() == ResponseCode.OK) {
             return null;

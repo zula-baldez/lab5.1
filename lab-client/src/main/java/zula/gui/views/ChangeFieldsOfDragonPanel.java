@@ -14,8 +14,8 @@ public class ChangeFieldsOfDragonPanel extends AddPanel {
     private final AddPanelController addPanelController = new AddPanelController();
     private final int dragonId;
     private final CommandExecutor commandExecutor;
-    public ChangeFieldsOfDragonPanel(ConnectionManager connectionManager, ResourceBundle resourceBundle, Dragon dragon) {
-        super(connectionManager, resourceBundle);
+    public ChangeFieldsOfDragonPanel(ConnectionManager connectionManager, ResourceBundle resourceBundle, Dragon dragon, MainScreen mainScreen) {
+        super(connectionManager, resourceBundle, mainScreen);
         this.dragonId = dragon.getId();
         initTextFields(dragon);
         addDeleteButton(dragonId);

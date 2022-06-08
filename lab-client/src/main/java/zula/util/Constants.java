@@ -19,9 +19,9 @@ public final class Constants {
     public static final Font SUB_FONT = new Font("Tahoma", Font.PLAIN, SCREEN_HEIGHT / 54); //в 2 раза поменьше
     public static final String[] LANGUAGES = {"Русский", "Македонски", "Latviski", "letón"};
     public static final ResourceBundle RU_BUNDLE = ResourceBundle.getBundle("zula.resources.Resource", new Locale("ru", "RU"));
-    public static final ResourceBundle LVA_BUNDLE = ResourceBundle.getBundle("zula.resources.Resource", new Locale("lva", "LVA"));
-    public static final ResourceBundle MKD_BUNDLE = ResourceBundle.getBundle("zula.resources.Resource", new Locale("mkd", "MKD"));
-    public static final ResourceBundle ESP_BUNDLE = ResourceBundle.getBundle("zula.resources.Resource", new Locale("esp", "ESP"));
+    public static final ResourceBundle LVA_BUNDLE = ResourceBundle.getBundle("zula.resources.Resource", new Locale("lv", "LV"));
+    public static final ResourceBundle MKD_BUNDLE = ResourceBundle.getBundle("zula.resources.Resource", new Locale("mk", "MK"));
+    public static final ResourceBundle ESP_BUNDLE = ResourceBundle.getBundle("zula.resources.Resource", new Locale("es", "ES"));
     public static final HashMap<String, ResourceBundle> LANGUAGES_AND_BUNDLES = new HashMap<>();
     public static final String[] TYPES = Arrays.stream(DragonType.values()).map(Enum::toString).toArray(String[]::new);
     public static final String[] COLORS = {"BLACK", "BLUE", "BROWN", "WHITE", "YELLOW", "NULL"};

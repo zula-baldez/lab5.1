@@ -12,13 +12,17 @@ import java.awt.event.ActionListener;
 import java.util.ResourceBundle;
 
 public class UpdateIdPanel extends AddPanel {
-    private final int dragonId;
+    private final Dragon oldDragon;
     private final CommandExecutor commandExecutor;
+    private final MainScreen mainScreen;
     private final AddPanelController addPanelController = new AddPanelController();
-    public UpdateIdPanel(ConnectionManager connectionManager, ResourceBundle resourceBundle, int dragonId) {
-        super(connectionManager, resourceBundle);
-        this.dragonId = dragonId;
+    public UpdateIdPanel(ConnectionManager connectionManager, ResourceBundle resourceBundle, Dragon dragon, MainScreen mainScreen) {
+        super(connectionManager, resourceBundle, mainScreen);
+        this.oldDragon = dragon;
+        initTextFields(oldDragon);
+        this.mainScreen = mainScreen;
         commandExecutor = new CommandExecutor(connectionManager, getMainFrame());
+
     }
     @Override
     protected void setListenerForSubmitButton() {
@@ -27,8 +31,11 @@ public class UpdateIdPanel extends AddPanel {
             public void actionPerformed(ActionEvent e) {
                 try {
                     Dragon dragon = parseDragonFromData();
-                    dragon.setId(dragonId);
+                    dragon.setId(oldDragon.getId());
+
                     addPanelController.updateAndClose(commandExecutor, getCurrentBundle(), getMainFrame(), dragon);
+                    mainScreen.setSettingsForTable(true);
+
                 } catch (WrongArgumentException wrongArgumentException) {
                     errorHandler();
                 }

@@ -222,16 +222,16 @@ public class ListManager implements CollectionManager {
         }
     }
 
-    public ResponseCode getById(int id, int userId) {
+    public Dragon getById(int id, int userId) {
         Lock readLock = lock.readLock();
         try {
             readLock.lock();
             for (Dragon e : dragons) {
                 if (e.getId() == id && e.getOwnerId() == userId) {
-                    return ResponseCode.OK;
+                    return e;
                 }
             }
-            return ResponseCode.ERROR;
+            return null;
         } finally {
             readLock.unlock();
         }

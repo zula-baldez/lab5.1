@@ -19,7 +19,6 @@ import zula.common.commands.Reorder;
 import zula.common.commands.Show;
 import zula.common.commands.UpdateId;
 import zula.common.data.Dragon;
-import zula.common.data.ResponseCode;
 import zula.common.data.ServerMessage;
 import zula.common.exceptions.GetServerMessageException;
 import zula.common.exceptions.PrintException;
@@ -56,7 +55,7 @@ public class CommandExecutor {
             return resourceBundle.getString(connectionManager.getMessage().getArguments()[0].toString());
         } catch (SendException | GetServerMessageException e) {
             e.printStackTrace();
-            return null;
+            return resourceBundle.getString("SERVER UMER");
         }
     }
     private synchronized String sendCommandReturningStringWithoutTranslate(Command command, Serializable[] args, ResourceBundle resourceBundle) {
@@ -65,7 +64,7 @@ public class CommandExecutor {
             return (connectionManager.getMessage().getArguments()[0].toString());
         } catch (SendException | GetServerMessageException e) {
             e.printStackTrace();
-            return null;
+            return resourceBundle.getString("SERVER UMER");
         }
     }
     private synchronized ServerMessage sendCommandReturningServerMessage(Command command, Serializable[] args, ResourceBundle resourceBundle) {
@@ -81,9 +80,12 @@ public class CommandExecutor {
 
     public String[][] showCommand(Locale locale) {
         List<Dragon> result = showWithoutParsingToMassive();
-        Parcers parcers = new Parcers();
-        return parcers.parseTableFromDragons(result, locale);
-
+        if (result != null) {
+            Parcers parcers = new Parcers();
+            return parcers.parseTableFromDragons(result, locale);
+        } else {
+            return null;
+        }
     }
     public List<Dragon> showWithoutParsingToMassive() {
         Show show = new Show();
@@ -103,12 +105,14 @@ public class CommandExecutor {
     }
     public String helpCommand(ResourceBundle resourceBundle) {
         Help help = new Help();
-        return sendCommandReturningStringWithoutTranslate(help, new Serializable[]{""}, resourceBundle);
+        return sendCommandReturningString(help, new Serializable[]{""}, resourceBundle);
 
     }
     public String infoCommand(ResourceBundle resourceBundle) {
         Info info = new Info();
-        return sendCommandReturningStringWithoutTranslate(info, new Serializable[]{""}, resourceBundle);
+        ServerMessage serverMessage = sendCommandReturningServerMessage(info, new Serializable[]{}, resourceBundle);
+        return resourceBundle.getString("size - ") + serverMessage.getArguments()[0].toString() + ' ' + resourceBundle.getString("date of creation - ") + serverMessage.getArguments()[1].toString() + " " + resourceBundle.getString("type - ") + serverMessage.getArguments()[2];
+
     }
 
 
@@ -165,8 +169,9 @@ public class CommandExecutor {
     public String reorder(ResourceBundle resourceBundle) {
         return sendCommandReturningString(new Reorder(), new Serializable[]{""}, resourceBundle);
     }
-    public ResponseCode getDragonById(int id, ResourceBundle resourceBundle) {
-        return sendCommandReturningServerMessage(new DragonByIdCommand(), new Serializable[]{id}, resourceBundle).getResponseStatus();
+    public ServerMessage getDragonById(int id, ResourceBundle resourceBundle) {
+        return sendCommandReturningServerMessage(new DragonByIdCommand(), new Serializable[]{id}, resourceBundle);
+
     }
     public void addCommand(Dragon dragon, ResourceBundle resourceBundle) {
         sendCommandReturningString(new Add(), new Serializable[]{dragon}, resourceBundle);

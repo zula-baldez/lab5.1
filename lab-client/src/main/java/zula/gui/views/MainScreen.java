@@ -1,6 +1,9 @@
 package zula.gui.views;
 
 import zula.client.ConnectionManager;
+import zula.common.data.Dragon;
+import zula.common.data.ResponseCode;
+import zula.common.data.ServerMessage;
 import zula.gui.controllers.MainScreenController;
 import zula.util.BasicGUIElementsFabric;
 import zula.util.CommandExecutor;
@@ -10,6 +13,7 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -18,7 +22,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.WindowConstants;
 import javax.swing.border.LineBorder;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -28,6 +34,10 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowStateListener;
 import java.util.ResourceBundle;
 
 
@@ -45,8 +55,13 @@ public class MainScreen {
     private static final int ARGUMENT_WIDTH = SCREEN_WIDTH / 7;
     private static final int VGAP = 30;
     private static final int HGAP = 25;
-    private final int currentVgap;
-    private final int currentHgap;
+    private static final int AMOUNT_OF_COLS = 12;
+    private final MainScreen mainScreen;
+
+    private Integer currentVgap;
+    private Integer currentHgap;
+    private final int northButtonWidth = 5;
+    private final int northButtonHeight = 20;
     private final CommandExecutor commandExecutor;
     private final JFrame mainFrame;
     private JPanel northPanel;
@@ -80,7 +95,7 @@ public class MainScreen {
     private JButton filterButton;
     private String[][] tableElements = {{}};
     private final MainScreenController mainScreenController = new MainScreenController();
-
+    private JDialog executer;
     public MainScreen(ConnectionManager connectionManager, JFrame mainFrame, ResourceBundle resourceBundle) {
         this.currentBundle = resourceBundle;
         this.commandExecutor = new CommandExecutor(connectionManager, mainFrame);
@@ -88,6 +103,9 @@ public class MainScreen {
         this.mainFrame = mainFrame;
         currentHgap = mainFrame.getSize().width / HGAP;
         currentVgap = mainFrame.getSize().height / VGAP;
+        mainScreen = this;
+        mainFrame.setTitle("Main");
+        executer = executeDialog();
     }
 
     public void setTableValue(String[][] tableValue) {
@@ -122,12 +140,42 @@ public class MainScreen {
         languages = BasicGUIElementsFabric.createBasicComboBox(Constants.LANGUAGES);
 
     }
+    private void setSettingsResized() {
+        currentHgap = mainFrame.getSize().width / HGAP;
+        currentVgap = mainFrame.getSize().height / VGAP;
+        sortBy.setPreferredSize(new Dimension(mainFrame.getWidth() / northButtonWidth, mainFrame.getHeight() / northButtonHeight));
+        visualStyleButton.setPreferredSize(new Dimension(mainFrame.getWidth() / northButtonWidth, mainFrame.getHeight() / northButtonHeight));
+        filterButton.setPreferredSize(new Dimension(mainFrame.getWidth() / northButtonWidth, mainFrame.getHeight() / northButtonHeight));
+        languages.setPreferredSize(new Dimension(mainFrame.getWidth() / northButtonWidth, mainFrame.getHeight() / northButtonHeight));
+        northPanel.setLayout(new FlowLayout(FlowLayout.LEFT, currentHgap, currentVgap));
+        northPanel.removeAll();
+        northPanel.add(visualStyleButton);
+        northPanel.add(sortBy);
+        northPanel.add(filterButton);
+        northPanel.add(languages);
 
+    }
     private void setSettingsForSortPanel() {
         sortBy.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 mainScreenController.createSortFrame(mainFrame, commandExecutor, currentBundle);
+            }
+        });
+        mainFrame.addWindowStateListener(new WindowStateListener() {
+            @Override
+            public void windowStateChanged(WindowEvent e) {
+                setSettingsResized();
+            }
+        });
+        mainFrame.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                setSettingsResized();
+
+                super.componentResized(e);
+
+
             }
         });
     }
@@ -154,20 +202,40 @@ public class MainScreen {
         visualStyleButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-               mainScreenController.createVisualStyleFrame(mainFrame, commandExecutor, currentBundle);
+                mainScreenController.createVisualStyleFrame(mainFrame, commandExecutor, currentBundle);
             }
         });
     }
 
-    private void setListenerForFileChooser() {
+    private synchronized void setListenerForFileChooser() {
         executeScriptFileChooser.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+
+
+                executer.setVisible(true);
+
+                mainFrame.revalidate();
+                mainFrame.repaint();
                 mainScreenController.executeScript(executeScriptFileChooser, commandExecutor, textResult, currentBundle);
+
+                setSettingsForTable(true);
+                executer.setVisible(false);
+
             }
         });
     }
-
+    private JDialog executeDialog() {
+        JDialog jDialog = new JDialog();
+        jDialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        jDialog.setLocationRelativeTo(null);
+        jDialog.setTitle("Script is completing...");
+        jDialog.add(BasicGUIElementsFabric.createBasicLabel("Script is completing..."));
+        jDialog.pack();
+        jDialog.revalidate();
+        jDialog.repaint();
+        return jDialog;
+    }
     private void setListenerForCommandsList() {
         commands.addActionListener(new ActionListener() {
             @Override
@@ -291,29 +359,35 @@ public class MainScreen {
             public void actionPerformed(ActionEvent e) {
                 if (commands.getSelectedItem().toString().equals(currentBundle.getString("info"))) {
                     textResult.setText(commandExecutor.infoCommand(currentBundle));
+                    setSettingsForTable(true);
                 }
                 if (commands.getSelectedItem().toString().equals(currentBundle.getString("show"))) {
-                    setSettingsForTable(true);
                     textResult.setText(currentBundle.getString("Table is correct"));
+                    setSettingsForTable(true);
                 }
                 if (commands.getSelectedItem().toString().equals(currentBundle.getString("print_ascending"))) {
-
                     textResult.setText(commandExecutor.printAscendingCommand(currentBundle));
+                    setSettingsForTable(true);
                 }
                 if (commands.getSelectedItem().toString().equals(currentBundle.getString("print_field_ascending_wingspan"))) {
                     textResult.setText(commandExecutor.printFieldAscendingWingspanCommand(currentBundle));
+                    setSettingsForTable(true);
                 }
                 if (commands.getSelectedItem().toString().equals(currentBundle.getString("average_of_wingspan"))) {
                     textResult.setText(commandExecutor.averageOfWingspan(currentBundle));
+                    setSettingsForTable(true);
                 }
                 if (commands.getSelectedItem().toString().equals(currentBundle.getString("remove_last"))) {
                     textResult.setText(commandExecutor.removeLastCommand(currentBundle));
+                    setSettingsForTable(true);
                 }
                 if (currentBundle.getString("clear").equals(commands.getSelectedItem().toString())) {
                     textResult.setText(commandExecutor.clearCommand(currentBundle));
+                    setSettingsForTable(true);
                 }
                 if (currentBundle.getString("reorder").equals(commands.getSelectedItem().toString())) {
                     textResult.setText(commandExecutor.reorder(currentBundle));
+                    setSettingsForTable(true);
                 }
                 checkOthersCommands();
             }
@@ -322,6 +396,7 @@ public class MainScreen {
 
     private void checkOthersCommands() { //to pass checkstyle
         if (commands.getSelectedItem().toString().equals(currentBundle.getString("help"))) {
+
             textResult.setText(commandExecutor.helpCommand(currentBundle));
         }
         if (commands.getSelectedItem().toString().equals(currentBundle.getString("remove_by_id"))) {
@@ -331,39 +406,82 @@ public class MainScreen {
             } catch (NumberFormatException ee) {
                 textResult.setText(currentBundle.getString("Id must be a number!"));
             }
+            setSettingsForTable(true);
         }
         if (commands.getSelectedItem().toString().equals(currentBundle.getString("exit"))) {
             textResult.setText(commandExecutor.exitCommand(currentBundle));
+            setSettingsForTable(true);
         }
         if (currentBundle.getString("remove_lower").equals(commands.getSelectedItem().toString())) {
             try {
                 int id = Integer.parseInt(argumentTextField.getText());
                 textResult.setText(commandExecutor.removeLowerCommand(id, currentBundle));
+                setSettingsForTable(true);
             } catch (NumberFormatException ee) {
                 textResult.setText(currentBundle.getString("Id must be a number!"));
             }
         }
-        mainScreenController.updateAndAdd(currentBundle, commands, argumentTextField, commandExecutor, textResult);
+        mainScreenController.updateAndAdd(currentBundle, commands, argumentTextField, commandExecutor, textResult, this);
 
     }
 
-    private void setSettingsForTable(boolean isNeedsToInitTable) {
-        if (isNeedsToInitTable) {
-            jTable = new JTable(commandExecutor.showCommand(currentBundle.getLocale()), tableHeader);
+    private void updateTable(int rowIndex) {
+        int id = Integer.parseInt(tableElements[rowIndex][0]);
+        ServerMessage serverMessage = commandExecutor.getDragonById(id, currentBundle);
+        if (ResponseCode.OK == serverMessage.getResponseStatus()) {
+            UpdateIdPanel changeFieldsOfDragonPanel = new UpdateIdPanel(commandExecutor.getConnectionManager(), currentBundle, ((Dragon) serverMessage.getArguments()[0]), mainScreen);
+            changeFieldsOfDragonPanel.drawPanel();
         } else {
-            jTable = new JTable(tableElements, tableHeader);
+            textResult.setText(currentBundle.getString("Either this id does not exist, or you are not its creator:("));
         }
+    }
+
+    protected void setSettingsForTable(boolean isNeedsToInitTable) {
+        if (isNeedsToInitTable) {
+            tableElements = commandExecutor.showCommand(currentBundle.getLocale());
+            if (tableElements == null) {
+                textResult.setText(currentBundle.getString("SERVER UMER"));
+                String[][] ta = new String[0][AMOUNT_OF_COLS];
+                jTable = new JTable(ta, tableHeader);
+            } else {
+                jTable = new JTable(tableElements, tableHeader) {
+                    @Override
+                    public void changeSelection(int rowIndex, int columnIndex, boolean toggle, boolean extend) {
+                        updateTable(rowIndex);
+                    }
+                    @Override
+                    public boolean isCellEditable(int i, int i1) {
+                        return false;
+                    }
+                };
+
+            }
+        } else {
+            jTable = new JTable(tableElements, tableHeader) {
+                @Override
+                public void changeSelection(int rowIndex, int columnIndex, boolean toggle, boolean extend) {
+                    updateTable(rowIndex);
+                }
+                @Override
+                public boolean isCellEditable(int i, int i1) {
+                    return false;
+                }
+
+            };
+        }
+       setSets();
+    }
+    private void setSets() {
         jTable.setVisible(true);
         jTable.setPreferredSize(new Dimension(RIGHT_OF_CENTER_SIZE, SCREEN_HEIGHT));
         jTable.setFont(Constants.SUB_FONT);
-        jTable.setRowHeight(ROW_HEIGHT);
         jTable.getTableHeader().setFont(Constants.SUB_FONT);
+        jTable.setRowHeight(ROW_HEIGHT);
         rightOfCenter.removeAll();
         rightOfCenter.add(new JScrollPane(jTable));
         mainFrame.revalidate();
         mainFrame.repaint();
     }
-
     private void setSettingForLanguagesList() {
         languages.setSelectedItem(Constants.getNameByBundle(currentBundle));
         languages.addActionListener(new ActionListener() {

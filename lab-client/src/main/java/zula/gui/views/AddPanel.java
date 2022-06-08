@@ -84,10 +84,12 @@ public class AddPanel {
     private final JComboBox<String> languages = BasicGUIElementsFabric.createBasicComboBox(Constants.LANGUAGES);
     private ResourceBundle currentBundle;
     private final CommandExecutor commandExecutor;
+    private final MainScreen mainScreen;
     private final AddPanelController addPanelController = new AddPanelController();
 
-    public AddPanel(ConnectionManager connectionManager, ResourceBundle resourceBundle) {
+    public AddPanel(ConnectionManager connectionManager, ResourceBundle resourceBundle, MainScreen mainScreen) {
         mainFrame = new JFrame();
+        this.mainScreen = mainScreen;
         this.currentBundle = resourceBundle;
         this.connectionManager = connectionManager;
         commandExecutor = new CommandExecutor(connectionManager, mainFrame);
@@ -100,7 +102,6 @@ public class AddPanel {
         centralPanel = new JPanel();
         southPanel = new JPanel();
         errorPanel = new JPanel();
-
         fieldText = BasicGUIElementsFabric.createBasicLabel(currentBundle.getString("FIELD"));
         nameText = BasicGUIElementsFabric.createBasicLabel(currentBundle.getString("name"));
         xText = BasicGUIElementsFabric.createBasicLabel(currentBundle.getString("x"));
@@ -217,6 +218,7 @@ public class AddPanel {
                 try {
                     Dragon dragon = parseDragonFromData();
                     addPanelController.addAndClose(commandExecutor, currentBundle, mainFrame, dragon);
+                    mainScreen.setSettingsForTable(true);
                 } catch (WrongArgumentException wrongArgumentException) {
                     errorHandler();
                 }
@@ -332,7 +334,6 @@ public class AddPanel {
         JButton deleteButton = BasicGUIElementsFabric.createBasicButton(currentBundle.getString("Delete"));
         southPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
         southPanel.add(deleteButton);
-
         deleteButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -340,4 +341,5 @@ public class AddPanel {
             }
         });
     }
+
 }

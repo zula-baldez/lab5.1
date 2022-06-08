@@ -1,5 +1,6 @@
 package zula.common.commands;
 
+import zula.common.data.Dragon;
 import zula.common.data.ResponseCode;
 import zula.common.data.ServerMessage;
 import zula.common.exceptions.PrintException;
@@ -12,9 +13,9 @@ public class DragonByIdCommand extends Command {
 
     @Override
     public ServerMessage doInstructions(IoManager ioManager, AbstractClient client, Serializable[] arguments) throws  PrintException {
-        ResponseCode responseCode = client.getCollectionManager().getById((Integer) arguments[0], client.getUserId());
-        if (responseCode == ResponseCode.OK) {
-            return new ServerMessage("", ResponseCode.OK);
+        Dragon dragon = client.getCollectionManager().getById((Integer) arguments[0], client.getUserId());
+        if (dragon != null) {
+            return new ServerMessage(dragon, ResponseCode.OK);
         } else {
             return new ServerMessage("There is no element with such id or you are not its creator", ResponseCode.ERROR);
         }

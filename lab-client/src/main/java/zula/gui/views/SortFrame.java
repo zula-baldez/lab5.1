@@ -47,12 +47,18 @@ public class SortFrame {
                 String columnToSort = (String) columns.getSelectedItem();
                 CommandExecutor commandExecutor = new CommandExecutor(connectionManager, mainFrame);
                 List<Dragon> dragons = commandExecutor.showWithoutParsingToMassive();
+                mainFrame.setEnabled(true);
+                if (dragons == null) {
+                    subFrame.dispose();
+                    MainScreen mainScreen = new MainScreen(connectionManager, mainFrame, currentBundle);
+                    mainScreen.startMain(true);
+                    return;
+                }
                 String[][] result = TableSorter.sortList(dragons, columnToSort, typeOfSorting, currentBundle);
                 MainScreen mainScreen = new MainScreen(connectionManager, mainFrame, currentBundle);
                 subFrame.dispose();
                 mainScreen.setTableValue(result);
                 mainScreen.startMain(false);
-                mainFrame.setEnabled(true);
             }
         });
     }

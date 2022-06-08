@@ -44,7 +44,7 @@ public interface CollectionManager {
 
     String removeById(int id);
 
-    ResponseCode getById(int id, int userId);
+    Dragon getById(int id, int userId);
 
     ResponseCode removeLower(int id, int userId);
 

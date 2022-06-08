@@ -28,7 +28,7 @@ public final class StringConverterRealisation {
     }
     public static String formatDate(String dateToFormat, Locale locale) {
         Date date = parseDate(dateToFormat);
-        DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT, locale);
+        DateFormat dateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss yyyy", locale);
 
         return dateFormat.format(date);
     }
